@@ -8,8 +8,8 @@
 <script src="/javascripts/vendor/pusher-1.10.1.js"></script>
 <script src="/javascripts/application.js"></script>
 <script>
-Pusher.host     = <%= PusherFake.configuration.host.inspect %>;
-Pusher.ws_port  = <%= PusherFake.configuration.port %>;
+Pusher.host     = <%= PusherFake.configuration.host.to_json %>;
+Pusher.ws_port  = <%= PusherFake.configuration.port.to_json %>;
 </script>
 
 </body>
