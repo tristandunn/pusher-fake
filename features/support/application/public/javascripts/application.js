@@ -1,4 +1,4 @@
-window.addEventListener("load", function() {
+window.addEventListener("DOMContentLoaded", function() {
   // Create the client instance.
   Pusher.instance = new Pusher("API_KEY");
 
