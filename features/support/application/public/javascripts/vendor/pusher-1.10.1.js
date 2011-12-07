@@ -1,5 +1,5 @@
 /*!
- * Pusher JavaScript Library v1.9.6
+ * Pusher JavaScript Library v1.10.1
  * http://pusherapp.com/
  *
  * Copyright 2011, Pusher
@@ -86,7 +86,7 @@ Pusher.prototype = {
     if (this.connection.state === 'connected') {
       channel.authorize(this, function(err, data) {
         if (err) {
-          channel.emit('subscription_error', data);
+          channel.emit('pusher:subscription_error', data);
         } else {
           self.send_event('pusher:subscribe', {
             channel: channel_name,
@@ -117,8 +117,7 @@ Pusher.prototype = {
     };
     if (channel) payload['channel'] = channel;
 
-    this.connection.send(JSON.stringify(payload));
-    return this;
+    return this.connection.send(JSON.stringify(payload));
   },
 
   send_local_event: function(event_name, event_data, channel_name) {
@@ -171,7 +170,7 @@ Pusher.debug = function() {
 }
 
 // Pusher defaults
-Pusher.VERSION = '1.9.6';
+Pusher.VERSION = '1.10.1';
 
 Pusher.host = 'ws.pusherapp.com';
 Pusher.ws_port = 80;
@@ -824,26 +823,27 @@ Pusher.Channels.prototype = {
 };
 
 Pusher.Channel = function(channel_name, pusher) {
+  var channel = this;
   Pusher.EventsDispatcher.call(this);
 
   this.pusher = pusher;
   this.name = channel_name;
   this.subscribed = false;
+
+  this.bind('pusher_internal:subscription_succeeded', function(sub_data){
+    channel.acknowledge_subscription(sub_data);
+  });
 };
 
 Pusher.Channel.prototype = {
   // inheritable constructor
-  init: function(){
-
-  },
-
-  disconnect: function(){
-
-  },
+  init: function() {},
+  disconnect: function() {},
 
   // Activate after successful subscription. Called on top-level pusher:subscription_succeeded
   acknowledge_subscription: function(data){
     this.subscribed = true;
+    this.dispatch_with_all('pusher:subscription_succeeded');
   },
 
   is_private: function(){
@@ -859,8 +859,7 @@ Pusher.Channel.prototype = {
   },
 
   trigger: function(event, data) {
-    this.pusher.send_event(event, data, this.name);
-    return this;
+    return this.pusher.send_event(event, data, this.name);
   }
 };
 
@@ -932,11 +931,6 @@ Pusher.Channel.PrivateChannel = {
 Pusher.Channel.PresenceChannel = {
 
   init: function(){
-    this.bind('pusher_internal:subscription_succeeded', function(sub_data){
-      this.acknowledge_subscription(sub_data);
-      this.dispatch_with_all('pusher:subscription_succeeded', this.members);
-    }.scopedTo(this));
-
     this.bind('pusher_internal:member_added', function(data){
       var member = this.members.add(data.user_id, data.user_info);
       this.dispatch_with_all('pusher:member_added', member);
@@ -958,6 +952,8 @@ Pusher.Channel.PresenceChannel = {
     this.members._members_map = sub_data.presence.hash;
     this.members.count = sub_data.presence.count;
     this.subscribed = true;
+
+    this.dispatch_with_all('pusher:subscription_succeeded', this.members);
   },
 
   is_presence: function(){
