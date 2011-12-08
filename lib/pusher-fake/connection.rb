@@ -37,7 +37,11 @@ module PusherFake
 
       case event
       when "pusher:subscribe"
-        emit("pusher_internal:subscription_succeeded", {}, data[:channel])
+        channel = Channel.factory(data)
+
+        if channel.authorized?(self, data[:auth])
+          emit("pusher_internal:subscription_succeeded", {}, data[:channel])
+        end
       end
     end
   end

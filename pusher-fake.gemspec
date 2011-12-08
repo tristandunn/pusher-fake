@@ -14,6 +14,7 @@ Gem::Specification.new do |s|
   s.require_path = "lib"
 
   s.add_dependency "em-websocket", "0.3.5"
+  s.add_dependency "ruby-hmac",    "0.4.0"
   s.add_dependency "yajl-ruby",    "1.1.0"
 
   s.add_development_dependency "bourne",          "1.0.0"
@@ -21,6 +22,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "capybara",        "1.1.2"
   s.add_development_dependency "capybara-webkit", "0.7.2"
   s.add_development_dependency "cucumber",        "1.1.3"
+  s.add_development_dependency "pusher",          "0.8.5"
   s.add_development_dependency "redcarpet",       "2.0.0"
   s.add_development_dependency "rspec",           "2.7.0"
   s.add_development_dependency "sinatra",         "1.3.1"

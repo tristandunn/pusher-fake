@@ -14,3 +14,12 @@ Feature: Client subscribing to a channel
     And I subscribe to the "chat-exit" channel
     Then I should be subscribed to the "chat-enter" channel
     And I should be subscribed to the "chat-exit" channel
+
+  Scenario: Client subscribes to a private channel
+    When I subscribe to the "private-message-bob" channel
+    Then I should be subscribed to the "private-message-bob" channel
+
+  Scenario: Client unsuccessfully subscribes to a private channel
+    Given I change my socket ID
+    When I subscribe to the "private-message-bob" channel
+    Then I should not be subscribed to the "private-message-bob" channel
