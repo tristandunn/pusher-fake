@@ -8,7 +8,8 @@ module PusherFake
       EventMachine::WebSocket.start(options) do |socket|
         connection = Connection.new(socket)
 
-        socket.onopen { onopen(connection) }
+        socket.onopen    { onopen(connection) }
+        socket.onmessage { |data| connection.process(data) }
       end
     end
 

@@ -1,15 +1,15 @@
 require "spec_helper"
 
 describe PusherFake::Server, ".start" do
-  let(:socket)        { stub }
+  let(:data)          { stub }
+  let(:socket)        { stub(onopen: nil, onmessage: nil) }
   let(:options)       { { host: configuration.host, port: configuration.port } }
-  let(:connection)    { stub }
+  let(:connection)    { stub(process: nil) }
   let(:configuration) { stub(host: "192.168.0.1", port: 8181) }
 
   subject { PusherFake::Server }
 
   before do
-    socket.stubs(:onopen)
     subject.stubs(:onopen)
     PusherFake.stubs(:configuration).returns(configuration)
     PusherFake::Connection.stubs(:new).returns(connection)
@@ -35,6 +35,17 @@ describe PusherFake::Server, ".start" do
     socket.stubs(:onopen).yields
     subject.start
     subject.should have_received(:onopen).with(connection)
+  end
+
+  it "defines a message callback on the socket" do
+    subject.start
+    socket.should have_received(:onmessage).with()
+  end
+
+  it "triggers process on the connection when the socket yields to onmessage" do
+    socket.stubs(:onmessage).yields(data)
+    subject.start
+    connection.should have_received(:process).with(data)
   end
 end
 
