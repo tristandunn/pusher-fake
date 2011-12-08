@@ -6,7 +6,7 @@ require "yard"
 Bundler::GemHelper.install_tasks
 
 Cucumber::Rake::Task.new do |t|
-  t.cucumber_opts = %w{--format progress --strict}
+  t.cucumber_opts = %w{--format progress --strict --tags ~@wip}
 end
 
 RSpec::Core::RakeTask.new do |t|
