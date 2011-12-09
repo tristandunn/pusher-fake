@@ -14,9 +14,19 @@ window.addEventListener("DOMContentLoaded", function() {
 
   // Create the client instance.
   Pusher.instance = new Pusher(<%= PusherFake.configuration.key.to_json %>);
+  Pusher.instance.events = {};
 
   // Force the connection to go unavailable after a single attempt.
   Pusher.instance.connection.connectionAttempts = 4;
+
+  // Record all events.
+  Pusher.instance.connection.bind("message", function(message) {
+    var events    = Pusher.instance.events,
+        namespace = [message.channel, message.event].join(":");
+
+    events[namespace] || (events[namespace] = []);
+    events[namespace].push(message.data);
+  });
 }, false);
 </script>
 

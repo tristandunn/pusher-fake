@@ -49,12 +49,11 @@ describe PusherFake::Connection, "#establish" do
 end
 
 describe PusherFake::Connection, "#process, with a subscribe event" do
-  let(:data)           { { channel: name, auth: authentication } }
-  let(:json)           { stub }
-  let(:name)           { "channel" }
-  let(:channel)        { stub(:authorized?) }
-  let(:message)        { { event: "pusher:subscribe", data: data } }
-  let(:authentication) { "PUSHER_API_KEY:hash" }
+  let(:data)    { { channel: name, auth: "auth" } }
+  let(:json)    { stub }
+  let(:name)    { "channel" }
+  let(:channel) { stub(add: nil) }
+  let(:message) { { event: "pusher:subscribe", data: data } }
 
   subject { PusherFake::Connection.new(stub) }
 
@@ -64,14 +63,36 @@ describe PusherFake::Connection, "#process, with a subscribe event" do
     PusherFake::Channel.stubs(:factory).returns(channel)
   end
 
-  it "creates a channel from the event data" do
+  it "parses the JSON data" do
     subject.process(json)
-    PusherFake::Channel.should have_received(:factory).with(data)
+    Yajl::Parser.should have_received(:parse).with(json, symbolize_keys: true)
   end
 
-  it "authorizes the connection for the channel" do
+  it "creates a channel from the event data" do
     subject.process(json)
-    channel.should have_received(:authorized?).with(subject, authentication)
+    PusherFake::Channel.should have_received(:factory).with(name)
+  end
+
+  it "attempts to add the connection to the channel" do
+    subject.process(json)
+    channel.should have_received(:add).with(subject, data)
+  end
+end
+
+describe PusherFake::Connection, "#process, with a custom event" do
+  let(:data)    { {} }
+  let(:json)    { stub }
+  let(:name)    { "channel" }
+  let(:event)   { "hello-world" }
+  let(:channel) { stub(emit: nil, includes?: nil) }
+  let(:message) { { event: event, data: data, channel: name } }
+
+  subject { PusherFake::Connection.new(stub) }
+
+  before do
+    subject.stubs(:emit)
+    Yajl::Parser.stubs(:parse).returns(message)
+    PusherFake::Channel.stubs(:factory).returns(channel)
   end
 
   it "parses the JSON data" do
@@ -79,15 +100,25 @@ describe PusherFake::Connection, "#process, with a subscribe event" do
     Yajl::Parser.should have_received(:parse).with(json, symbolize_keys: true)
   end
 
-  it "emits a subscription succeeded event for the channel, when authorized" do
-    channel.stubs(authorized?: true)
+  it "creates a channel from the event data" do
     subject.process(json)
-    subject.should have_received(:emit).with("pusher_internal:subscription_succeeded", {}, name)
+    PusherFake::Channel.should have_received(:factory).with(name)
   end
 
-  it "does not emit a subscription succeeded event for the channel, when not authorized" do
-    channel.stubs(authorized?: false)
+  it "checks if the connection is in the channel" do
     subject.process(json)
-    subject.should have_received(:emit).never
+    channel.should have_received(:includes?).with(subject)
+  end
+
+  it "emits the event to the channel when the connection is in the channel" do
+    channel.stubs(includes?: true)
+    subject.process(json)
+    channel.should have_received(:emit).with(event, data)
+  end
+
+  it "does not emit the event to the channel when the connection is not in the channel" do
+    channel.stubs(includes?: false)
+    subject.process(json)
+    channel.should have_received(:emit).never
   end
 end

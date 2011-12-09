@@ -34,14 +34,15 @@ module PusherFake
       message = Yajl::Parser.parse(data, symbolize_keys: true)
       data    = message[:data]
       event   = message[:event]
+      channel = message[:channel] || data.delete(:channel)
 
       case event
       when "pusher:subscribe"
-        channel = Channel.factory(data)
-
-        if channel.authorized?(self, data[:auth])
-          emit("pusher_internal:subscription_succeeded", {}, data[:channel])
-        end
+        channel = Channel.factory(channel)
+        channel.add(self, data)
+      else
+        channel = Channel.factory(channel)
+        channel.emit(event, data) if channel.includes?(self)
       end
     end
   end

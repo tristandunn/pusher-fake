@@ -1,19 +1,25 @@
 module PusherFake
   module Channel
     class << self
+      attr_accessor :channels
+
       # Create a channel, determing the type by the name.
       #
-      # @param [Hash] options The channel options.
-      # @option options [String] :channel The channel name.
+      # @param [String] name The channel name.
       # @return [Public|Private] The channel object.
-      def factory(options)
-        name = options[:channel]
+      def factory(name)
+        self.channels ||= {}
 
         if name =~ /^private-/
-          Private.new(options[:channel])
+          self.channels[name] ||= Private.new(name)
         else
-          Public.new(options[:channel])
+          self.channels[name] ||= Public.new(name)
         end
+      end
+
+      # Reset the channel cache.
+      def reset
+        self.channels = {}
       end
     end
   end
