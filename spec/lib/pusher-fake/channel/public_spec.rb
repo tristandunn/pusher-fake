@@ -30,7 +30,7 @@ describe PusherFake::Channel, "#add" do
 
   it "authorizes the connection" do
     subject.add(connection, data)
-    subject.should have_received(:authorized?).with(connection, authentication)
+    subject.should have_received(:authorized?).with(connection, data)
   end
 
   it "adds the connection to the channel when authorized" do
@@ -53,13 +53,14 @@ describe PusherFake::Channel, "#add" do
 end
 
 describe PusherFake::Channel, "#authorized?" do
+  let(:data)           { { auth: authentication } }
   let(:connection)     { stub }
   let(:authentication) { "auth" }
 
   subject { PusherFake::Channel::Public.new("name") }
 
   it "returns true" do
-    subject.should be_authorized(connection, authentication)
+    subject.should be_authorized(connection, data)
   end
 end
 

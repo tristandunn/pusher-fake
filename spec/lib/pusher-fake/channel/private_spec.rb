@@ -33,6 +33,7 @@ describe PusherFake::Channel::Private, "#authentication_for" do
 end
 
 describe PusherFake::Channel::Private, "#authorized?" do
+  let(:data)           { { auth: authentication } }
   let(:name)           { "private-channel" }
   let(:socket)         { stub }
   let(:connection)     { stub(socket: socket) }
@@ -45,17 +46,17 @@ describe PusherFake::Channel::Private, "#authorized?" do
   end
 
   it "generates authentication for the connection socket ID" do
-    subject.authorized?(connection, authentication)
+    subject.authorized?(connection, data)
     subject.should have_received(:authentication_for).with(socket.object_id)
   end
 
   it "returns true if the authentication matches" do
     subject.stubs(:authentication_for).returns(authentication)
-    subject.authorized?(connection, authentication).should be_true
+    subject.authorized?(connection, data).should be_true
   end
 
   it "returns false if the authentication matches" do
     subject.stubs(:authentication_for).returns("")
-    subject.authorized?(connection, authentication).should be_false
+    subject.authorized?(connection, data).should be_false
   end
 end

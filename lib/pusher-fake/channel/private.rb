@@ -4,8 +4,8 @@ module PusherFake
       # Determine if the connection is authorized for the channel.
       #
       # @return [Boolean] +true+ if authorized, +false+ otherwise.
-      def authorized?(connection, authentication)
-        authentication_for(connection.socket.object_id) == authentication
+      def authorized?(connection, options)
+        authentication_for(connection.socket.object_id) == options[:auth]
       end
 
       # @private

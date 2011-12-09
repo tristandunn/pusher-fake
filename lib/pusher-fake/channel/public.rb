@@ -21,7 +21,7 @@ module PusherFake
       # @param [Hash] options The options for the channel.
       # @options options [String] :auth The authentication string.
       def add(connection, options = {})
-        if authorized?(connection, options[:auth])
+        if authorized?(connection, options)
           connection.emit("pusher_internal:subscription_succeeded", {}, name)
           connections.push(connection)
         else
@@ -32,7 +32,7 @@ module PusherFake
       # Determine if the connection is authorized for the channel.
       #
       # @return [true]
-      def authorized?(connection, authentication)
+      def authorized?(connection, options = {})
         true
       end
 
