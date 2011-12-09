@@ -17,6 +17,8 @@ Fully recreate the Pusher API service for development and testing.
 
 * Connecting.
 * Subscribing to public and private channels.
+* Triggering events on channels.
+* Unsubscribing from channels.
 
 ## License
 
