@@ -99,3 +99,18 @@ describe PusherFake::Channel, "#includes?" do
     subject.includes?(connection).should be_false
   end
 end
+
+describe PusherFake::Channel, "#remove" do
+  let(:connection) { stub }
+
+  subject { PusherFake::Channel::Public.new("name") }
+
+  before do
+    subject.stubs(connections: [connection])
+  end
+
+  it "removes the connection from the channel" do
+    subject.remove(connection)
+    subject.connections.should be_empty
+  end
+end

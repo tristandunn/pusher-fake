@@ -40,6 +40,9 @@ module PusherFake
       when "pusher:subscribe"
         channel = Channel.factory(channel)
         channel.add(self, data)
+      when "pusher:unsubscribe"
+        channel = Channel.factory(channel)
+        channel.remove(self)
       else
         channel = Channel.factory(channel)
         channel.emit(event, data) if channel.includes?(self)

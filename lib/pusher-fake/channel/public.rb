@@ -53,6 +53,13 @@ module PusherFake
       def includes?(connection)
         connections.index(connection)
       end
+
+      # Removes the +connection+ from the channel.
+      #
+      # @param [Connection] connection The connection to remove.
+      def remove(connection)
+        connections.delete(connection)
+      end
     end
   end
 end

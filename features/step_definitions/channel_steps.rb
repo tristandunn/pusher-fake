@@ -13,6 +13,10 @@ When %{I subscribe to the "$channel" channel} do |channel|
   page.execute_script("Pusher.instance.subscribe(#{channel.to_json})")
 end
 
+When %{I unsubscribe from the "$channel" channel} do |channel|
+  page.execute_script("Pusher.instance.unsubscribe(#{channel.to_json})")
+end
+
 Then %{I should be subscribed to the "$channel" channel} do |channel|
   wait_until do
     subscribed = page.evaluate_script(%{

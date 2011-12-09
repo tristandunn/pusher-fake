@@ -79,6 +79,36 @@ describe PusherFake::Connection, "#process, with a subscribe event" do
   end
 end
 
+describe PusherFake::Connection, "#process, with an unsubscribe event" do
+  let(:json)    { stub }
+  let(:name)    { "channel" }
+  let(:channel) { stub(remove: nil) }
+  let(:message) { { event: "pusher:unsubscribe", channel: name } }
+
+  subject { PusherFake::Connection.new(stub) }
+
+  before do
+    subject.stubs(:emit)
+    Yajl::Parser.stubs(:parse).returns(message)
+    PusherFake::Channel.stubs(:factory).returns(channel)
+  end
+
+  it "parses the JSON data" do
+    subject.process(json)
+    Yajl::Parser.should have_received(:parse).with(json, symbolize_keys: true)
+  end
+
+  it "creates a channel from the event data" do
+    subject.process(json)
+    PusherFake::Channel.should have_received(:factory).with(name)
+  end
+
+  it "removes the connection from the channel" do
+    subject.process(json)
+    channel.should have_received(:remove).with(subject)
+  end
+end
+
 describe PusherFake::Connection, "#process, with a custom event" do
   let(:data)    { {} }
   let(:json)    { stub }
