@@ -42,8 +42,11 @@ module PusherFake
         channel.add(self, data)
       when "pusher:unsubscribe"
         channel.remove(self)
-      else
-        channel.emit(event, data) if channel.includes?(self)
+      when /^client-(.+)$/
+        return unless channel.is_a?(Channel::Private)
+        return unless channel.includes?(self)
+
+        channel.emit(event, data)
       end
     end
   end

@@ -58,7 +58,6 @@ describe PusherFake::Connection, "#process, with a subscribe event" do
   subject { PusherFake::Connection.new(stub) }
 
   before do
-    subject.stubs(:emit)
     Yajl::Parser.stubs(:parse).returns(message)
     PusherFake::Channel.stubs(:factory).returns(channel)
   end
@@ -88,7 +87,6 @@ describe PusherFake::Connection, "#process, with an unsubscribe event" do
   subject { PusherFake::Connection.new(stub) }
 
   before do
-    subject.stubs(:emit)
     Yajl::Parser.stubs(:parse).returns(message)
     PusherFake::Channel.stubs(:factory).returns(channel)
   end
@@ -109,18 +107,17 @@ describe PusherFake::Connection, "#process, with an unsubscribe event" do
   end
 end
 
-describe PusherFake::Connection, "#process, with a custom event" do
+describe PusherFake::Connection, "#process, with a client event" do
   let(:data)    { {} }
   let(:json)    { stub }
   let(:name)    { "channel" }
-  let(:event)   { "hello-world" }
-  let(:channel) { stub(emit: nil, includes?: nil) }
+  let(:event)   { "client-hello-world" }
+  let(:channel) { stub(emit: nil, includes?: nil, is_a?: true) }
   let(:message) { { event: event, data: data, channel: name } }
 
   subject { PusherFake::Connection.new(stub) }
 
   before do
-    subject.stubs(:emit)
     Yajl::Parser.stubs(:parse).returns(message)
     PusherFake::Channel.stubs(:factory).returns(channel)
   end
@@ -135,6 +132,11 @@ describe PusherFake::Connection, "#process, with a custom event" do
     PusherFake::Channel.should have_received(:factory).with(name)
   end
 
+  it "ensures the channel is private" do
+    subject.process(json)
+    channel.should have_received(:is_a?).with(PusherFake::Channel::Private)
+  end
+
   it "checks if the connection is in the channel" do
     subject.process(json)
     channel.should have_received(:includes?).with(subject)
@@ -146,8 +148,45 @@ describe PusherFake::Connection, "#process, with a custom event" do
     channel.should have_received(:emit).with(event, data)
   end
 
+  it "does not emit the event to the channel when the channel is not private" do
+    channel.stubs(includes?: true, is_a?: false)
+    subject.process(json)
+    channel.should have_received(:emit).never
+  end
+
   it "does not emit the event to the channel when the connection is not in the channel" do
     channel.stubs(includes?: false)
+    subject.process(json)
+    channel.should have_received(:emit).never
+  end
+end
+
+describe PusherFake::Connection, "#process, with an unknown event" do
+  let(:data)    { {} }
+  let(:json)    { stub }
+  let(:name)    { "channel" }
+  let(:event)   { "hello-world" }
+  let(:channel) { stub(emit: nil) }
+  let(:message) { { event: event, data: data, channel: name } }
+
+  subject { PusherFake::Connection.new(stub) }
+
+  before do
+    Yajl::Parser.stubs(:parse).returns(message)
+    PusherFake::Channel.stubs(:factory).returns(channel)
+  end
+
+  it "parses the JSON data" do
+    subject.process(json)
+    Yajl::Parser.should have_received(:parse).with(json, symbolize_keys: true)
+  end
+
+  it "creates a channel from the event data" do
+    subject.process(json)
+    PusherFake::Channel.should have_received(:factory).with(name)
+  end
+
+  it "does not emit the event" do
     subject.process(json)
     channel.should have_received(:emit).never
   end
