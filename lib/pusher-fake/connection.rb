@@ -31,20 +31,18 @@ module PusherFake
     #
     # @param [String] data The event data as JSON.
     def process(data)
-      message = Yajl::Parser.parse(data, symbolize_keys: true)
-      data    = message[:data]
-      event   = message[:event]
-      channel = message[:channel] || data.delete(:channel)
+      message      = Yajl::Parser.parse(data, symbolize_keys: true)
+      data         = message[:data]
+      event        = message[:event]
+      channel_name = message[:channel] || data.delete(:channel)
+      channel      = Channel.factory(channel_name)
 
       case event
       when "pusher:subscribe"
-        channel = Channel.factory(channel)
         channel.add(self, data)
       when "pusher:unsubscribe"
-        channel = Channel.factory(channel)
         channel.remove(self)
       else
-        channel = Channel.factory(channel)
         channel.emit(event, data) if channel.includes?(self)
       end
     end

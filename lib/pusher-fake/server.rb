@@ -2,24 +2,27 @@ module PusherFake
   class Server
     # Start the WebSocket server.
     def self.start
-      configuration = PusherFake.configuration
-      options       = { host: configuration.host, port: configuration.port }
-
       EventMachine::WebSocket.start(options) do |socket|
-        connection = Connection.new(socket)
+        socket.onopen do
+          connection = Connection.new(socket)
+          connection.establish
 
-        socket.onopen    { onopen(connection) }
-        socket.onmessage { |data| connection.process(data) }
+          socket.onmessage do |data|
+            connection.process(data)
+          end
+        end
       end
     end
 
-    # Creates and establishes a new connection.
-    #
-    # @param [EventMachine::WebSocket::Connection] socket The socket object for the connection.
-    def self.onopen(connection)
-      EventMachine.next_tick do
-        connection.establish
-      end
+    private
+
+    def self.configuration
+      PusherFake.configuration
+    end
+
+    def self.options
+      { host: configuration.host,
+        port: configuration.port }
     end
   end
 end
