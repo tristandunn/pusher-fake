@@ -1,3 +1,8 @@
+Given "I am connected" do
+  step %{I am on the homepage}
+  step %{I should be connected}
+end
+
 Given "I change my socket ID" do
   page.execute_script("Pusher.instance.connection.socket_id = -1;")
 end

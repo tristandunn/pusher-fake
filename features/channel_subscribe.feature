@@ -2,8 +2,7 @@
 Feature: Client subscribing to a channel
 
   Background:
-    Given I am on the homepage
-    Then I should be connected
+    Given I am connected
 
   Scenario: Client subscribes to a channel
     When I subscribe to the "chat-message" channel
