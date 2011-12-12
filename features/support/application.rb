@@ -1,9 +1,7 @@
 require "pusher"
 require "sinatra"
 
-Pusher.app_id = "PUSHER_API_ID"
-Pusher.key    = "PUSHER_API_KEY"
-Pusher.secret = "PUSHER_API_SECRET"
+Pusher.url = "http://PUSHER_API_KEY:PUSHER_API_SECRET@localhost:8081/apps/PUSHER_APP_ID"
 
 class Sinatra::Application
   set :root,          Proc.new { File.join(File.dirname(__FILE__), "application") }

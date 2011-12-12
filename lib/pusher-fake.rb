@@ -1,5 +1,6 @@
 require "em-websocket"
 require "hmac-sha2"
+require "thin"
 require "yajl"
 
 require "pusher-fake/channel"
@@ -8,6 +9,7 @@ require "pusher-fake/channel/private"
 require "pusher-fake/configuration"
 require "pusher-fake/connection"
 require "pusher-fake/server"
+require "pusher-fake/server/application"
 require "pusher-fake/version"
 
 module PusherFake

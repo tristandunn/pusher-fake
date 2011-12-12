@@ -1,3 +1,7 @@
+When %{a "$event" event is triggered on the "$channel" channel} do |event, channel|
+  Pusher[channel].trigger(event, {})
+end
+
 When %{I trigger the "$event" event on the "$channel" channel} do |event, channel|
   page.execute_script(%{
     var
