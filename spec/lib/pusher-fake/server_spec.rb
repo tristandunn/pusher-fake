@@ -37,9 +37,9 @@ end
 describe PusherFake::Server, ".start_socket_server" do
   let(:data)          { stub }
   let(:socket)        { stub(onopen: nil, onmessage: nil) }
-  let(:options)       { { host: configuration.host, port: configuration.socket_port } }
+  let(:options)       { { host: configuration.socket_host, port: configuration.socket_port } }
   let(:connection)    { stub(establish: nil, process: nil) }
-  let(:configuration) { stub(host: "192.168.0.1", socket_port: 8080) }
+  let(:configuration) { stub(socket_host: "192.168.0.1", socket_port: 8080) }
 
   subject { PusherFake::Server }
 
@@ -105,7 +105,7 @@ end
 describe PusherFake::Server, ".start_web_server" do
   let(:host)          { "192.168.0.1" }
   let(:port)          { 8081 }
-  let(:configuration) { stub(host: host, web_port: port) }
+  let(:configuration) { stub(web_host: host, web_port: port) }
 
   subject { PusherFake::Server }
 

@@ -23,7 +23,7 @@ module PusherFake
 
     def self.start_web_server
       Thin::Logging.silent = true
-      Thin::Server.start(web_server_options[:host], web_server_options[:port], Application, daemonize: false)
+      Thin::Server.start(configuration.web_host, configuration.web_port, Application, daemonize: false)
     end
 
     private
@@ -33,13 +33,8 @@ module PusherFake
     end
 
     def self.socket_server_options
-      { host: configuration.host,
+      { host: configuration.socket_host,
         port: configuration.socket_port }
-    end
-
-    def self.web_server_options
-      { host: configuration.host,
-        port: configuration.web_port }
     end
   end
 end

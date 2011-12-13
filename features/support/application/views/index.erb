@@ -9,7 +9,7 @@
 <script>
 window.addEventListener("DOMContentLoaded", function() {
   // Use the PusherFake server.
-  Pusher.host     = <%= PusherFake.configuration.host.to_json %>;
+  Pusher.host     = <%= PusherFake.configuration.socket_host.to_json %>;
   Pusher.ws_port  = <%= PusherFake.configuration.socket_port.to_json %>;
 
   // Create the client instance.
