@@ -6,7 +6,3 @@ Feature: Client connecting to the server
 
   Scenario: Client connects to the server
     Then I should be connected
-
-  @disable-server
-  Scenario: Client unsuccessfully connects to the server
-    Then I should not be connected
