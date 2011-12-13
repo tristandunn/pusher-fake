@@ -13,12 +13,9 @@ Fully recreate the Pusher API service for development and testing.
 * Wasting connections and messages in development is unreasonable.
 * Stubbing the JavaScript, such as with [pusher-test-stub](https://github.com/leggetter/pusher-test-stub), is suboptimal and tedious for integration tests.
 
-## Supported
+## Currently Unsupported
 
-* Connecting.
-* Subscribing to public and private channels.
-* Triggering events and client events on channels.
-* Unsubscribing from channels.
+* Presence channels.
 
 ## License
 
