@@ -1,6 +1,6 @@
 module Capybara
   module Wait
-    def wait(seconds = Capybara.default_wait_time, &block)
+    def wait(seconds = 0.25, &block)
       sleep(seconds) && yield
     end
   end
