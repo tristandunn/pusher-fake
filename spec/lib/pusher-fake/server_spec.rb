@@ -44,8 +44,8 @@ describe PusherFake::Server, ".start_socket_server" do
   subject { PusherFake::Server }
 
   before do
-    PusherFake.stubs(:configuration).returns(configuration)
-    PusherFake::Connection.stubs(:new).returns(connection)
+    PusherFake.stubs(configuration: configuration)
+    PusherFake::Connection.stubs(new: connection)
     EventMachine::WebSocket.stubs(:start).yields(socket)
   end
 
@@ -112,7 +112,7 @@ describe PusherFake::Server, ".start_web_server" do
   before do
     Thin::Server.stubs(:start)
     Thin::Logging.stubs(:silent=)
-    PusherFake.stubs(:configuration).returns(configuration)
+    PusherFake.stubs(configuration: configuration)
   end
 
   it "silences the logging" do

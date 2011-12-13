@@ -58,8 +58,8 @@ describe PusherFake::Connection, "#process, with a subscribe event" do
   subject { PusherFake::Connection.new(stub) }
 
   before do
-    Yajl::Parser.stubs(:parse).returns(message)
-    PusherFake::Channel.stubs(:factory).returns(channel)
+    Yajl::Parser.stubs(parse: message)
+    PusherFake::Channel.stubs(factory: channel)
   end
 
   it "parses the JSON data" do
@@ -87,8 +87,8 @@ describe PusherFake::Connection, "#process, with an unsubscribe event" do
   subject { PusherFake::Connection.new(stub) }
 
   before do
-    Yajl::Parser.stubs(:parse).returns(message)
-    PusherFake::Channel.stubs(:factory).returns(channel)
+    Yajl::Parser.stubs(parse: message)
+    PusherFake::Channel.stubs(factory: channel)
   end
 
   it "parses the JSON data" do
@@ -118,8 +118,8 @@ describe PusherFake::Connection, "#process, with a client event" do
   subject { PusherFake::Connection.new(stub) }
 
   before do
-    Yajl::Parser.stubs(:parse).returns(message)
-    PusherFake::Channel.stubs(:factory).returns(channel)
+    Yajl::Parser.stubs(parse: message)
+    PusherFake::Channel.stubs(factory: channel)
   end
 
   it "parses the JSON data" do
@@ -172,8 +172,8 @@ describe PusherFake::Connection, "#process, with an unknown event" do
   subject { PusherFake::Connection.new(stub) }
 
   before do
-    Yajl::Parser.stubs(:parse).returns(message)
-    PusherFake::Channel.stubs(:factory).returns(channel)
+    Yajl::Parser.stubs(parse: message)
+    PusherFake::Channel.stubs(factory: channel)
   end
 
   it "parses the JSON data" do

@@ -19,7 +19,7 @@ describe PusherFake::Channel::Private, "#authentication_for" do
 
   before do
     PusherFake.stubs(configuration: configuration)
-    HMAC::SHA256.stubs(:hexdigest).returns(signature)
+    HMAC::SHA256.stubs(hexdigest: signature)
   end
 
   it "generates a signature" do
@@ -51,12 +51,12 @@ describe PusherFake::Channel::Private, "#authorized?" do
   end
 
   it "returns true if the authentication matches" do
-    subject.stubs(:authentication_for).returns(authentication)
+    subject.stubs(authentication_for: authentication)
     subject.authorized?(connection, data).should be_true
   end
 
   it "returns false if the authentication matches" do
-    subject.stubs(:authentication_for).returns("")
+    subject.stubs(authentication_for: "")
     subject.authorized?(connection, data).should be_false
   end
 end

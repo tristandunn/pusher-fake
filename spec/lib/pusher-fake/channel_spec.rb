@@ -15,13 +15,13 @@ describe PusherFake::Channel, ".factory" do
   end
 
   it "creates a public channel by name" do
-    PusherFake::Channel::Public.stubs(:new).returns(channel)
+    PusherFake::Channel::Public.stubs(new: channel)
     subject.factory(name)
     PusherFake::Channel::Public.should have_received(:new).with(name)
   end
 
   it "returns the channel instance" do
-    PusherFake::Channel::Public.stubs(:new).returns(channel)
+    PusherFake::Channel::Public.stubs(new: channel)
     subject.factory(name).should == channel
   end
 end
@@ -41,13 +41,13 @@ describe PusherFake::Channel, ".factory, for a private channel" do
   end
 
   it "creates a private channel by name" do
-    PusherFake::Channel::Private.stubs(:new).returns(channel)
+    PusherFake::Channel::Private.stubs(new: channel)
     subject.factory(name)
     PusherFake::Channel::Private.should have_received(:new).with(name)
   end
 
   it "returns the channel instance" do
-    PusherFake::Channel::Private.stubs(:new).returns(channel)
+    PusherFake::Channel::Private.stubs(new: channel)
     subject.factory(name).should == channel
   end
 end
