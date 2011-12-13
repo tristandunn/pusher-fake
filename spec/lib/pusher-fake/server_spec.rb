@@ -36,7 +36,7 @@ end
 
 describe PusherFake::Server, ".start_socket_server" do
   let(:data)          { stub }
-  let(:socket)        { stub(onopen: nil, onmessage: nil) }
+  let(:socket)        { stub(onopen: nil, onmessage: nil, onclose: nil) }
   let(:options)       { { host: configuration.socket_host, port: configuration.socket_port } }
   let(:connection)    { stub(establish: nil, process: nil) }
   let(:configuration) { stub(socket_host: "192.168.0.1", socket_port: 8080) }
@@ -45,6 +45,7 @@ describe PusherFake::Server, ".start_socket_server" do
 
   before do
     PusherFake.stubs(configuration: configuration)
+    PusherFake::Channel.stubs(:remove)
     PusherFake::Connection.stubs(new: connection)
     EventMachine::WebSocket.stubs(:start).yields(socket)
   end
@@ -99,6 +100,28 @@ describe PusherFake::Server, ".start_socket_server" do
 
     subject.start_socket_server
     connection.should have_received(:process).with(data)
+  end
+
+  it "defines a close callback on the socket when onopen yields" do
+    subject.start_socket_server
+    socket.should have_received(:onclose).never
+
+    socket.stubs(:onopen).yields
+
+    subject.start_socket_server
+    socket.should have_received(:onclose).with()
+  end
+
+  it "removes the connection from all channels when onclose yields" do
+    socket.stubs(:onopen).yields
+
+    subject.start_socket_server
+    PusherFake::Channel.should have_received(:remove).never
+
+    socket.stubs(:onclose).yields
+
+    subject.start_socket_server
+    PusherFake::Channel.should have_received(:remove).with(connection)
   end
 end
 

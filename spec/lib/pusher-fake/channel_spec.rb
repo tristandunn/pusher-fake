@@ -52,6 +52,35 @@ describe PusherFake::Channel, ".factory, for a private channel" do
   end
 end
 
+describe PusherFake::Channel, ".remove" do
+  let(:channels)   { { channel_1: channel_1, channel_2: channel_2 } }
+  let(:channel_1)  { stub(connections: stub(length: 0), remove: nil) }
+  let(:channel_2)  { stub(connections: stub(length: 1), remove: nil) }
+  let(:connection) { mock }
+
+  subject { PusherFake::Channel }
+
+  before do
+    subject.stubs(channels: channels)
+  end
+
+  it "removes the connection from all channels" do
+    subject.remove(connection)
+    channel_1.should have_received(:remove).with(connection)
+    channel_2.should have_received(:remove).with(connection)
+  end
+
+  it "deletes a channel with no connections remaining" do
+    subject.remove(connection)
+    channels.should_not have_key(:channel_1)
+  end
+
+  it "does not delete a channel with connections remaining" do
+    subject.remove(connection)
+    channels.should have_key(:channel_2)
+  end
+end
+
 describe PusherFake::Channel, ".reset" do
   subject { PusherFake::Channel }
 

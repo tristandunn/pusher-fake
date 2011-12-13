@@ -17,6 +17,9 @@ module PusherFake
           socket.onmessage do |data|
             connection.process(data)
           end
+          socket.onclose do
+            Channel.remove(connection)
+          end
         end
       end
     end
