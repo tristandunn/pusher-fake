@@ -26,7 +26,7 @@ module PusherFake
 
     def self.start_web_server
       Thin::Logging.silent = true
-      Thin::Server.start(configuration.web_host, configuration.web_port, Application, daemonize: false)
+      Thin::Server.start(configuration.web_host, configuration.web_port, Application)
     end
 
     private

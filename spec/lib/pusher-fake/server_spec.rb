@@ -145,6 +145,6 @@ describe PusherFake::Server, ".start_web_server" do
 
   it "starts the web server" do
     subject.start_web_server
-    Thin::Server.should have_received(:start).with(host, port, PusherFake::Server::Application, daemonize: false)
+    Thin::Server.should have_received(:start).with(host, port, PusherFake::Server::Application)
   end
 end
