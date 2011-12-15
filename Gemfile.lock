@@ -67,7 +67,7 @@ GEM
     rspec-mocks (2.7.0)
     ruby-hmac (0.4.0)
     rubyzip (0.9.5)
-    selenium-webdriver (2.14.0)
+    selenium-webdriver (2.15.0)
       childprocess (>= 0.2.1)
       ffi (~> 1.0.9)
       multi_json (~> 1.0.4)
@@ -94,7 +94,7 @@ PLATFORMS
 
 DEPENDENCIES
   bourne (= 1.0.0)
-  bundler (= 1.1.rc.2)
+  bundler (= 1.1.rc.5)
   capybara (= 1.1.2)
   capybara-webkit (= 0.7.2)
   cucumber (= 1.1.4)
