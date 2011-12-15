@@ -1,6 +1,9 @@
 module PusherFake
   module Server
-    # Start the WebSocket server.
+    # Start the servers.
+    #
+    # @see start_socket_server
+    # @see start_web_server
     def self.start
       EventMachine.run do
         start_web_server
@@ -8,6 +11,7 @@ module PusherFake
       end
     end
 
+    # Start the WebSocket server.
     def self.start_socket_server
       EventMachine::WebSocket.start(socket_server_options) do |socket|
         socket.onopen do
@@ -24,6 +28,7 @@ module PusherFake
       end
     end
 
+    # Start the web server.
     def self.start_web_server
       Thin::Logging.silent = true
       Thin::Server.start(configuration.web_host, configuration.web_port, Application)
