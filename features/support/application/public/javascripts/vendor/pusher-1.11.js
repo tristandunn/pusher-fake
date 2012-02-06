@@ -1,12 +1,12 @@
 /*!
- * Pusher JavaScript Library v1.10.1
+ * Pusher JavaScript Library v1.11.0
  * http://pusherapp.com/
  *
  * Copyright 2011, Pusher
  * Released under the MIT licence.
  */
 
-if (typeof Function.prototype.scopedTo === 'undefined') {
+if (Function.prototype.scopedTo === undefined) {
   Function.prototype.scopedTo = function(context, args) {
     var f = this;
     return function() {
@@ -18,13 +18,13 @@ if (typeof Function.prototype.scopedTo === 'undefined') {
 
 var Pusher = function(app_key, options) {
   this.options = options || {};
-  this.path = '/app/' + app_key + '?client=js&version=' + Pusher.VERSION;
   this.key = app_key;
   this.channels = new Pusher.Channels();
-  this.global_channel = new Pusher.Channel('pusher_global_channel');
-  this.global_channel.global = true;
+  this.global_emitter = new Pusher.EventsDispatcher()
 
   var self = this;
+
+  this.checkAppKey();
 
   this.connection = new Pusher.Connection(this.key, this.options);
 
@@ -34,13 +34,21 @@ var Pusher = function(app_key, options) {
       self.subscribeAll();
     })
     .bind('message', function(params) {
-      self.send_local_event(params.event, params.data, params.channel);
+      var internal = (params.event.indexOf('pusher_internal:') === 0);
+      if (params.channel) {
+        var channel;
+        if (channel = self.channel(params.channel)) {
+          channel.emit(params.event, params.data);
+        }
+      }
+      // Emit globaly [deprecated]
+      if (!internal) self.global_emitter.emit(params.event, params.data);
     })
     .bind('disconnected', function() {
       self.channels.disconnect();
     })
     .bind('error', function(err) {
-      Pusher.debug('Error', err);
+      Pusher.warn('Error', err);
     });
 
   Pusher.instances.push(this);
@@ -62,12 +70,12 @@ Pusher.prototype = {
   },
 
   bind: function(event_name, callback) {
-    this.global_channel.bind(event_name, callback);
+    this.global_emitter.bind(event_name, callback);
     return this;
   },
 
   bind_all: function(callback) {
-    this.global_channel.bind_all(callback);
+    this.global_emitter.bind_all(callback);
     return this;
   },
 
@@ -109,30 +117,13 @@ Pusher.prototype = {
   },
 
   send_event: function(event_name, data, channel) {
-    Pusher.debug("Event sent (channel,event,data)", channel, event_name, data);
-
-    var payload = {
-      event: event_name,
-      data: data
-    };
-    if (channel) payload['channel'] = channel;
-
-    return this.connection.send(JSON.stringify(payload));
+    return this.connection.send_event(event_name, data, channel);
   },
 
-  send_local_event: function(event_name, event_data, channel_name) {
-    event_data = Pusher.data_decorator(event_name, event_data);
-    if (channel_name) {
-      var channel = this.channel(channel_name);
-      if (channel) {
-        channel.dispatch_with_all(event_name, event_data);
-      }
-    } else {
-      // Bit hacky but these events won't get logged otherwise
-      Pusher.debug("Event recd (event,data)", event_name, event_data);
+  checkAppKey: function() {
+    if(this.key === null || this.key === undefined) {
+      Pusher.warn('Warning', 'You must pass your app key when you instantiate Pusher.');
     }
-
-    this.global_channel.dispatch_with_all(event_name, event_data);
   }
 };
 
@@ -147,42 +138,61 @@ Pusher.Util = {
       }
     }
     return target;
+  },
+
+  stringify: function stringify() {
+    var m = ["Pusher"]
+    for (var i = 0; i < arguments.length; i++){
+      if (typeof arguments[i] === "string") {
+        m.push(arguments[i])
+      } else {
+        if (window['JSON'] == undefined) {
+          m.push(arguments[i].toString());
+        } else {
+          m.push(JSON.stringify(arguments[i]))
+        }
+      }
+    };
+    return m.join(" : ")
+  },
+
+  arrayIndexOf: function(array, item) { // MSIE doesn't have array.indexOf
+    var nativeIndexOf = Array.prototype.indexOf;
+    if (array == null) return -1;
+    if (nativeIndexOf && array.indexOf === nativeIndexOf) return array.indexOf(item);
+    for (i = 0, l = array.length; i < l; i++) if (array[i] === item) return i;
+    return -1;
   }
 };
 
 // To receive log output provide a Pusher.log function, for example
 // Pusher.log = function(m){console.log(m)}
 Pusher.debug = function() {
-  if (!Pusher.log) { return }
-  var m = ["Pusher"]
-  for (var i = 0; i < arguments.length; i++){
-    if (typeof arguments[i] === "string") {
-      m.push(arguments[i])
-    } else {
-      if (window['JSON'] == undefined) {
-        m.push(arguments[i].toString());
-      } else {
-        m.push(JSON.stringify(arguments[i]))
-      }
-    }
-  };
-  Pusher.log(m.join(" : "))
+  if (!Pusher.log) return
+  Pusher.log(Pusher.Util.stringify.apply(this, arguments))
 }
+Pusher.warn = function() {
+  if (window.console && window.console.warn) {
+    window.console.warn(Pusher.Util.stringify.apply(this, arguments));
+  } else {
+    if (!Pusher.log) return
+    Pusher.log(Pusher.Util.stringify.apply(this, arguments));
+  }
+};
 
 // Pusher defaults
-Pusher.VERSION = '1.10.1';
+Pusher.VERSION = '1.11.0';
 
 Pusher.host = 'ws.pusherapp.com';
 Pusher.ws_port = 80;
 Pusher.wss_port = 443;
 Pusher.channel_auth_endpoint = '/pusher/auth';
-Pusher.connection_timeout = 5000;
-Pusher.cdn_http = 'http://js.pusherapp.com/'
-Pusher.cdn_https = 'https://d3ds63zw57jt09.cloudfront.net/'
+Pusher.cdn_http = 'http://js.pusher.com/'
+Pusher.cdn_https = 'https://d3dy5gmtp8yhk7.cloudfront.net/'
 Pusher.dependency_suffix = '';
-Pusher.data_decorator = function(event_name, event_data){ return event_data }; // wrap event_data before dispatching
-Pusher.allow_reconnect = true;
 Pusher.channel_auth_transport = 'ajax';
+Pusher.activity_timeout = 120000;
+Pusher.pong_timeout = 30000;
 
 Pusher.isReady = false;
 Pusher.ready = function() {
@@ -208,9 +218,11 @@ Example:
     emitter.bind_all(function(event_name, data){ alert(data) });
 
 --------------------------------------------------------*/
-  function EventsDispatcher() {
+  function EventsDispatcher(failThrough) {
     this.callbacks = {};
     this.global_callbacks = [];
+    // Run this function when dispatching an event when no callbacks defined
+    this.failThrough = failThrough;
   }
 
   EventsDispatcher.prototype.bind = function(event_name, callback) {
@@ -218,42 +230,37 @@ Example:
     this.callbacks[event_name].push(callback);
     return this;// chainable
   };
+  
+  EventsDispatcher.prototype.unbind = function(eventName, callback) {
+    if(this.callbacks[eventName]) {
+      var index = Pusher.Util.arrayIndexOf(this.callbacks[eventName], callback);
+      this.callbacks[eventName].splice(index, 1);
+    }
+    return this;
+  };
 
   EventsDispatcher.prototype.emit = function(event_name, data) {
-    this.dispatch_global_callbacks(event_name, data);
-    this.dispatch(event_name, data);
+    // Global callbacks
+    for (var i = 0; i < this.global_callbacks.length; i++) {
+      this.global_callbacks[i](event_name, data);
+    }
+
+    // Event callbacks
+    var callbacks = this.callbacks[event_name];
+    if (callbacks) {
+      for (var i = 0; i < callbacks.length; i++) {
+        callbacks[i](data);
+      }
+    } else if (this.failThrough) {
+      this.failThrough(event_name, data)
+    }
+
     return this;
   };
 
   EventsDispatcher.prototype.bind_all = function(callback) {
     this.global_callbacks.push(callback);
     return this;
-  };
-
-  EventsDispatcher.prototype.dispatch = function(event_name, event_data) {
-    var callbacks = this.callbacks[event_name];
-
-    if (callbacks) {
-      for (var i = 0; i < callbacks.length; i++) {
-        callbacks[i](event_data);
-      }
-    } else {
-      // Log is un-necessary in case of global channel or connection object
-      if (!(this.global || this instanceof Pusher.Connection || this instanceof Pusher.Machine)) {
-        Pusher.debug('No callbacks for ' + event_name, event_data);
-      }
-    }
-  };
-
-  EventsDispatcher.prototype.dispatch_global_callbacks = function(event_name, data) {
-    for (var i = 0; i < this.global_callbacks.length; i++) {
-      this.global_callbacks[i](event_name, data);
-    }
-  };
-
-  EventsDispatcher.prototype.dispatch_with_all = function(event_name, data) {
-    this.dispatch(event_name, data);
-    this.dispatch_global_callbacks(event_name, data);
   };
 
   this.Pusher.EventsDispatcher = EventsDispatcher;
@@ -265,16 +272,6 @@ Example:
   /*-----------------------------------------------
     Helpers:
   -----------------------------------------------*/
-
-  // MSIE doesn't have array.indexOf
-  var nativeIndexOf = Array.prototype.indexOf;
-  function indexOf(array, item) {
-    if (array == null) return -1;
-    if (nativeIndexOf && array.indexOf === nativeIndexOf) return array.indexOf(item);
-    for (i = 0, l = array.length; i < l; i++) if (array[i] === item) return i;
-    return -1;
-  }
-
 
   function capitalize(str) {
     return str.substr(0, 1).toUpperCase() + str.substr(1);
@@ -290,10 +287,9 @@ Example:
   /*-----------------------------------------------
     The State Machine
   -----------------------------------------------*/
-  function Machine(actor, initialState, transitions, stateActions) {
+  function Machine(initialState, transitions, stateActions) {
     Pusher.EventsDispatcher.call(this);
 
-    this.actor = actor;
     this.state = undefined;
     this.errors = [];
 
@@ -310,8 +306,8 @@ Example:
     var prevState = this.state;
     var stateCallbacks = this.stateActions;
 
-    if (prevState && (indexOf(this.transitions[prevState], nextState) == -1)) {
-      throw new Error(this.actor.key + ': Invalid transition [' + prevState + ' to ' + nextState + ']');
+    if (prevState && (Pusher.Util.arrayIndexOf(this.transitions[prevState], nextState) == -1)) {
+      throw new Error('Invalid transition [' + prevState + ' to ' + nextState + ']');
     }
 
     // exit
@@ -350,8 +346,6 @@ Example:
 }).call(this);
 
 ;(function() {
-  var Pusher = this.Pusher;
-
   /*
     A little bauble to interface with window.navigator.onLine,
     window.ononline and window.onoffline.  Easier to mock.
@@ -382,7 +376,12 @@ Example:
   };
 
   Pusher.Util.extend(NetInfo.prototype, Pusher.EventsDispatcher.prototype);
-  this.Pusher.NetInfo = Pusher.NetInfo = NetInfo;
+  
+  this.Pusher.NetInfo = NetInfo;
+}).call(this);
+
+;(function() {
+  var Pusher = this.Pusher;
 
   var machineTransitions = {
     'initialized': ['waiting', 'failed'],
@@ -425,7 +424,7 @@ Example:
 
     Pusher.EventsDispatcher.call(this);
 
-    this.options = Pusher.Util.extend({encrypted: false}, options || {});
+    this.options = Pusher.Util.extend({encrypted: false}, options);
 
     this.netInfo = new Pusher.NetInfo();
 
@@ -452,7 +451,7 @@ Example:
     });
 
     // define the state machine that runs the connection
-    this._machine = new Pusher.Machine(self, 'initialized', machineTransitions, {
+    this._machine = new Pusher.Machine('initialized', machineTransitions, {
 
       // TODO: Use the constructor for this.
       initializedPre: function() {
@@ -467,7 +466,7 @@ Example:
 
       waitingPre: function() {
         if (self.connectionWait > 0) {
-          informUser('connecting_in', self.connectionWait);
+          self.emit('connecting_in', self.connectionWait);
         }
 
         if (self.netInfo.isOnLine() === false || self.connectionAttempts > 4){
@@ -529,7 +528,7 @@ Example:
       },
 
       openPre: function() {
-        self.socket.onmessage = ws_onMessage;
+        self.socket.onmessage = ws_onMessageOpen;
         self.socket.onerror = ws_onError;
         self.socket.onclose = transitionToWaiting;
 
@@ -552,11 +551,13 @@ Example:
       connectedPre: function(socket_id) {
         self.socket_id = socket_id;
 
-        self.socket.onmessage = ws_onMessage;
+        self.socket.onmessage = ws_onMessageConnected;
         self.socket.onerror = ws_onError;
         self.socket.onclose = transitionToWaiting;
 
         resetConnectionParameters(self);
+
+        resetActivityCheck();
       },
 
       connectedPost: function() {
@@ -564,6 +565,7 @@ Example:
       },
 
       connectedExit: function() {
+        stopActivityCheck();
         triggerStateChange('disconnected');
       },
 
@@ -639,6 +641,22 @@ Example:
       self._machine.transition('impermanentlyClosing');
     }
 
+    function resetActivityCheck() {
+      if (self._activityTimer) { clearTimeout(self._activityTimer); }
+      // Send ping after inactivity
+      self._activityTimer = setTimeout(function() {
+        self.send_event('pusher:ping', {})
+        // Wait for pong response
+        self._activityTimer = setTimeout(function() {
+          self.socket.close();
+        }, (self.options.pong_timeout || Pusher.pong_timeout))
+      }, (self.options.activity_timeout || Pusher.activity_timeout))
+    }
+
+    function stopActivityCheck() {
+      if (self._activityTimer) { clearTimeout(self._activityTimer); }
+    }
+
     /*-----------------------------------------------
       WebSocket Callbacks
       -----------------------------------------------*/
@@ -648,38 +666,49 @@ Example:
       self._machine.transition('open');
     };
 
-    function ws_onMessage(event) {
+    function ws_onMessageOpen(event) {
       var params = parseWebSocketEvent(event);
+      if (params !== undefined) {
+        if (params.event === 'pusher:connection_established') {
+          self._machine.transition('connected', params.data.socket_id);
+        } else if (params.event === 'pusher:error') {
+          // first inform the end-developer of this error
+          self.emit('error', {type: 'PusherError', data: params.data});
 
-      // case of invalid JSON payload sent
-      // we have to handle the error in the parseWebSocketEvent
-      // method as JavaScript error objects are kinda icky.
-      if (typeof params === 'undefined') return;
+          switch (params.data.code) {
+            case 4000:
+              Pusher.warn(params.data.message);
 
-      Pusher.debug('Event recd (event,data)', params.event, params.data);
+              self.compulsorySecure = true;
+              self.connectionSecure = true;
+              self.options.encrypted = true;
+              break;
+            case 4001:
+              // App not found by key - close connection
+              self._machine.transition('permanentlyClosing');
+              break;
+          }
+        }
+      }
+    }
 
-      // Continue to work with valid payloads:
-      if (params.event === 'pusher:connection_established') {
-        self._machine.transition('connected', params.data.socket_id);
-      } else if (params.event === 'pusher:error') {
-        // first inform the end-developer of this error
-        informUser('error', {type: 'PusherError', data: params.data});
+    function ws_onMessageConnected(event) {
+      resetActivityCheck();
 
-        // App not found by key - close connection
-        if (params.data.code === 4001) {
-          self._machine.transition('permanentlyClosing');
+      var params = parseWebSocketEvent(event);
+      if (params !== undefined) {
+        Pusher.debug('Event recd', params);
+
+        switch (params.event) {
+          case 'pusher:error':
+            self.emit('error', {type: 'PusherError', data: params.data});
+            break;
+          case 'pusher:ping':
+            self.send_event('pusher:pong', {})
+            break;
         }
 
-        if (params.data.code === 4000) {
-          Pusher.debug(params.data.message);
-
-          self.compulsorySecure = true;
-          self.connectionSecure = true;
-          self.options.encrypted = true;
-        }
-      } else if (params.event === 'pusher:heartbeat') {
-      } else if (self._machine.is('connected')) {
-        informUser('message', params);
+        self.emit('message', params);
       }
     }
 
@@ -706,7 +735,7 @@ Example:
 
         return params;
       } catch (e) {
-        informUser('error', {type: 'MessageParseError', error: e, data: event.data});
+        self.emit('error', {type: 'MessageParseError', error: e, data: event.data});
       }
     }
 
@@ -715,17 +744,13 @@ Example:
     }
 
     function ws_onError() {
-      informUser('error', {
+      self.emit('error', {
         type: 'WebSocketError'
       });
 
       // note: required? is the socket auto closed in the case of error?
       self.socket.close();
       self._machine.transition('impermanentlyClosing');
-    }
-
-    function informUser(eventName, data) {
-      self.emit(eventName, data);
     }
 
     function triggerStateChange(newState, data) {
@@ -746,7 +771,7 @@ Example:
 
   Connection.prototype.connect = function() {
     // no WebSockets
-    if (Pusher.Transport === null || typeof Pusher.Transport === 'undefined') {
+    if (Pusher.Transport === null || Pusher.Transport === undefined) {
       this._machine.transition('failed');
     }
     // initial open of connection
@@ -773,12 +798,19 @@ Example:
     }
   };
 
-  Connection.prototype.disconnect = function() {
-    if (this._machine.is('permanentlyClosed')) {
-      return;
-    }
+  Connection.prototype.send_event = function(event_name, data, channel) {
+    var payload = {
+      event: event_name,
+      data: data
+    };
+    if (channel) payload['channel'] = channel;
 
-    Pusher.debug('Disconnecting');
+    Pusher.debug('Event sent', payload);
+    return this.send(JSON.stringify(payload));
+  }
+
+  Connection.prototype.disconnect = function() {
+    if (this._machine.is('permanentlyClosed')) return;
 
     if (this._machine.is('waiting')) {
       this._machine.transition('permanentlyClosed');
@@ -823,15 +855,17 @@ Pusher.Channels.prototype = {
 };
 
 Pusher.Channel = function(channel_name, pusher) {
-  var channel = this;
-  Pusher.EventsDispatcher.call(this);
+  var self = this;
+  Pusher.EventsDispatcher.call(this, function(event_name, event_data) {
+    Pusher.debug('No callbacks on ' + channel_name + ' for ' + event_name);
+  });
 
   this.pusher = pusher;
   this.name = channel_name;
   this.subscribed = false;
 
-  this.bind('pusher_internal:subscription_succeeded', function(sub_data){
-    channel.acknowledge_subscription(sub_data);
+  this.bind('pusher_internal:subscription_succeeded', function(data) {
+    self.onSubscriptionSucceeded(data);
   });
 };
 
@@ -840,18 +874,9 @@ Pusher.Channel.prototype = {
   init: function() {},
   disconnect: function() {},
 
-  // Activate after successful subscription. Called on top-level pusher:subscription_succeeded
-  acknowledge_subscription: function(data){
+  onSubscriptionSucceeded: function(data) {
     this.subscribed = true;
-    this.dispatch_with_all('pusher:subscription_succeeded');
-  },
-
-  is_private: function(){
-    return false;
-  },
-
-  is_presence: function(){
-    return false;
+    this.emit('pusher:subscription_succeeded');
   },
 
   authorize: function(pusher, callback){
@@ -897,7 +922,7 @@ Pusher.authorizers = {
             callback(false, data);
           }
         } else {
-          Pusher.debug("Couldn't get auth info from your webapp", status);
+          Pusher.warn("Couldn't get auth info from your webapp", status);
           callback(true, xhr.status);
         }
       }
@@ -919,27 +944,22 @@ Pusher.authorizers = {
 };
 
 Pusher.Channel.PrivateChannel = {
-  is_private: function(){
-    return true;
-  },
-
   authorize: function(pusher, callback){
     Pusher.authorizers[Pusher.channel_auth_transport].scopedTo(this)(pusher, callback);
   }
 };
 
 Pusher.Channel.PresenceChannel = {
-
   init: function(){
     this.bind('pusher_internal:member_added', function(data){
       var member = this.members.add(data.user_id, data.user_info);
-      this.dispatch_with_all('pusher:member_added', member);
+      this.emit('pusher:member_added', member);
     }.scopedTo(this))
 
     this.bind('pusher_internal:member_removed', function(data){
       var member = this.members.remove(data.user_id);
       if (member) {
-        this.dispatch_with_all('pusher:member_removed', member);
+        this.emit('pusher:member_removed', member);
       }
     }.scopedTo(this))
   },
@@ -948,16 +968,12 @@ Pusher.Channel.PresenceChannel = {
     this.members.clear();
   },
 
-  acknowledge_subscription: function(sub_data){
-    this.members._members_map = sub_data.presence.hash;
-    this.members.count = sub_data.presence.count;
+  onSubscriptionSucceeded: function(data) {
+    this.members._members_map = data.presence.hash;
+    this.members.count = data.presence.count;
     this.subscribed = true;
 
-    this.dispatch_with_all('pusher:subscription_succeeded', this.members);
-  },
-
-  is_presence: function(){
-    return true;
+    this.emit('pusher:subscription_succeeded', this.members);
   },
 
   members: {
@@ -1008,18 +1024,15 @@ Pusher.Channel.PresenceChannel = {
 
 Pusher.Channel.factory = function(channel_name, pusher){
   var channel = new Pusher.Channel(channel_name, pusher);
-  if(channel_name.indexOf(Pusher.Channel.private_prefix) === 0) {
+  if (channel_name.indexOf('private-') === 0) {
     Pusher.Util.extend(channel, Pusher.Channel.PrivateChannel);
-  } else if(channel_name.indexOf(Pusher.Channel.presence_prefix) === 0) {
+  } else if (channel_name.indexOf('presence-') === 0) {
     Pusher.Util.extend(channel, Pusher.Channel.PrivateChannel);
     Pusher.Util.extend(channel, Pusher.Channel.PresenceChannel);
   };
-  channel.init();// inheritable constructor
+  channel.init();
   return channel;
 };
-
-Pusher.Channel.private_prefix = "private-";
-Pusher.Channel.presence_prefix = "presence-";
 
 var _require = (function () {
 
@@ -1074,20 +1087,20 @@ var _require = (function () {
   var root = cdn + Pusher.VERSION;
   var deps = [];
 
-  if (typeof window['JSON'] === 'undefined') {
+  if (window['JSON'] === undefined) {
     deps.push(root + '/json2' + Pusher.dependency_suffix + '.js');
   }
-  if (typeof window['WebSocket'] === 'undefined' && typeof window['MozWebSocket'] === 'undefined') {
+  if (window['WebSocket'] === undefined && window['MozWebSocket'] === undefined) {
     // We manually initialize web-socket-js to iron out cross browser issues
     window.WEB_SOCKET_DISABLE_AUTO_INITIALIZATION = true;
     deps.push(root + '/flashfallback' + Pusher.dependency_suffix + '.js');
   }
 
   var initialize = function() {
-    if (typeof window['WebSocket'] === 'undefined' && typeof window['MozWebSocket'] === 'undefined') {
+    if (window['WebSocket'] === undefined && window['MozWebSocket'] === undefined) {
       return function() {
         // This runs after flashfallback.js has loaded
-        if (typeof window['WebSocket'] !== 'undefined' && typeof window['MozWebSocket'] === 'undefined') {
+        if (window['WebSocket'] !== undefined && window['MozWebSocket'] === undefined) {
           // window['WebSocket'] is a flash emulation of WebSocket
           Pusher.Transport = window['WebSocket'];
           Pusher.TransportType = 'flash';
@@ -1108,7 +1121,7 @@ var _require = (function () {
       return function() {
         // This is because Mozilla have decided to
         // prefix the WebSocket constructor with "Moz".
-        if (typeof window['MozWebSocket'] !== 'undefined') {
+        if (window['MozWebSocket'] !== undefined) {
           Pusher.Transport = window['MozWebSocket'];
         } else {
           Pusher.Transport = window['WebSocket'];
