@@ -2,6 +2,10 @@
 
 A fake [Pusher](http://pusher.com) server for development and testing.
 
+## Examples
+
+* [pusher-fake-example](https://github.com/tristandunn/pusher-fake-example) - An example of using pusher-fake with Cucumber to test a Rails application.
+
 ## Goal
 
 Fully recreate the Pusher API service for development and testing.
