@@ -12,6 +12,8 @@ module PusherFake
 
         if name =~ /^private-/
           self.channels[name] ||= Private.new(name)
+        elsif name =~ /^presence-/
+          self.channels[name] ||= Presence.new(name)
         else
           self.channels[name] ||= Public.new(name)
         end

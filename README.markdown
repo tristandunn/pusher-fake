@@ -17,10 +17,6 @@ Fully recreate the Pusher API service for development and testing.
 * Wasting connections and messages in development is unreasonable.
 * Stubbing the JavaScript, such as with [pusher-test-stub](https://github.com/leggetter/pusher-test-stub), is suboptimal and tedious for integration tests.
 
-## Currently Unsupported
-
-* Presence channels.
-
 ## License
 
 pusher-fake uses the MIT license. See LICENSE for more details.

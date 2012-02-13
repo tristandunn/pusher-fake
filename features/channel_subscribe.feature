@@ -22,3 +22,12 @@ Feature: Client subscribing to a channel
     Given I change my socket ID
     When I subscribe to the "private-message-bob" channel
     Then I should not be subscribed to the "private-message-bob" channel
+
+  Scenario: Client subscribes to a presence channel
+    When I subscribe to the "presence-game-1" channel
+    Then I should be subscribed to the "presence-game-1" channel
+
+  Scenario: Client unsuccessfully subscribes to a presence channel
+    Given I change my socket ID
+    When I subscribe to the "presence-game-1" channel
+    Then I should not be subscribed to the "presence-game-1" channel

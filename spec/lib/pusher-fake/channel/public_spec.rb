@@ -17,50 +17,23 @@ describe PusherFake::Channel::Public do
 end
 
 describe PusherFake::Channel, "#add" do
-  let(:data)           { { auth: authentication } }
-  let(:connection)     { stub(emit: nil) }
-  let(:connections)    { stub(push: nil) }
-  let(:authentication) { "auth" }
+  let(:connection)  { stub(emit: nil) }
+  let(:connections) { stub(push: nil) }
 
   subject { PusherFake::Channel::Public.new("name") }
 
   before do
-    subject.stubs(authorized?: nil, connections: connections)
+    subject.stubs(connections: connections)
   end
 
-  it "authorizes the connection" do
-    subject.add(connection, data)
-    subject.should have_received(:authorized?).with(connection, data)
-  end
-
-  it "adds the connection to the channel when authorized" do
-    subject.stubs(authorized?: true)
-    subject.add(connection, data)
+  it "adds the connection" do
+    subject.add(connection)
     connections.should have_received(:push).with(connection)
   end
 
-  it "successfully subscribes the connection when authorized" do
-    subject.stubs(authorized?: true)
-    subject.add(connection, data)
+  it "successfully subscribes the connection" do
+    subject.add(connection)
     connection.should have_received(:emit).with("pusher_internal:subscription_succeeded", {}, subject.name)
-  end
-
-  it "unsuccessfully subscribes the connection when not authorized" do
-    subject.stubs(authorized?: false)
-    subject.add(connection, data)
-    connection.should have_received(:emit).with("pusher_internal:subscription_error", {}, subject.name)
-  end
-end
-
-describe PusherFake::Channel, "#authorized?" do
-  let(:data)           { { auth: authentication } }
-  let(:connection)     { stub }
-  let(:authentication) { "auth" }
-
-  subject { PusherFake::Channel::Public.new("name") }
-
-  it "returns true" do
-    subject.should be_authorized(connection, data)
   end
 end
 
