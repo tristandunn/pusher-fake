@@ -13,25 +13,6 @@ module PusherFake
         @members = {}
       end
 
-      # Add the connection to the channel if they are authorized.
-      #
-      # @param [Connection] connection The connection to add.
-      # @param [Hash] options The options for the channel.
-      # @option options [String] :auth The authentication string.
-      # @option options [Hash] :channel_data The ID and information for the subscribed client.
-      def add(connection, options = {})
-        if authorized?(connection, options)
-          members[connection] = Yajl::Parser.parse(options[:channel_data], symbolize_keys: true)
-
-          emit("pusher_internal:member_added", members[connection])
-
-          connection.emit("pusher_internal:subscription_succeeded", subscription_data, name)
-          connections.push(connection)
-        else
-          connection.emit("pusher_internal:subscription_error", {}, name)
-        end
-      end
-
       # Removes the +connection+ from the channel and notifies the channel.
       #
       # @param [Connection] connection The connection to remove.
@@ -52,6 +33,16 @@ module PusherFake
         }
 
         { presence: { hash: hash, count: members.size } }
+      end
+
+      private
+
+      def subscription_succeeded(connection, options = {})
+        members[connection] = Yajl::Parser.parse(options[:channel_data], symbolize_keys: true)
+
+        emit("pusher_internal:member_added", members[connection])
+
+        super(connection, options)
       end
     end
   end

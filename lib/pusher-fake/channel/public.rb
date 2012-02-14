@@ -20,8 +20,7 @@ module PusherFake
       # @param [Connection] connection The connection to add.
       # @param [Hash] options The options for the channel.
       def add(connection, options = {})
-        connection.emit("pusher_internal:subscription_succeeded", {}, name)
-        connections.push(connection)
+        subscription_succeeded(connection, options)
       end
 
       # Emits an event to the channel.
@@ -47,6 +46,17 @@ module PusherFake
       # @param [Connection] connection The connection to remove.
       def remove(connection)
         connections.delete(connection)
+      end
+
+      private
+
+      def subscription_data
+        {}
+      end
+
+      def subscription_succeeded(connection, options = {})
+        connection.emit("pusher_internal:subscription_succeeded", subscription_data, name)
+        connections.push(connection)
       end
     end
   end

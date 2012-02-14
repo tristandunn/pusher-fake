@@ -6,10 +6,10 @@ module PusherFake
       # @param [Connection] connection The connection to add.
       # @param [Hash] options The options for the channel.
       # @option options [String] :auth The authentication string.
+      # @option options [Hash] :channel_data The ID and information for the subscribed client.
       def add(connection, options = {})
         if authorized?(connection, options)
-          connection.emit("pusher_internal:subscription_succeeded", {}, name)
-          connections.push(connection)
+          subscription_succeeded(connection, options)
         else
           connection.emit("pusher_internal:subscription_error", {}, name)
         end
