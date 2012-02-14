@@ -11,9 +11,11 @@ require "pusher-fake/configuration"
 require "pusher-fake/connection"
 require "pusher-fake/server"
 require "pusher-fake/server/application"
-require "pusher-fake/version"
 
 module PusherFake
+  # The current version string.
+  VERSION = "0.1.0"
+
   # Call this method to modify the defaults.
   #
   # @example
