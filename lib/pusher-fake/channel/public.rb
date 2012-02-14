@@ -27,7 +27,7 @@ module PusherFake
       # Emits an event to the channel.
       #
       # @param [String] event The event name.
-      # @param [Hash] data Data to emit with the event.
+      # @param [Hash] data The event data.
       def emit(event, data)
         connections.each do |connection|
           connection.emit(event, data, name)

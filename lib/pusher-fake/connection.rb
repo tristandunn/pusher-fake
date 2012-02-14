@@ -14,6 +14,7 @@ module PusherFake
     #
     # @param [String] event The event name.
     # @param [Hash] data The event data.
+    # @param [String] The channel name.
     def emit(event, data = {}, channel = nil)
       message = { event: event, data: data }
       message[:channel] = channel if channel

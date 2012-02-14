@@ -18,7 +18,7 @@ module PusherFake
       # @param [Connection] connection The connection to add.
       # @param [Hash] options The options for the channel.
       # @option options [String] :auth The authentication string.
-      # @option options [Hash] :channel_data The id and information for the subscribed client.
+      # @option options [Hash] :channel_data The ID and information for the subscribed client.
       def add(connection, options = {})
         if authorized?(connection, options)
           members[connection] = Yajl::Parser.parse(options[:channel_data], symbolize_keys: true)

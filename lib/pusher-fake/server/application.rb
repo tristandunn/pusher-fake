@@ -37,7 +37,7 @@ module PusherFake
 
       # Get the event name from the request parameters.
       #
-      # @return [String] The even name.
+      # @return [String] The event name.
       def self.event
         request.params["name"]
       end
