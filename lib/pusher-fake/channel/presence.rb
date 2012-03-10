@@ -27,10 +27,11 @@ module PusherFake
       #
       # @return [Hash] Subscription hash contained presence information.
       def subscription_data
-        hash = members.values.inject({}) { |result, member|
-          result[member[:user_id]] = member
-          result
-        }
+        hash = Hash[
+          members.map { |_, member|
+            [member[:user_id], member]
+          }
+        ]
 
         { presence: { hash: hash, count: members.size } }
       end

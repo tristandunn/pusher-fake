@@ -80,8 +80,8 @@ end
 
 describe PusherFake::Channel, ".remove" do
   let(:channels)   { { channel_1: channel_1, channel_2: channel_2 } }
-  let(:channel_1)  { stub(connections: stub(length: 0), remove: nil) }
-  let(:channel_2)  { stub(connections: stub(length: 1), remove: nil) }
+  let(:channel_1)  { stub(connections: stub(empty?: true), remove: nil) }
+  let(:channel_2)  { stub(connections: stub(empty?: false), remove: nil) }
   let(:connection) { mock }
 
   subject { PusherFake::Channel }
