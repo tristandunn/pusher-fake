@@ -16,11 +16,10 @@ end
 When %{I subscribe to the "$channel" channel with presence events} do |channel|
   page.execute_script(%{
     var list    = document.querySelector("#presence ul"),
+        count   = document.querySelector("#presence header h1 span"),
         channel = Pusher.instance.subscribe(#{channel.to_json});
 
     channel.bind("pusher:subscription_succeeded", function(clients) {
-      var
-      count = document.querySelector("#presence header h1 span");
       count.innerHTML = clients.count;
 
       clients.each(function(client) {
@@ -30,8 +29,6 @@ When %{I subscribe to the "$channel" channel with presence events} do |channel|
       });
     });
     channel.bind("pusher:member_added", function(client) {
-      var
-      count = document.querySelector("#presence header h1 span");
       count.innerHTML = parseInt(count.innerHTML, 10) + 1;
 
       var
@@ -39,8 +36,7 @@ When %{I subscribe to the "$channel" channel with presence events} do |channel|
       element.setAttribute("id", "client-" + client.id);
     });
     channel.bind("pusher:member_removed", function(client) {
-      var item  = list.querySelector("li#client-" + client.id),
-          count = document.querySelector("#presence header h1 span");
+      var item = list.querySelector("li#client-" + client.id);
 
       count.innerHTML = parseInt(count.innerHTML, 10) - 1;
 
