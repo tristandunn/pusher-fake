@@ -15,15 +15,13 @@ class Sinatra::Application
   end
 
   post "/pusher/auth" do
+    data    = nil
     channel = Pusher[params[:channel_name]]
 
-    if params[:channel_name] =~ /^private-/
-      channel.authenticate(params[:socket_id]).to_json
-    elsif params[:channel_name] =~ /^presence-/
-      channel.authenticate(params[:socket_id], {
-        user_id:   params[:socket_id],
-        user_info: {}
-      }).to_json
+    if params[:channel_name] =~ /^presence-/
+      data = { user_id: params[:socket_id], user_info: {} }
     end
+
+    channel.authenticate(params[:socket_id], data).to_json
   end
 end
