@@ -95,7 +95,7 @@ PLATFORMS
 
 DEPENDENCIES
   bourne (= 1.1.1)
-  bundler (= 1.1.0)
+  bundler (>= 1.1.0)
   capybara (= 1.1.2)
   capybara-webkit (= 0.10.1)
   cucumber (= 1.1.9)

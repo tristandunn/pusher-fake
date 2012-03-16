@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
   s.add_dependency "yajl-ruby",    "1.1.0"
 
   s.add_development_dependency "bourne",          "1.1.1"
-  s.add_development_dependency "bundler",         "1.1.0"
+  s.add_development_dependency "bundler",         ">= 1.1.0"
   s.add_development_dependency "capybara",        "1.1.2"
   s.add_development_dependency "capybara-webkit", "0.10.1"
   s.add_development_dependency "cucumber",        "1.1.9"
