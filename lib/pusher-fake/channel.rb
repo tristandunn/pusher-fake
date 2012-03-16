@@ -6,7 +6,7 @@ module PusherFake
 
       attr_accessor :channels
 
-      # Create a channel, determing the type by the name.
+      # Create a channel, determining the type by the name.
       #
       # @param [String] name The channel name.
       # @return [Public|Private] The channel object.
