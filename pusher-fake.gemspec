@@ -24,6 +24,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "capybara-webkit", "0.10.1"
   s.add_development_dependency "cucumber",        "1.1.9"
   s.add_development_dependency "pusher",          "0.9.2"
+  s.add_development_dependency "rake",            "0.9.2.2"
   s.add_development_dependency "redcarpet",       "2.1.0"
   s.add_development_dependency "rspec",           "2.8.0"
   s.add_development_dependency "sinatra",         "1.3.2"
