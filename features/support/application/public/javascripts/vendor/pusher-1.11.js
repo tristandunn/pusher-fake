@@ -1,5 +1,5 @@
 /*!
- * Pusher JavaScript Library v1.11.0
+ * Pusher JavaScript Library v1.11.2
  * http://pusherapp.com/
  *
  * Copyright 2011, Pusher
@@ -181,7 +181,7 @@ Pusher.warn = function() {
 };
 
 // Pusher defaults
-Pusher.VERSION = '1.11.0';
+Pusher.VERSION = '1.11.2';
 
 Pusher.host = 'ws.pusherapp.com';
 Pusher.ws_port = 80;
@@ -307,6 +307,11 @@ Example:
     var stateCallbacks = this.stateActions;
 
     if (prevState && (Pusher.Util.arrayIndexOf(this.transitions[prevState], nextState) == -1)) {
+      this.emit('invalid_transition_attempt', {
+        oldState: prevState,
+        newState: nextState
+      });
+
       throw new Error('Invalid transition [' + prevState + ' to ' + nextState + ']');
     }
 
@@ -350,6 +355,7 @@ Example:
     A little bauble to interface with window.navigator.onLine,
     window.ononline and window.onoffline.  Easier to mock.
   */
+
   var NetInfo = function() {
     var self = this;
     Pusher.EventsDispatcher.call(this);
@@ -376,7 +382,7 @@ Example:
   };
 
   Pusher.Util.extend(NetInfo.prototype, Pusher.EventsDispatcher.prototype);
-  
+
   this.Pusher.NetInfo = NetInfo;
 }).call(this);
 
@@ -431,7 +437,7 @@ Example:
     this.netInfo.bind('online', function(){
       if (self._machine.is('waiting')) {
         self._machine.transition('connecting');
-        triggerStateChange('connecting');
+        updateState('connecting');
       }
     });
 
@@ -452,8 +458,6 @@ Example:
 
     // define the state machine that runs the connection
     this._machine = new Pusher.Machine('initialized', machineTransitions, {
-
-      // TODO: Use the constructor for this.
       initializedPre: function() {
         self.compulsorySecure = self.options.encrypted;
 
@@ -469,16 +473,18 @@ Example:
           self.emit('connecting_in', self.connectionWait);
         }
 
-        if (self.netInfo.isOnLine() === false || self.connectionAttempts > 4){
-          triggerStateChange('unavailable');
+        if (self.netInfo.isOnLine() && self.connectionAttempts <= 4) {
+          updateState('connecting');
         } else {
-          triggerStateChange('connecting');
+          updateState('unavailable');
         }
 
-        if (self.netInfo.isOnLine() === true) {
+        // When in the unavailable state we attempt to connect, but don't
+        // broadcast that fact
+        if (self.netInfo.isOnLine()) {
           self._waitingTimer = setTimeout(function() {
             self._machine.transition('connecting');
-          }, self.connectionWait);
+          }, connectionDelay());
         }
       },
 
@@ -491,7 +497,7 @@ Example:
         // state even when offline.
         if (self.netInfo.isOnLine() === false) {
           self._machine.transition('waiting');
-          triggerStateChange('unavailable');
+          updateState('unavailable');
 
           return;
         }
@@ -545,6 +551,11 @@ Example:
       },
 
       openToImpermanentlyClosing: function() {
+        // Possible to receive connection_established event after transition to impermanentlyClosing
+        // but before socket close.  Prevent this triggering a transition from impermanentlyClosing to connected
+        // by unbinding onmessage callback.
+        self.socket.onmessage = undefined;
+
         updateConnectionParameters();
       },
 
@@ -556,17 +567,18 @@ Example:
         self.socket.onclose = transitionToWaiting;
 
         resetConnectionParameters(self);
+        self.connectedAt = new Date().getTime();
 
         resetActivityCheck();
       },
 
       connectedPost: function() {
-        triggerStateChange('connected');
+        updateState('connected');
       },
 
       connectedExit: function() {
         stopActivityCheck();
-        triggerStateChange('disconnected');
+        updateState('disconnected');
       },
 
       impermanentlyClosingPost: function() {
@@ -591,8 +603,12 @@ Example:
       },
 
       failedPre: function() {
-        triggerStateChange('failed');
+        updateState('failed');
         Pusher.debug('WebSockets are not available in this browser.');
+      },
+
+      permanentlyClosedPost: function() {
+        updateState('disconnected');
       }
     });
 
@@ -633,7 +649,11 @@ Example:
         protocol = 'wss://';
       }
 
-      return protocol + Pusher.host + ':' + port + '/app/' + key + '?client=js&version=' + Pusher.VERSION;
+      var flash = (Pusher.TransportType === "flash") ? "true" : "false";
+
+      return protocol + Pusher.host + ':' + port + '/app/' + key + '?protocol=5&client=js'
+        + '&version=' + Pusher.VERSION
+        + '&flash=' + flash;
     }
 
     // callback for close and retry.  Used on timeouts.
@@ -657,6 +677,25 @@ Example:
       if (self._activityTimer) { clearTimeout(self._activityTimer); }
     }
 
+    // Returns the delay before the next connection attempt should be made
+    //
+    // This function guards against attempting to connect more frequently than
+    // once every second
+    //
+    function connectionDelay() {
+      var delay = self.connectionWait;
+      if (delay === 0) {
+        if (self.connectedAt) {
+          var t = 1000;
+          var connectedFor = new Date().getTime() - self.connectedAt;
+          if (connectedFor < t) {
+            delay = t - connectedFor;
+          }
+        }
+      }
+      return delay;
+    }
+
     /*-----------------------------------------------
       WebSocket Callbacks
       -----------------------------------------------*/
@@ -666,28 +705,40 @@ Example:
       self._machine.transition('open');
     };
 
+    function handleCloseCode(code, message) {
+      // first inform the end-developer of this error
+      self.emit('error', {type: 'PusherError', data: {code: code, message: message}});
+
+      if (code === 4000) {
+        // SSL only app
+        self.compulsorySecure = true;
+        self.connectionSecure = true;
+        self.options.encrypted = true;
+
+        self._machine.transition('impermanentlyClosing')
+      } else if (code < 4100) {
+        // Permentently close connection
+        self._machine.transition('permanentlyClosing')
+      } else if (code < 4200) {
+        // Backoff before reconnecting
+        self.connectionWait = 1000;
+        self._machine.transition('waiting')
+      } else if (code < 4300) {
+        // Reconnect immediately
+        self._machine.transition('impermanentlyClosing')
+      } else {
+        // Unknown error
+        self._machine.transition('permanentlyClosing')
+      }
+    }
+
     function ws_onMessageOpen(event) {
       var params = parseWebSocketEvent(event);
       if (params !== undefined) {
         if (params.event === 'pusher:connection_established') {
           self._machine.transition('connected', params.data.socket_id);
         } else if (params.event === 'pusher:error') {
-          // first inform the end-developer of this error
-          self.emit('error', {type: 'PusherError', data: params.data});
-
-          switch (params.data.code) {
-            case 4000:
-              Pusher.warn(params.data.message);
-
-              self.compulsorySecure = true;
-              self.connectionSecure = true;
-              self.options.encrypted = true;
-              break;
-            case 4001:
-              // App not found by key - close connection
-              self._machine.transition('permanentlyClosing');
-              break;
-          }
+          handleCloseCode(params.data.code, params.data.message)
         }
       }
     }
@@ -753,19 +804,21 @@ Example:
       self._machine.transition('impermanentlyClosing');
     }
 
-    function triggerStateChange(newState, data) {
-      // avoid emitting and changing the state
-      // multiple times when it's the same.
-      if (self.state === newState) return;
-
+    // Updates the public state information exposed by connection
+    //
+    // This is distinct from the internal state information used by _machine
+    // to manage the connection
+    //
+    function updateState(newState, data) {
       var prevState = self.state;
-
       self.state = newState;
 
-      Pusher.debug('State changed', prevState + ' -> ' + newState);
-
-      self.emit('state_change', {previous: prevState, current: newState});
-      self.emit(newState, data);
+      // Only emit when the state changes
+      if (prevState !== newState) {
+        Pusher.debug('State changed', prevState + ' -> ' + newState);
+        self.emit('state_change', {previous: prevState, current: newState});
+        self.emit(newState, data);
+      }
     }
   };
 
@@ -785,14 +838,24 @@ Example:
     }
     // user re-opening connection after closing it
     else if(this._machine.is("permanentlyClosed")) {
+      resetConnectionParameters(this);
       this._machine.transition('waiting');
     }
   };
 
   Connection.prototype.send = function(data) {
     if (this._machine.is('connected')) {
-      this.socket.send(data);
-      return true;
+      // Bug in iOS (reproduced in 5.0.1) Mobile Safari:
+      // 1. Open page/tab, connect WS, get some data.
+      // 2. Switch tab or close Mobile Safari and wait for WS connection to get closed (probably by server).
+      // 3. Switch back to tab or open Mobile Safari and Mobile Safari crashes.
+      // The problem is that WS tries to send data on closed WS connection before it realises it is closed.
+      // The timeout means that by the time the send happens, the WS readyState correctly reflects closed state.
+      var self = this;
+      setTimeout(function() {
+        self.socket.send(data);
+      }, 0);
+      return true; // only a reflection of fact that WS thinks it is open - could get returned before some lower-level failure.
     } else {
       return false;
     }
