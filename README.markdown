@@ -1,4 +1,4 @@
-# pusher-fake
+# pusher-fake [![Build Status](https://secure.travis-ci.org/tristandunn/pusher-fake.png?branch=master)](http://travis-ci.org/tristandunn/pusher-fake)
 
 A fake [Pusher](http://pusher.com) server for development and testing.
 
