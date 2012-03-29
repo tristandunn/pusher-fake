@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.1 — Unreleased
+## 0.1.1 — March 29, 2012
 
 * Added support for parametric app_id in configuration and application server. (Alessandro Morandi)
 * Upgraded the Pusher JS client to version 1.11.2. (Tristan Dunn)
