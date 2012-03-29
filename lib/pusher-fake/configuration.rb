@@ -1,5 +1,8 @@
 module PusherFake
   class Configuration
+    # @return [String] The Pusher Applicaiton ID. (Defaults to +PUSHER_APP_ID+.)
+    attr_accessor :app_id
+
     # @return [String] The Pusher API key. (Defaults to +PUSHER_API_KEY+.)
     attr_accessor :key
 
@@ -20,6 +23,7 @@ module PusherFake
 
     # Instantiated from {PusherFake.configuration}. Sets the defaults.
     def initialize
+      self.app_id      = "PUSHER_APP_ID"
       self.key         = "PUSHER_API_KEY"
       self.secret      = "PUSHER_API_SECRET"
       self.socket_host = "127.0.0.1"

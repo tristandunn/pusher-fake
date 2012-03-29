@@ -60,6 +60,19 @@ describe PusherFake::Server::Application, ".channel" do
   it "returns the channel name from the path" do
     subject.channel.should == channel
   end
+
+  context "with a custom application ID" do
+    let(:path)   { "/apps/#{app_id}/channels/#{channel}/events" }
+    let(:app_id) { "test-id" }
+
+    before do
+      PusherFake.configuration.app_id = app_id
+    end
+
+    it "returns the channel name from the path" do
+      subject.channel.should == channel
+    end
+  end
 end
 
 describe PusherFake::Server::Application, ".data" do
