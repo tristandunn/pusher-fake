@@ -8,7 +8,7 @@ module PusherFake
       #
       # @param [String] name The channel name.
       def initialize(name)
-        super(name)
+        super
 
         @members = {}
       end
@@ -43,7 +43,7 @@ module PusherFake
 
         emit("pusher_internal:member_added", members[connection])
 
-        super(connection, options)
+        super
       end
     end
   end
