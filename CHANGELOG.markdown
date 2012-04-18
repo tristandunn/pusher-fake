@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2 — Unreleased
+
+* Miscellaneous clean up. (Tristan Dunn)
+
 ## 0.1.1 — March 29, 2012
 
 * Added support for parametric app_id in configuration and application server. (Alessandro Morandi)
