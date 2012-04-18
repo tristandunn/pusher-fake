@@ -18,7 +18,9 @@ module PusherFake
       #
       # @return [String] The channel name.
       def self.channel
-        path.match(%r{/apps/#{PusherFake.configuration.app_id}/channels/(.+)/events}i)[1]
+        matcher = %r{/apps/#{PusherFake.configuration.app_id}/channels/(.+)/events}i
+        matches = path.match(matcher)
+        matches[1]
       end
 
       # Parse and return the event data from the request JSON.
