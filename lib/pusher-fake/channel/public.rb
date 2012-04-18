@@ -48,11 +48,11 @@ module PusherFake
         connections.delete(connection)
       end
 
-      private
-
       def subscription_data
         {}
       end
+
+      private
 
       def subscription_succeeded(connection, options = {})
         connection.emit("pusher_internal:subscription_succeeded", subscription_data, name)

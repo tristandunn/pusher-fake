@@ -22,10 +22,9 @@ module PusherFake
         emit("pusher_internal:member_removed", members.delete(connection))
       end
 
-      # Returns a subscription hash containing presence information for
-      # the channel.
+      # Returns a hash containing presence information for the channel.
       #
-      # @return [Hash] Subscription hash contained presence information.
+      # @return [Hash] Hash containing presence information.
       def subscription_data
         hash = Hash[
           members.map { |_, member|

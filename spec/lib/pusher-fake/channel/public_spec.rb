@@ -88,3 +88,11 @@ describe PusherFake::Channel, "#remove" do
     subject.connections.should be_empty
   end
 end
+
+describe PusherFake::Channel::Public, "#subscription_data" do
+  subject { PusherFake::Channel::Public.new("name") }
+
+  it "returns an empty hash" do
+    subject.subscription_data.should == {}
+  end
+end

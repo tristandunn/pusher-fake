@@ -111,7 +111,7 @@ describe PusherFake::Channel::Presence, "#subscription_data" do
     subject.stubs(members: members)
   end
 
-  it "returns presence hash and count" do
+  it "returns hash with presence information" do
     subject.subscription_data.should == {
       presence: {
         hash:  { member[:user_id] => member },
