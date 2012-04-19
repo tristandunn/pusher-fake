@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.2 — Unreleased
+## 0.1.2 — April 19, 2012
 
 * Make subscription_data match Pusher v1.11 format. (Thomas Walpole)
 * Miscellaneous clean up. (Tristan Dunn)
