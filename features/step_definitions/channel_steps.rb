@@ -26,6 +26,7 @@ When %{I subscribe to the "$channel" channel with presence events} do |channel|
         var
         element = list.appendChild(document.createElement("li"));
         element.setAttribute("id", "client-" + client.id);
+        element.innerHTML = client.info && client.info.name
       });
     });
     channel.bind("pusher:member_added", function(client) {
@@ -34,6 +35,7 @@ When %{I subscribe to the "$channel" channel with presence events} do |channel|
       var
       element = list.appendChild(document.createElement("li"));
       element.setAttribute("id", "client-" + client.id);
+      element.innerHTML = client.info && client.info.name
     });
     channel.bind("pusher:member_removed", function(client) {
       var item = list.querySelector("li#client-" + client.id);
