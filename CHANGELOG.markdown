@@ -2,6 +2,7 @@
 
 ## 0.1.2 — Unreleased
 
+* Make subscription_data match Pusher v1.11 format. (Thomas Walpole)
 * Miscellaneous clean up. (Tristan Dunn)
 
 ## 0.1.1 — March 29, 2012
