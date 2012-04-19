@@ -28,18 +28,17 @@ module PusherFake
       def subscription_data
         hash = Hash[
           members.map { |_, member|
-            [member[:user_id], member]
+#            [member[:user_id], member]
+             [member[:user_id], member[:user_info]]
           }
         ]
-
-        { presence: { hash: hash, count: members.size } }
+        { presence: { hash: hash, count: members.size, ids: members.map { |_,m| m[:user_id] } } }
       end
 
       private
 
       def subscription_succeeded(connection, options = {})
         members[connection] = Yajl::Parser.parse(options[:channel_data], symbolize_keys: true)
-
         emit("pusher_internal:member_added", members[connection])
 
         super

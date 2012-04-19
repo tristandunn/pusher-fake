@@ -114,8 +114,9 @@ describe PusherFake::Channel::Presence, "#subscription_data" do
   it "returns hash with presence information" do
     subject.subscription_data.should == {
       presence: {
-        hash:  { member[:user_id] => member },
-        count: 1
+        hash:  { member[:user_id] => member[:user_info] },
+        count: 1,
+        ids: [ member[:user_id] ]
       }
     }
   end
@@ -125,8 +126,9 @@ describe PusherFake::Channel::Presence, "#subscription_data" do
 
     subject.subscription_data.should == {
       presence: {
-        hash:  { member[:user_id] => member, other[:user_id] => other },
-        count: 2
+        hash:  { member[:user_id] => member[:user_info], other[:user_id] => other[:user_info] },
+        count: 2,
+        ids: [member[:user_id], other[:user_id]]
       }
     }
   end
