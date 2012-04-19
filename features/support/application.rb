@@ -19,7 +19,7 @@ class Sinatra::Application
     channel = Pusher[params[:channel_name]]
 
     if params[:channel_name] =~ /^presence-/
-      data = { user_id: params[:socket_id], user_info: {} }
+      data = { user_id: params[:socket_id], user_info: { name: "Alan Turing" } }
     end
 
     channel.authenticate(params[:socket_id], data).to_json

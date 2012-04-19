@@ -28,7 +28,7 @@ module PusherFake
       def subscription_data
         hash = Hash[
           members.map { |_, member|
-            [member[:user_id], member]
+            [member[:user_id], member[:user_info]]
           }
         ]
 
