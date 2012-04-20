@@ -21,6 +21,8 @@ module PusherFake
       #
       # @param [Connection] connection The connection to remove.
       def remove(connection)
+        return if channels.nil?
+
         channels.each do |name, channel|
           channel.remove(connection)
 

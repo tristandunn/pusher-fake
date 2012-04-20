@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3 — Unreleased
+
+* Handle channels not being defined when attempting to remove a connection. (Tristan Dunn)
+
 ## 0.1.2 — April 19, 2012
 
 * Make subscription_data match Pusher v1.11 format. (Thomas Walpole)

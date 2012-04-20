@@ -105,6 +105,11 @@ describe PusherFake::Channel, ".remove" do
     subject.remove(connection)
     channels.should have_key(:channel_2)
   end
+
+  it "handles channels not being defined" do
+    subject.stubs(channels: nil)
+    subject.remove(connection)
+  end
 end
 
 describe PusherFake::Channel, ".reset" do
