@@ -11,7 +11,7 @@ module PusherFake
 
         Channel.factory(channel).emit(event, data)
 
-        Rack::Response.new.finish
+        Rack::Response.new("{}").finish
       end
 
       # Determine the channel name from the request path.

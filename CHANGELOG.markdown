@@ -2,6 +2,7 @@
 
 ## 0.1.3 — Unreleased
 
+* Ensure the server returns a valid JSON response. (Marko Anastasov)
 * Handle channels not being defined when attempting to remove a connection. (Tristan Dunn)
 * Update dependencies. (Tristan Dunn)
 
