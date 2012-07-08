@@ -3,6 +3,7 @@
 ## 0.1.3 — Unreleased
 
 * Handle channels not being defined when attempting to remove a connection. (Tristan Dunn)
+* Update dependencies. (Tristan Dunn)
 
 ## 0.1.2 — April 19, 2012
 
