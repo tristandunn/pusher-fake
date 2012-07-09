@@ -32,7 +32,7 @@ describe PusherFake::Server::Application, ".call" do
     channel.should have_received(:emit).with(event, data)
   end
 
-  it "creates a Rack response" do
+  it "creates a Rack response with an empty JSON object" do
     subject.call(environment)
     Rack::Response.should have_received(:new).with("{}")
   end
