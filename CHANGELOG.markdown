@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.3 — Unreleased
+## 0.1.3 — July 9, 2012
 
 * Ensure the server returns a valid JSON response. (Marko Anastasov)
 * Handle channels not being defined when attempting to remove a connection. (Tristan Dunn)
