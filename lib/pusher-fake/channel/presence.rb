@@ -13,7 +13,7 @@ module PusherFake
         @members = {}
       end
 
-      # Removes the +connection+ from the channel and notifies the channel.
+      # Remove the +connection+ from the channel and notify the channel.
       #
       # @param [Connection] connection The connection to remove.
       def remove(connection)
@@ -22,7 +22,7 @@ module PusherFake
         emit("pusher_internal:member_removed", members.delete(connection))
       end
 
-      # Returns a hash containing presence information for the channel.
+      # Return a hash containing presence information for the channel.
       #
       # @return [Hash] Hash containing presence information.
       def subscription_data
@@ -37,6 +37,11 @@ module PusherFake
 
       private
 
+      # Store the member data for the connection and notify connections a
+      # member was added.
+      #
+      # @param [Connection] connection The connection a subscription succeeded for.
+      # @param [Hash] options The options for the channel.
       def subscription_succeeded(connection, options = {})
         members[connection] = Yajl::Parser.parse(options[:channel_data], symbolize_keys: true)
 

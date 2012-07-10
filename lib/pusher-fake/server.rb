@@ -36,10 +36,17 @@ module PusherFake
 
     private
 
+    # Convenience method for access the configuration object.
+    #
+    # @return [Configuration] The configuration object.
     def self.configuration
       PusherFake.configuration
     end
 
+    # Return a hash of options for the socket server based on
+    # the configuration.
+    #
+    # @return [Hash] The socket server configuration options.
     def self.socket_server_options
       { host: configuration.socket_host,
         port: configuration.socket_port }
