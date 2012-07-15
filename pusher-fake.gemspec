@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   s.test_files   = Dir["{features,spec}/**/*"].to_a
   s.require_path = "lib"
 
-  s.add_dependency "em-websocket", "0.3.6"
+  s.add_dependency "em-websocket", "0.3.8"
   s.add_dependency "ruby-hmac",    "0.4.0"
   s.add_dependency "thin",         "1.4.1"
   s.add_dependency "yajl-ruby",    "1.1.0"

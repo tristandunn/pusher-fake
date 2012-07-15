@@ -4,6 +4,7 @@
 
 * Upgraded the Pusher JS client to version 1.12.1. (Tristan Dunn)
 * Improve documentation. (Tristan Dunn)
+* Update dependencies. (Tristan Dunn)
 
 ## 0.1.3 — July 9, 2012
 
