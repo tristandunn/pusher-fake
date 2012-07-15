@@ -14,7 +14,7 @@ require "pusher-fake/server/application"
 
 module PusherFake
   # The current version string.
-  VERSION = "0.1.3"
+  VERSION = "0.1.4"
 
   # Call this method to modify the defaults.
   #

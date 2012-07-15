@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.4 — Unreleased
+## 0.1.4 — July 15, 2012
 
 * Upgraded the Pusher JS client to version 1.12.1. (Tristan Dunn)
 * Improve documentation. (Tristan Dunn)
