@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    pusher-fake (0.1.4)
+    pusher-fake (0.1.5)
       em-websocket (= 0.3.8)
       ruby-hmac (= 0.4.0)
       thin (= 1.5.0)

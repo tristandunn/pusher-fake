@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.5 — Unreleased
+## 0.1.5 — November 12, 2012
 
 * Use the new Pusher event format. (Tristan Dunn)
 * Upgraded the Pusher JS client to version 1.12.5. (Tristan Dunn)
