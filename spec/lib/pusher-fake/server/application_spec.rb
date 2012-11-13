@@ -1,35 +1,52 @@
 require "spec_helper"
 
 describe PusherFake::Server::Application, ".call" do
-  let(:data)         { mock }
-  let(:event)        { mock }
-  let(:channel)      { stub(emit: nil) }
-  let(:response)     { mock }
-  let(:environment)  { mock }
-  let(:channel_name) { mock }
+  let(:body)        { stub(read: json) }
+  let(:data)        { mock }
+  let(:json)        { mock }
+  let(:name)        { "event-name" }
+  let(:event)       { { "channels" => channels, "name" => name, "data" => data } }
+  let(:request)     { stub(body: body) }
+  let(:channels)    { ["channel-1", "channel-2"] }
+  let(:response)    { mock }
+  let(:channel_1)   { stub(emit: true) }
+  let(:channel_2)   { stub(emit: true) }
+  let(:environment) { mock }
 
   subject { PusherFake::Server::Application }
 
   before do
-    subject.stubs(channel: channel_name, data: data, event: event)
-    PusherFake::Channel.stubs(factory: channel)
     response.stubs(finish: response)
+
+    Yajl::Parser.stubs(parse: event)
+    Rack::Request.stubs(new: request)
     Rack::Response.stubs(new: response)
+    PusherFake::Channel.stubs(:factory).with(channels[0]).returns(channel_1)
+    PusherFake::Channel.stubs(:factory).with(channels[1]).returns(channel_2)
   end
 
-  it "assigns the environment" do
+  it "creates a request" do
     subject.call(environment)
-    subject.environment.should == environment
+    Rack::Request.should have_received(:new).with(environment)
   end
 
-  it "creates the channel by name" do
+  it "parses the request body as JSON" do
     subject.call(environment)
-    PusherFake::Channel.should have_received(:factory).with(channel_name)
+    Yajl::Parser.should have_received(:parse).with(json)
   end
 
-  it "emits the event to the channel" do
+  it "creates channels by name" do
     subject.call(environment)
-    channel.should have_received(:emit).with(event, data)
+
+    channels.each do |channel|
+      PusherFake::Channel.should have_received(:factory).with(channel)
+    end
+  end
+
+  it "emits the event to the channels" do
+    subject.call(environment)
+    channel_1.should have_received(:emit).with(name, data)
+    channel_2.should have_received(:emit).with(name, data)
   end
 
   it "creates a Rack response with an empty JSON object" do
@@ -44,103 +61,5 @@ describe PusherFake::Server::Application, ".call" do
 
   it "returns the response" do
     subject.call(environment).should == response
-  end
-end
-
-describe PusherFake::Server::Application, ".channel" do
-  let(:path)    { "/apps/PUSHER_APP_ID/channels/#{channel}/events" }
-  let(:channel) { "channel-name" }
-
-  subject { PusherFake::Server::Application }
-
-  before do
-    subject.stubs(path: path)
-  end
-
-  it "returns the channel name from the path" do
-    subject.channel.should == channel
-  end
-
-  context "with a custom application ID" do
-    let(:path)   { "/apps/#{app_id}/channels/#{channel}/events" }
-    let(:app_id) { "test-id" }
-
-    before do
-      PusherFake.configuration.app_id = app_id
-    end
-
-    it "returns the channel name from the path" do
-      subject.channel.should == channel
-    end
-  end
-end
-
-describe PusherFake::Server::Application, ".data" do
-  let(:data)    { mock }
-  let(:body)    { stub(read: json) }
-  let(:json)    { mock }
-  let(:request) { stub(body: body) }
-
-  subject { PusherFake::Server::Application }
-
-  before do
-    subject.stubs(request: request)
-    Yajl::Parser.stubs(parse: data)
-  end
-
-  it "parses the request body as JSON" do
-    subject.data
-    Yajl::Parser.should have_received(:parse).with(json)
-  end
-
-  it "returns the parsed JSON" do
-    subject.data.should == data
-  end
-end
-
-describe PusherFake::Server::Application, ".event" do
-  let(:name)    { mock }
-  let(:params)  { { "name" => name } }
-  let(:request) { stub(params: params) }
-
-  subject { PusherFake::Server::Application }
-
-  before do
-    subject.stubs(request: request)
-  end
-
-  it "creates a reqeust from the environment" do
-    subject.event.should == name
-  end
-end
-
-describe PusherFake::Server::Application, ".path" do
-  let(:path)        { mock }
-  let(:environment) { { "PATH_INFO" => path } }
-
-  subject { PusherFake::Server::Application }
-
-  before do
-    subject.stubs(environment: environment)
-  end
-
-  it "returns the path for the environment" do
-    subject.path.should == path
-  end
-end
-
-describe PusherFake::Server::Application, ".request" do
-  let(:environment) { mock }
-
-  subject { PusherFake::Server::Application }
-
-  before do
-    Rack::Request.stubs(:new)
-    subject.stubs(environment: environment)
-  end
-
-  it "creates a reqeust from the environment" do
-    subject.request
-    Rack::Request.should have_received(:new).with(environment)
   end
 end

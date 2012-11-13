@@ -2,6 +2,7 @@
 
 ## 0.1.5 — Unreleased
 
+* Use the new Pusher event format. (Tristan Dunn)
 * Upgraded the Pusher JS client to version 1.12.5. (Tristan Dunn)
 * Update dependencies. (Tristan Dunn)
 
