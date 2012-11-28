@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.2.0 — Unreleased
+## 0.2.0 — November 28, 2012
 
 * Replace ruby-hmac with openssl. (Sergey Nartimov)
 * Use multi_json instead of yajl-ruby. (Sergey Nartimov)
