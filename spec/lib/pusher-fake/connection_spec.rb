@@ -13,12 +13,12 @@ end
 
 describe PusherFake::Connection, "#emit" do
   let(:data)         { { some: "data", good: true } }
-  let(:json)         { Yajl::Encoder.encode(message) }
+  let(:json)         { MultiJson.dump(message) }
   let(:event)        { "name" }
   let(:socket)       { stub(:send) }
   let(:channel)      { "channel" }
   let(:message)      { { event: event, data: data } }
-  let(:channel_json) { Yajl::Encoder.encode(message.merge(channel: channel)) }
+  let(:channel_json) { MultiJson.dump(message.merge(channel: channel)) }
 
   subject { PusherFake::Connection.new(socket) }
 
@@ -58,13 +58,13 @@ describe PusherFake::Connection, "#process, with a subscribe event" do
   subject { PusherFake::Connection.new(stub) }
 
   before do
-    Yajl::Parser.stubs(parse: message)
+    MultiJson.stubs(load: message)
     PusherFake::Channel.stubs(factory: channel)
   end
 
   it "parses the JSON data" do
     subject.process(json)
-    Yajl::Parser.should have_received(:parse).with(json, symbolize_keys: true)
+    MultiJson.should have_received(:load).with(json, symbolize_keys: true)
   end
 
   it "creates a channel from the event data" do
@@ -87,13 +87,13 @@ describe PusherFake::Connection, "#process, with an unsubscribe event" do
   subject { PusherFake::Connection.new(stub) }
 
   before do
-    Yajl::Parser.stubs(parse: message)
+    MultiJson.stubs(load: message)
     PusherFake::Channel.stubs(factory: channel)
   end
 
   it "parses the JSON data" do
     subject.process(json)
-    Yajl::Parser.should have_received(:parse).with(json, symbolize_keys: true)
+    MultiJson.should have_received(:load).with(json, symbolize_keys: true)
   end
 
   it "creates a channel from the event data" do
@@ -118,13 +118,13 @@ describe PusherFake::Connection, "#process, with a client event" do
   subject { PusherFake::Connection.new(stub) }
 
   before do
-    Yajl::Parser.stubs(parse: message)
+    MultiJson.stubs(load: message)
     PusherFake::Channel.stubs(factory: channel)
   end
 
   it "parses the JSON data" do
     subject.process(json)
-    Yajl::Parser.should have_received(:parse).with(json, symbolize_keys: true)
+    MultiJson.should have_received(:load).with(json, symbolize_keys: true)
   end
 
   it "creates a channel from the event data" do
@@ -172,13 +172,13 @@ describe PusherFake::Connection, "#process, with an unknown event" do
   subject { PusherFake::Connection.new(stub) }
 
   before do
-    Yajl::Parser.stubs(parse: message)
+    MultiJson.stubs(load: message)
     PusherFake::Channel.stubs(factory: channel)
   end
 
   it "parses the JSON data" do
     subject.process(json)
-    Yajl::Parser.should have_received(:parse).with(json, symbolize_keys: true)
+    MultiJson.should have_received(:load).with(json, symbolize_keys: true)
   end
 
   it "creates a channel from the event data" do

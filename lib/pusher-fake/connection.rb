@@ -18,7 +18,7 @@ module PusherFake
     def emit(event, data = {}, channel = nil)
       message = { event: event, data: data }
       message[:channel] = channel if channel
-      message = Yajl::Encoder.encode(message)
+      message = MultiJson.dump(message)
 
       socket.send(message)
     end
@@ -32,7 +32,7 @@ module PusherFake
     #
     # @param [String] data The event data as JSON.
     def process(data)
-      message      = Yajl::Parser.parse(data, symbolize_keys: true)
+      message      = MultiJson.load(data, symbolize_keys: true)
       data         = message[:data]
       event        = message[:event]
       channel_name = message[:channel] || data.delete(:channel)

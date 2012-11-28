@@ -26,7 +26,7 @@ describe PusherFake::Channel::Presence, "#add" do
   subject { PusherFake::Channel::Presence.new("name") }
 
   before do
-    Yajl::Parser.stubs(:parse).returns(channel_data)
+    MultiJson.stubs(:load).returns(channel_data)
     subject.stubs(connections: connections, emit: nil, subscription_data: subscription_data)
   end
 
@@ -39,7 +39,7 @@ describe PusherFake::Channel::Presence, "#add" do
   it "parses the channel_data when authorized" do
     subject.stubs(authorized?: true)
     subject.add(connection, data)
-    Yajl::Parser.should have_received(:parse).with(data[:channel_data], symbolize_keys: true)
+    MultiJson.should have_received(:load).with(data[:channel_data], symbolize_keys: true)
   end
 
   it "assigns the parsed channel_data to the members hash for the current connection" do
