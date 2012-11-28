@@ -8,7 +8,7 @@ module PusherFake
       # @return [Rack::Response] A successful response.
       def self.call(environment)
         request = Rack::Request.new(environment)
-        event   = Yajl::Parser.parse(request.body.read)
+        event   = MultiJson.load(request.body.read)
 
         event["channels"].each do |channel|
           Channel.factory(channel).emit(event["name"], event["data"])

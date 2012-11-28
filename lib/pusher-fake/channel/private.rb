@@ -35,7 +35,8 @@ module PusherFake
       def authentication_for(id, data = nil)
         configuration = PusherFake.configuration
         string        = [id, name, data].compact.map(&:to_s).join(":")
-        signature     = HMAC::SHA256.hexdigest(configuration.secret, string)
+        digest        = OpenSSL::Digest::SHA256.new
+        signature     = OpenSSL::HMAC.hexdigest(digest, configuration.secret, string)
 
         "#{configuration.key}:#{signature}"
       end
