@@ -18,7 +18,7 @@ describe PusherFake::Server::Application, ".call" do
   before do
     response.stubs(finish: response)
 
-    Yajl::Parser.stubs(parse: event)
+    MultiJson.stubs(load: event)
     Rack::Request.stubs(new: request)
     Rack::Response.stubs(new: response)
     PusherFake::Channel.stubs(:factory).with(channels[0]).returns(channel_1)
@@ -32,7 +32,7 @@ describe PusherFake::Server::Application, ".call" do
 
   it "parses the request body as JSON" do
     subject.call(environment)
-    Yajl::Parser.should have_received(:parse).with(json)
+    MultiJson.should have_received(:load).with(json)
   end
 
   it "creates channels by name" do

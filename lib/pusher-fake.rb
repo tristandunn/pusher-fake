@@ -1,7 +1,7 @@
 require "em-websocket"
-require "hmac-sha2"
+require "multi_json"
+require "openssl"
 require "thin"
-require "yajl"
 
 require "pusher-fake/channel"
 require "pusher-fake/channel/public"

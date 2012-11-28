@@ -56,12 +56,12 @@ describe PusherFake::Channel::Private, "#authentication_for" do
 
   before do
     PusherFake.stubs(configuration: configuration)
-    HMAC::SHA256.stubs(hexdigest: signature)
+    OpenSSL::HMAC.stubs(hexdigest: signature)
   end
 
   it "generates a signature" do
     subject.authentication_for(id)
-    HMAC::SHA256.should have_received(:hexdigest).with(configuration.secret, string)
+    OpenSSL::HMAC.should have_received(:hexdigest).with(kind_of(OpenSSL::Digest::SHA256), configuration.secret, string)
   end
 
   it "returns the authentication string" do
@@ -81,12 +81,12 @@ describe PusherFake::Channel::Private, "#authentication_for, with channel data" 
 
   before do
     PusherFake.stubs(configuration: configuration)
-    HMAC::SHA256.stubs(hexdigest: signature)
+    OpenSSL::HMAC.stubs(hexdigest: signature)
   end
 
   it "generates a signature" do
     subject.authentication_for(id, channel_data)
-    HMAC::SHA256.should have_received(:hexdigest).with(configuration.secret, string)
+    OpenSSL::HMAC.should have_received(:hexdigest).with(kind_of(OpenSSL::Digest::SHA256), configuration.secret, string)
   end
 
   it "returns the authentication string" do

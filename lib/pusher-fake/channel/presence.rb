@@ -43,7 +43,7 @@ module PusherFake
       # @param [Connection] connection The connection a subscription succeeded for.
       # @param [Hash] options The options for the channel.
       def subscription_succeeded(connection, options = {})
-        members[connection] = Yajl::Parser.parse(options[:channel_data], symbolize_keys: true)
+        members[connection] = MultiJson.load(options[:channel_data], symbolize_keys: true)
 
         emit("pusher_internal:member_added", members[connection])
 
