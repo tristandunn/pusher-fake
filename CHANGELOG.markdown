@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.0 — Unreleased
+
+* Update dependencies. (Tristan Dunn)
+
 ## 0.1.5 — November 12, 2012
 
 * Use the new Pusher event format. (Tristan Dunn)
