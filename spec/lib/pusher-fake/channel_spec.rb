@@ -6,22 +6,25 @@ describe PusherFake::Channel, ".factory" do
 
   subject { PusherFake::Channel }
 
+  before do
+    PusherFake::Channel::Public.stubs(new: channel)
+  end
+
   after do
     PusherFake::Channel.reset
   end
 
   it "caches the channel" do
+    PusherFake::Channel::Public.unstub(:new)
     subject.factory(name).should == subject.factory(name)
   end
 
   it "creates a public channel by name" do
-    PusherFake::Channel::Public.stubs(new: channel)
     subject.factory(name)
     PusherFake::Channel::Public.should have_received(:new).with(name)
   end
 
   it "returns the channel instance" do
-    PusherFake::Channel::Public.stubs(new: channel)
     subject.factory(name).should == channel
   end
 end
@@ -32,22 +35,25 @@ describe PusherFake::Channel, ".factory, for a private channel" do
 
   subject { PusherFake::Channel }
 
+  before do
+    PusherFake::Channel::Private.stubs(new: channel)
+  end
+
   after do
     PusherFake::Channel.reset
   end
 
   it "caches the channel" do
+    PusherFake::Channel::Private.unstub(:new)
     subject.factory(name).should == subject.factory(name)
   end
 
   it "creates a private channel by name" do
-    PusherFake::Channel::Private.stubs(new: channel)
     subject.factory(name)
     PusherFake::Channel::Private.should have_received(:new).with(name)
   end
 
   it "returns the channel instance" do
-    PusherFake::Channel::Private.stubs(new: channel)
     subject.factory(name).should == channel
   end
 end
@@ -58,22 +64,25 @@ describe PusherFake::Channel, ".factory, for a presence channel" do
 
   subject { PusherFake::Channel }
 
+  before do
+    PusherFake::Channel::Presence.stubs(new: channel)
+  end
+
   after do
     PusherFake::Channel.reset
   end
 
   it "caches the channel" do
+    PusherFake::Channel::Presence.unstub(:new)
     subject.factory(name).should == subject.factory(name)
   end
 
   it "creates a presence channel by name" do
-    PusherFake::Channel::Presence.stubs(new: channel)
     subject.factory(name)
     PusherFake::Channel::Presence.should have_received(:new).with(name)
   end
 
   it "returns the channel instance" do
-    PusherFake::Channel::Presence.stubs(new: channel)
     subject.factory(name).should == channel
   end
 end
@@ -116,6 +125,7 @@ describe PusherFake::Channel, ".reset" do
   subject { PusherFake::Channel }
 
   it "empties the channel cache" do
+    subject.factory("example")
     subject.reset
     subject.channels.should == {}
   end

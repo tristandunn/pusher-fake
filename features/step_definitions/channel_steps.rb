@@ -15,41 +15,38 @@ end
 
 When %{I subscribe to the "$channel" channel with presence events} do |channel|
   page.execute_script(%{
-    var list    = document.querySelector("#presence ul"),
-        count   = document.querySelector("#presence header h1 span"),
-        channel = Pusher.instance.subscribe(#{channel.to_json});
+    var list      = list      || document.querySelector("section ul"),
+        count     = count     || document.querySelector("section header h1 span"),
+        addClient = addClient || function(client) {
+          var
+          element = list.appendChild(document.createElement("li"));
+          element.setAttribute("id", "client-" + client.id);
 
-    channel.bind("pusher:subscription_succeeded", function(clients) {
-      count.innerHTML = clients.count;
+          if (client.info) {
+            element.innerHTML = client.info.name;
+          }
+        },
+        changeCount = changeCount || function(delta) {
+          count.innerHTML = parseInt(count.innerHTML, 10) + delta;
+        };
 
-      clients.each(function(client) {
-        var
-        element = list.appendChild(document.createElement("li"));
-        element.setAttribute("id", "client-" + client.id);
+    Pusher.instance.subscribe(#{channel.to_json})
+      .bind("pusher:subscription_succeeded", function(clients) {
+        clients.each(addClient);
 
-        if (client.info) {
-          element.innerHTML = client.info.name;
-        }
+        count.innerHTML = clients.count;
+      })
+      .bind("pusher:member_added", function(client) {
+        addClient(client);
+        changeCount(1);
+      })
+      .bind("pusher:member_removed", function(client) {
+        var item = list.querySelector("li#client-" + client.id);
+
+        list.removeChild(item);
+
+        changeCount(-1);
       });
-    });
-    channel.bind("pusher:member_added", function(client) {
-      count.innerHTML = parseInt(count.innerHTML, 10) + 1;
-
-      var
-      element = list.appendChild(document.createElement("li"));
-      element.setAttribute("id", "client-" + client.id);
-
-      if (client.info) {
-        element.innerHTML = client.info.name;
-      }
-    });
-    channel.bind("pusher:member_removed", function(client) {
-      var item = list.querySelector("li#client-" + client.id);
-
-      count.innerHTML = parseInt(count.innerHTML, 10) - 1;
-
-      list.removeChild(item);
-    });
   })
 end
 

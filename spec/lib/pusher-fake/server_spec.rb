@@ -10,7 +10,7 @@ describe PusherFake::Server, ".start" do
 
   it "runs the event loop" do
     subject.start
-    EventMachine.should have_received(:run)
+    EventMachine.should have_received(:run).with()
   end
 
   it "starts the socket web server when run yields" do
@@ -20,7 +20,7 @@ describe PusherFake::Server, ".start" do
     EventMachine.stubs(:run).yields
 
     subject.start
-    subject.should have_received(:start_web_server)
+    subject.should have_received(:start_web_server).with()
   end
 
   it "starts the socket server when run yields" do
@@ -30,7 +30,7 @@ describe PusherFake::Server, ".start" do
     EventMachine.stubs(:run).yields
 
     subject.start
-    subject.should have_received(:start_socket_server)
+    subject.should have_received(:start_socket_server).with()
   end
 end
 
