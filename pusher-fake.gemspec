@@ -15,11 +15,9 @@ Gem::Specification.new do |s|
 
   s.add_dependency "em-websocket", "0.3.8"
   s.add_dependency "thin",         "1.5.0"
-  s.add_dependency "multi_json",   "1.3.7"
+  s.add_dependency "multi_json",   "1.4.0"
 
-  s.add_development_dependency "bourne",          "1.2.1"
-  s.add_development_dependency "bundler",         ">= 1.1.0"
-  s.add_development_dependency "capybara",        "1.1.3"
+  s.add_development_dependency "bourne",          "1.3.0"
   s.add_development_dependency "capybara-webkit", "0.13.0"
   s.add_development_dependency "cucumber",        "1.2.1"
   s.add_development_dependency "pusher",          "0.11.1"

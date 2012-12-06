@@ -3,17 +3,17 @@ PATH
   specs:
     pusher-fake (0.2.0)
       em-websocket (= 0.3.8)
-      multi_json (= 1.3.7)
+      multi_json (= 1.4.0)
       thin (= 1.5.0)
 
 GEM
   remote: http://rubygems.org/
   specs:
     addressable (2.3.2)
-    bourne (1.2.1)
-      mocha (= 0.12.7)
+    bourne (1.3.0)
+      mocha (= 0.13.0)
     builder (3.1.4)
-    capybara (1.1.3)
+    capybara (1.1.4)
       mime-types (>= 1.16)
       nokogiri (>= 1.3.3)
       rack (>= 1.0.0)
@@ -40,13 +40,14 @@ GEM
     gherkin (2.11.5)
       json (>= 1.4.6)
     json (1.7.5)
-    libwebsocket (0.1.6.1)
+    libwebsocket (0.1.7.1)
+      addressable
       websocket
     metaclass (0.0.1)
     mime-types (1.19)
-    mocha (0.12.7)
+    mocha (0.13.0)
       metaclass (~> 0.0.1)
-    multi_json (1.3.7)
+    multi_json (1.4.0)
     nokogiri (1.5.5)
     pusher (0.11.1)
       multi_json (~> 1.0)
@@ -62,7 +63,7 @@ GEM
       rspec-core (~> 2.12.0)
       rspec-expectations (~> 2.12.0)
       rspec-mocks (~> 2.12.0)
-    rspec-core (2.12.0)
+    rspec-core (2.12.1)
     rspec-expectations (2.12.0)
       diff-lcs (~> 1.1.3)
     rspec-mocks (2.12.0)
@@ -91,9 +92,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  bourne (= 1.2.1)
-  bundler (>= 1.1.0)
-  capybara (= 1.1.3)
+  bourne (= 1.3.0)
   capybara-webkit (= 0.13.0)
   cucumber (= 1.2.1)
   pusher (= 0.11.1)
