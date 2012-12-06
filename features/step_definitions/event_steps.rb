@@ -1,5 +1,5 @@
 When %{a "$event" event is triggered on the "$channel" channel} do |event, channel|
-  Pusher.trigger([channel], event, {})
+  Pusher.trigger(channel, event, {})
 end
 
 When %{I trigger the "$event" event on the "$channel" channel} do |event, channel|
