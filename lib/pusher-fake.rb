@@ -1,3 +1,4 @@
+require "em-http-request"
 require "em-websocket"
 require "multi_json"
 require "openssl"
@@ -11,6 +12,7 @@ require "pusher-fake/configuration"
 require "pusher-fake/connection"
 require "pusher-fake/server"
 require "pusher-fake/server/application"
+require "pusher-fake/webhook"
 
 module PusherFake
   # The current version string.

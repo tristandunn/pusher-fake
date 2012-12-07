@@ -10,13 +10,15 @@ end
 
 describe PusherFake::Channel::Private, "#add" do
   let(:data)           { { auth: authentication } }
+  let(:name)           { "name" }
   let(:connection)     { stub(emit: nil) }
-  let(:connections)    { stub(push: nil) }
+  let(:connections)    { stub(push: nil, length: 0) }
   let(:authentication) { "auth" }
 
-  subject { PusherFake::Channel::Private.new("name") }
+  subject { PusherFake::Channel::Private.new(name) }
 
   before do
+    PusherFake::Webhook.stubs(:trigger)
     subject.stubs(connections: connections)
   end
 
@@ -38,10 +40,30 @@ describe PusherFake::Channel::Private, "#add" do
     connection.should have_received(:emit).with("pusher_internal:subscription_succeeded", {}, subject.name)
   end
 
+  it "triggers channel occupied webhook for the first connection added when authorized" do
+    subject.unstub(:connections)
+    subject.stubs(authorized?: true)
+
+    subject.add(connection, data)
+    PusherFake::Webhook.should have_received(:trigger).with("channel_occupied", channel: name).once
+    subject.add(connection, data)
+    PusherFake::Webhook.should have_received(:trigger).with("channel_occupied", channel: name).once
+  end
+
   it "unsuccessfully subscribes the connection when not authorized" do
     subject.stubs(authorized?: false)
     subject.add(connection, data)
     connection.should have_received(:emit).with("pusher_internal:subscription_error", {}, subject.name)
+  end
+
+  it "does not trigger channel occupied webhook when not authorized" do
+    subject.unstub(:connections)
+    subject.stubs(authorized?: false)
+
+    subject.add(connection, data)
+    PusherFake::Webhook.should have_received(:trigger).never
+    subject.add(connection, data)
+    PusherFake::Webhook.should have_received(:trigger).never
   end
 end
 

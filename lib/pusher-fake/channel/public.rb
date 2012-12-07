@@ -46,6 +46,10 @@ module PusherFake
       # @param [Connection] connection The connection to remove.
       def remove(connection)
         connections.delete(connection)
+
+        if connections.empty?
+          trigger("channel_vacated", channel: name)
+        end
       end
 
       # Return subscription data for the channel.
@@ -66,6 +70,14 @@ module PusherFake
       def subscription_succeeded(connection, options = {})
         connection.emit("pusher_internal:subscription_succeeded", subscription_data, name)
         connections.push(connection)
+
+        if connections.length == 1
+          trigger("channel_occupied", channel: name)
+        end
+      end
+
+      def trigger(name, data = {})
+        PusherFake::Webhook.trigger(name, data)
       end
     end
   end

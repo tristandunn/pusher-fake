@@ -21,6 +21,9 @@ module PusherFake
     # @return [Fixnum] The port on which the web server listens. (Defaults to +8081+.)
     attr_accessor :web_port
 
+    # @return [Array] An array of webhook URLs. (Defaults to +[]+.)
+    attr_accessor :webhooks
+
     # Instantiated from {PusherFake.configuration}. Sets the defaults.
     def initialize
       self.app_id      = "PUSHER_APP_ID"
@@ -30,6 +33,7 @@ module PusherFake
       self.socket_port = 8080
       self.web_host    = "127.0.0.1"
       self.web_port    = 8081
+      self.webhooks    = []
     end
   end
 end

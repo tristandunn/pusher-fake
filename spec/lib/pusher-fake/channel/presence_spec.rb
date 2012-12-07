@@ -16,16 +16,19 @@ describe PusherFake::Channel::Presence do
 end
 
 describe PusherFake::Channel::Presence, "#add" do
-  let(:data)              { { auth: authentication, channel_data: "{}" } }
+  let(:data)              { { auth: authentication, channel_data: channel_data.to_json } }
+  let(:name)              { "name" }
+  let(:user_id)           { "1234" }
   let(:connection)        { stub(emit: nil) }
-  let(:connections)       { stub(push: nil) }
-  let(:channel_data)      { {} }
+  let(:connections)       { stub(push: nil, length: 0) }
+  let(:channel_data)      { { user_id: user_id } }
   let(:authentication)    { "auth" }
   let(:subscription_data) { { presence: { hash: {}, count: 1 } } }
 
-  subject { PusherFake::Channel::Presence.new("name") }
+  subject { PusherFake::Channel::Presence.new(name) }
 
   before do
+    PusherFake::Webhook.stubs(:trigger)
     MultiJson.stubs(:load).returns(channel_data)
     subject.stubs(connections: connections, emit: nil, subscription_data: subscription_data)
   end
@@ -66,20 +69,55 @@ describe PusherFake::Channel::Presence, "#add" do
     connections.should have_received(:push).with(connection)
   end
 
+  it "triggers channel occupied webhook for the first connection added when authorized" do
+    subject.unstub(:connections)
+    subject.stubs(authorized?: true)
+
+    subject.add(connection, data)
+    PusherFake::Webhook.should have_received(:trigger).with("channel_occupied", channel: name).once
+    subject.add(connection, data)
+    PusherFake::Webhook.should have_received(:trigger).with("channel_occupied", channel: name).once
+  end
+
+  it "triggers the member added webhook when authorized" do
+    subject.stubs(authorized?: true)
+    subject.add(connection, data)
+    PusherFake::Webhook.should have_received(:trigger).with("member_added", channel: name, user_id: user_id).once
+  end
+
   it "unsuccessfully subscribes the connection when not authorized" do
     subject.stubs(authorized?: false)
     subject.add(connection, data)
     connection.should have_received(:emit).with("pusher_internal:subscription_error", {}, subject.name)
   end
+
+  it "does not trigger channel occupied webhook when not authorized" do
+    subject.unstub(:connections)
+    subject.stubs(authorized?: false)
+
+    subject.add(connection, data)
+    PusherFake::Webhook.should have_received(:trigger).never
+    subject.add(connection, data)
+    PusherFake::Webhook.should have_received(:trigger).never
+  end
+
+  it "does not trigger the member added webhook when not authorized" do
+    subject.stubs(authorized?: false)
+    subject.add(connection, data)
+    PusherFake::Webhook.should have_received(:trigger).never
+  end
 end
 
 describe PusherFake::Channel::Presence, "#remove" do
+  let(:name)         { "name" }
+  let(:user_id)      { "1234" }
   let(:connection)   { stub }
-  let(:channel_data) { {} }
+  let(:channel_data) { { user_id: user_id } }
 
-  subject { PusherFake::Channel::Presence.new("name") }
+  subject { PusherFake::Channel::Presence.new(name) }
 
   before do
+    PusherFake::Webhook.stubs(:trigger)
     subject.members[connection] = channel_data
     subject.stubs(connections: [connection], emit: nil)
   end
@@ -92,6 +130,11 @@ describe PusherFake::Channel::Presence, "#remove" do
   it "removes the connection from the members hash" do
     subject.remove(connection)
     subject.members.should_not have_key(connection)
+  end
+
+  it "triggers the member removed webhook" do
+    subject.remove(connection)
+    PusherFake::Webhook.should have_received(:trigger).with("member_removed", channel: name, user_id: user_id).once
   end
 
   it "notifies the channel of the removed member" do

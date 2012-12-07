@@ -17,12 +17,14 @@ describe PusherFake::Channel::Public do
 end
 
 describe PusherFake::Channel, "#add" do
+  let(:name)        { "name" }
   let(:connection)  { stub(emit: nil) }
-  let(:connections) { stub(push: nil) }
+  let(:connections) { stub(push: nil, length: 0) }
 
-  subject { PusherFake::Channel::Public.new("name") }
+  subject { PusherFake::Channel::Public.new(name) }
 
   before do
+    PusherFake::Webhook.stubs(:trigger)
     subject.stubs(connections: connections)
   end
 
@@ -34,6 +36,15 @@ describe PusherFake::Channel, "#add" do
   it "successfully subscribes the connection" do
     subject.add(connection)
     connection.should have_received(:emit).with("pusher_internal:subscription_succeeded", {}, subject.name)
+  end
+
+  it "triggers channel occupied webhook for the first connection added" do
+    subject.unstub(:connections)
+
+    subject.add(connection)
+    PusherFake::Webhook.should have_received(:trigger).with("channel_occupied", channel: name).once
+    subject.add(connection)
+    PusherFake::Webhook.should have_received(:trigger).with("channel_occupied", channel: name).once
   end
 end
 
@@ -75,17 +86,27 @@ describe PusherFake::Channel, "#includes?" do
 end
 
 describe PusherFake::Channel, "#remove" do
-  let(:connection) { stub }
+  let(:name)         { "name" }
+  let(:connection_1) { stub  }
+  let(:connection_2) { stub }
 
-  subject { PusherFake::Channel::Public.new("name") }
+  subject { PusherFake::Channel::Public.new(name) }
 
   before do
-    subject.stubs(connections: [connection])
+    subject.stubs(connections: [connection_1, connection_2])
+    PusherFake::Webhook.stubs(:trigger)
   end
 
   it "removes the connection from the channel" do
-    subject.remove(connection)
-    subject.connections.should be_empty
+    subject.remove(connection_1)
+    subject.connections.should_not include(connection_1)
+  end
+
+  it "triggers channel vacated webhook when all connections are removed" do
+    subject.remove(connection_1)
+    PusherFake::Webhook.should have_received(:trigger).never
+    subject.remove(connection_2)
+    PusherFake::Webhook.should have_received(:trigger).with("channel_vacated", channel: name).once
   end
 end
 

@@ -19,6 +19,8 @@ module PusherFake
       def remove(connection)
         super
 
+        trigger("member_removed", channel: name, user_id: members[connection][:user_id])
+
         emit("pusher_internal:member_removed", members.delete(connection))
       end
 
@@ -43,9 +45,11 @@ module PusherFake
       # @param [Connection] connection The connection a subscription succeeded for.
       # @param [Hash] options The options for the channel.
       def subscription_succeeded(connection, options = {})
-        members[connection] = MultiJson.load(options[:channel_data], symbolize_keys: true)
+        member = members[connection] = MultiJson.load(options[:channel_data], symbolize_keys: true)
 
-        emit("pusher_internal:member_added", members[connection])
+        emit("pusher_internal:member_added", member)
+
+        trigger("member_added", channel: name, user_id: member[:user_id])
 
         super
       end

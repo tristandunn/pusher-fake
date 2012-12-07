@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.0 — Unreleased
+
+* Support triggering webhooks. (Tristan Dunn)
+* Update dependencies. (Tristan Dunn)
+
 ## 0.2.0 — November 28, 2012
 
 * Replace ruby-hmac with openssl. (Sergey Nartimov)
