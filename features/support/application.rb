@@ -22,6 +22,6 @@ class Sinatra::Application
       data = { user_id: params[:socket_id], user_info: { name: "Alan Turing" } }
     end
 
-    channel.authenticate(params[:socket_id], data).to_json
+    MultiJson.dump(channel.authenticate(params[:socket_id], data))
   end
 end

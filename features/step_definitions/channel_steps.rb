@@ -10,7 +10,7 @@ Given %{$name is subscribed to the "$channel" channel} do |name, channel|
 end
 
 When %{I subscribe to the "$channel" channel} do |channel|
-  page.execute_script("Pusher.instance.subscribe(#{channel.to_json})")
+  page.execute_script("Pusher.instance.subscribe(#{MultiJson.dump(channel)})")
 end
 
 When %{I subscribe to the "$channel" channel with presence events} do |channel|
@@ -30,7 +30,7 @@ When %{I subscribe to the "$channel" channel with presence events} do |channel|
           count.innerHTML = parseInt(count.innerHTML, 10) + delta;
         };
 
-    Pusher.instance.subscribe(#{channel.to_json})
+    Pusher.instance.subscribe(#{MultiJson.dump(channel)})
       .bind("pusher:subscription_succeeded", function(clients) {
         clients.each(addClient);
 
@@ -51,7 +51,7 @@ When %{I subscribe to the "$channel" channel with presence events} do |channel|
 end
 
 When %{I unsubscribe from the "$channel" channel} do |channel|
-  page.execute_script("Pusher.instance.unsubscribe(#{channel.to_json})")
+  page.execute_script("Pusher.instance.unsubscribe(#{MultiJson.dump(channel)})")
 end
 
 When %{$name unsubscribes from the "$channel" channel} do |name, channel|
@@ -64,7 +64,7 @@ Then %{I should be subscribed to the "$channel" channel} do |channel|
   Capybara.timeout do
     subscribed = page.evaluate_script(%{
       var
-      channel = Pusher.instance.channel(#{channel.to_json});
+      channel = Pusher.instance.channel(#{MultiJson.dump(channel)});
       channel && channel.subscribed;
     })
     subscribed == true
@@ -75,7 +75,7 @@ Then %{I should not be subscribed to the "$channel" channel} do |channel|
   wait do
     subscribed = page.evaluate_script(%{
       var
-      channel = Pusher.instance.channel(#{channel.to_json});
+      channel = Pusher.instance.channel(#{MultiJson.dump(channel)});
       channel && channel.subscribed;
     })
     subscribed.should be_false

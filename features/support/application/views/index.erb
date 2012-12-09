@@ -17,11 +17,11 @@
 <script>
 window.addEventListener("DOMContentLoaded", function() {
   // Use the PusherFake server.
-  Pusher.host     = <%= PusherFake.configuration.socket_host.to_json %>;
-  Pusher.ws_port  = <%= PusherFake.configuration.socket_port.to_json %>;
+  Pusher.host     = <%= MultiJson.dump(PusherFake.configuration.socket_host) %>;
+  Pusher.ws_port  = <%= MultiJson.dump(PusherFake.configuration.socket_port) %>;
 
   // Create the client instance.
-  Pusher.instance = new Pusher(<%= PusherFake.configuration.key.to_json %>);
+  Pusher.instance = new Pusher(<%= MultiJson.dump(PusherFake.configuration.key) %>);
   Pusher.instance.events = {};
 
   // Force the connection to go unavailable after a single attempt.

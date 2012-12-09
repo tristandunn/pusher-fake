@@ -16,7 +16,7 @@ describe PusherFake::Channel::Presence do
 end
 
 describe PusherFake::Channel::Presence, "#add" do
-  let(:data)              { { auth: authentication, channel_data: channel_data.to_json } }
+  let(:data)              { { auth: authentication, channel_data: MultiJson.dump(channel_data) } }
   let(:name)              { "name" }
   let(:user_id)           { "1234" }
   let(:connection)        { stub(emit: nil) }
