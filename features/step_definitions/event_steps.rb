@@ -2,6 +2,12 @@ When %{a "$event" event is triggered on the "$channel" channel} do |event, chann
   Pusher.trigger(channel, event, {})
 end
 
+When %{a "$event" event is triggered on the following channels:} do |event, table|
+  channels = table.hashes.collect { |hash| hash["name"] }
+
+  Pusher.trigger(channels, event, {})
+end
+
 When %{I trigger the "$event" event on the "$channel" channel} do |event, channel|
   page.execute_script(%{
     var

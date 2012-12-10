@@ -72,3 +72,13 @@ Feature: Triggering events on a channel
     When I trigger the "client-message" event on the "chat" channel
     Then I should not receive a "client-message" event on the "chat" channel
     And Bob should not receive a "client-message" event on the "chat" channel
+
+  Scenario: Server triggers an event on multiple private channels
+    Given I am subscribed to the "private-chat-1" channel
+    And Bob is subscribed to the "private-chat-2" channel
+    When a "message" event is triggered on the following channels:
+      | name           |
+      | private-chat-1 |
+      | private-chat-2 |
+    Then I should receive a "message" event on the "private-chat-1" channel
+    And Bob should receive a "message" event on the "private-chat-2" channel
