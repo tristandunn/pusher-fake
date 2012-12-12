@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    pusher-fake (0.2.0)
+    pusher-fake (0.3.0)
       em-http-request (= 1.0.3)
       em-websocket (= 0.3.8)
       multi_json (= 1.4.0)
