@@ -47,7 +47,7 @@ module PusherFake
         return unless channel.is_a?(Channel::Private)
         return unless channel.includes?(self)
 
-        channel.emit(event, data)
+        channel.emit(event, data, self)
       end
     end
   end
