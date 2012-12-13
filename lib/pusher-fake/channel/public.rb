@@ -27,9 +27,9 @@ module PusherFake
       #
       # @param [String] event The event name.
       # @param [Hash] data The event data.
-      def emit(event, data)
+      def emit(event, data, connection_to_skip=nil)
         connections.each do |connection|
-          connection.emit(event, data, name)
+          connection.emit(event, data, name) unless connection==connection_to_skip
         end
       end
 
