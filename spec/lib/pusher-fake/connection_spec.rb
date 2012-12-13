@@ -145,7 +145,7 @@ describe PusherFake::Connection, "#process, with a client event" do
   it "emits the event to the channel when the connection is in the channel" do
     channel.stubs(includes?: true)
     subject.process(json)
-    channel.should have_received(:emit).with(event, data)
+    channel.should have_received(:emit).with(event, data, socket_id: subject.socket.object_id)
   end
 
   it "does not emit the event to the channel when the channel is not private" do

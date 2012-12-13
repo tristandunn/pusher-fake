@@ -3,6 +3,7 @@
 ## 0.4.0 — Unreleased
 
 * Support excluding recipients. (Tristan Dunn)
+* Don't deliver client events to the originator of the event. (Thomas Walpole)
 * Update dependencies. (Tristan Dunn)
 
 ## 0.3.0 — December 12, 2012
