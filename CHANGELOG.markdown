@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.4.0 — Unreleased
+## 0.4.0 — December 14, 2012
 
 * Support excluding recipients. (Tristan Dunn)
 * Don't deliver client events to the originator of the event. (Thomas Walpole)
