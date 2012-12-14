@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.0 — Unreleased
+
+* Update dependencies. (Tristan Dunn)
+
 ## 0.3.0 — December 12, 2012
 
 * Support triggering webhooks. (Tristan Dunn)
