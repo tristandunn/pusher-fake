@@ -2,6 +2,7 @@
 
 ## 0.4.0 — Unreleased
 
+* Support excluding recipients. (Tristan Dunn)
 * Update dependencies. (Tristan Dunn)
 
 ## 0.3.0 — December 12, 2012

@@ -5,12 +5,13 @@ describe PusherFake::Server::Application, ".call" do
   let(:data)        { mock }
   let(:json)        { mock }
   let(:name)        { "event-name" }
-  let(:event)       { { "channels" => channels, "name" => name, "data" => data } }
+  let(:event)       { { "channels" => channels, "name" => name, "data" => data, "socket_id" => socket_id } }
   let(:request)     { stub(body: body) }
   let(:channels)    { ["channel-1", "channel-2"] }
   let(:response)    { mock }
   let(:channel_1)   { stub(emit: true) }
   let(:channel_2)   { stub(emit: true) }
+  let(:socket_id)   { stub }
   let(:environment) { mock }
 
   subject { PusherFake::Server::Application }
@@ -45,8 +46,8 @@ describe PusherFake::Server::Application, ".call" do
 
   it "emits the event to the channels" do
     subject.call(environment)
-    channel_1.should have_received(:emit).with(name, data)
-    channel_2.should have_received(:emit).with(name, data)
+    channel_1.should have_received(:emit).with(name, data, socket_id: socket_id)
+    channel_2.should have_received(:emit).with(name, data, socket_id: socket_id)
   end
 
   it "creates a Rack response with an empty JSON object" do

@@ -82,3 +82,10 @@ Feature: Triggering events on a channel
       | private-chat-2 |
     Then I should receive a "message" event on the "private-chat-1" channel
     And Bob should receive a "message" event on the "private-chat-2" channel
+
+  Scenario: Server triggers an event and excludes a client by socket ID
+    Given I am subscribed to the "chat" channel
+    And Bob is subscribed to the "chat" channel
+    When a "message" event is triggered on the "chat" channel, ignoring Bob
+    Then I should receive a "message" event on the "chat" channel
+    And Bob should not receive a "message" event on the "chat" channel

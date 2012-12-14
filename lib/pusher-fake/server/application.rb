@@ -11,7 +11,7 @@ module PusherFake
         event   = MultiJson.load(request.body.read)
 
         event["channels"].each do |channel|
-          Channel.factory(channel).emit(event["name"], event["data"])
+          Channel.factory(channel).emit(event["name"], event["data"], socket_id: event["socket_id"])
         end
 
         Rack::Response.new("{}").finish

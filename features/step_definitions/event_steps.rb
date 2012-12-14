@@ -2,6 +2,17 @@ When %{a "$event" event is triggered on the "$channel" channel} do |event, chann
   Pusher.trigger(channel, event, {})
 end
 
+When %{a "$event" event is triggered on the "$channel" channel, ignoring $name} do |event, channel, name|
+  name      = nil if name == "me"
+  socket_id = nil
+
+  using_session(name) do
+    socket_id = page.evaluate_script("Pusher.instance.connection.socket_id")
+  end
+
+  Pusher.trigger(channel, event, {}, socket_id: socket_id)
+end
+
 When %{a "$event" event is triggered on the following channels:} do |event, table|
   channels = table.hashes.collect { |hash| hash["name"] }
 

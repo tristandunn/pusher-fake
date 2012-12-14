@@ -52,9 +52,11 @@ describe PusherFake::Channel, "#emit" do
   let(:data)         { stub }
   let(:name)         { "name" }
   let(:event)        { "event" }
+  let(:socket_1)     { stub }
+  let(:socket_2)     { stub }
   let(:connections)  { [connection_1, connection_2] }
-  let(:connection_1) { stub(emit: nil) }
-  let(:connection_2) { stub(emit: nil) }
+  let(:connection_1) { stub(emit: nil, socket: socket_1) }
+  let(:connection_2) { stub(emit: nil, socket: socket_2) }
 
   subject { PusherFake::Channel::Public.new(name) }
 
@@ -66,6 +68,12 @@ describe PusherFake::Channel, "#emit" do
     subject.emit(event, data)
     connection_1.should have_received(:emit).with(event, data, name)
     connection_2.should have_received(:emit).with(event, data, name)
+  end
+
+  it "ignores connection if socket_id matches the connections socket object_id" do
+    subject.emit(event, data, socket_id: socket_2.object_id)
+    connection_1.should have_received(:emit).with(event, data, name)
+    connection_2.should have_received(:emit).never
   end
 end
 
