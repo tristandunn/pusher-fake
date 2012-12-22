@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+* Update depenencies. (Tristan Dunn)
+
 ## 0.4.0 — December 14, 2012
 
 * Support excluding recipients. (Tristan Dunn)
