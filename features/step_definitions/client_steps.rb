@@ -14,14 +14,14 @@ Given "I change my socket ID" do
 end
 
 Then "I should be connected" do
-  Capybara.timeout do
+  timeout_after(5) do
     state = page.evaluate_script("Pusher.instance.connection.state")
     state == "connected"
   end
 end
 
 Then "I should not be connected" do
-  Capybara.timeout do
+  timeout_after(5) do
     state = page.evaluate_script("Pusher.instance.connection.state")
     state == "unavailable"
   end

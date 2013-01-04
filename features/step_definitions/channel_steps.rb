@@ -61,7 +61,7 @@ When %{$name unsubscribes from the "$channel" channel} do |name, channel|
 end
 
 Then %{I should be subscribed to the "$channel" channel} do |channel|
-  Capybara.timeout do
+  timeout_after(5) do
     subscribed = page.evaluate_script(%{
       var
       channel = Pusher.instance.channel(#{MultiJson.dump(channel)});

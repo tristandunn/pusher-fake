@@ -28,8 +28,8 @@ end.tap do |thread|
   at_exit { thread.exit }
 
   # Wait for the webhook endpoint server to start.
-  Capybara.timeout do
-    thread[:ready]
+  Timeout::timeout(5) do
+    sleep(0.05) until thread[:ready]
   end
 end
 

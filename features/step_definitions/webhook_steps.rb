@@ -7,7 +7,7 @@ Then /^the server should have received the following (user )*event:$/ do |user_e
     end
   end if user_event
 
-  Capybara.timeout do
+  timeout_after(5) do
     $events.include?(event)
   end
 
