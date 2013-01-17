@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
   s.add_dependency "multi_json",      "1.5.0"
 
   s.add_development_dependency "bourne",          "1.3.0"
-  s.add_development_dependency "capybara-webkit", "0.14.0"
+  s.add_development_dependency "capybara-webkit", "0.14.1"
   s.add_development_dependency "cucumber",        "1.2.1"
   s.add_development_dependency "pusher",          "0.11.2"
   s.add_development_dependency "rake",            "10.0.3"
