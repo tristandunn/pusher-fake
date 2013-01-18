@@ -1,5 +1,8 @@
 module PusherFake
   class Connection
+    # Name matcher for client events.
+    CLIENT_EVENT_MATCHER  = /\Aclient-(.+)\Z/.freeze
+
     # @return [EventMachine::WebSocket::Connection] The socket object for this connection.
     attr_reader :socket
 
@@ -18,9 +21,8 @@ module PusherFake
     def emit(event, data = {}, channel = nil)
       message = { event: event, data: data }
       message[:channel] = channel if channel
-      message = MultiJson.dump(message)
 
-      socket.send(message)
+      socket.send(MultiJson.dump(message))
     end
 
     # Notify the Pusher client that a connection has been established.
@@ -43,7 +45,7 @@ module PusherFake
         channel.add(self, data)
       when "pusher:unsubscribe"
         channel.remove(self)
-      when /^client-(.+)$/
+      when CLIENT_EVENT_MATCHER
         return unless channel.is_a?(Channel::Private)
         return unless channel.includes?(self)
 

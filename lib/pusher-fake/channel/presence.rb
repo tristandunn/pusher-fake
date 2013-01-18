@@ -15,6 +15,8 @@ module PusherFake
 
       # Remove the +connection+ from the channel and notify the channel.
       #
+      # Also trigger the member_removed webhook.
+      #
       # @param [Connection] connection The connection to remove.
       def remove(connection)
         super
@@ -39,8 +41,10 @@ module PusherFake
 
       private
 
-      # Store the member data for the connection and notify connections a
+      # Store the member data for the connection and notify the channel a
       # member was added.
+      #
+      # Also trigger the member_added webhook.
       #
       # @param [Connection] connection The connection a subscription succeeded for.
       # @param [Hash] options The options for the channel.

@@ -2,10 +2,10 @@ module PusherFake
   module Channel
     class << self
       # Name matcher for private channels.
-      PRIVATE_CHANNEL_MATCHER  = /^private-/.freeze
+      PRIVATE_CHANNEL_MATCHER  = /\Aprivate-/.freeze
 
       # Name matcher for presence channels.
-      PRESENCE_CHANNEL_MATCHER = /^presence-/.freeze
+      PRESENCE_CHANNEL_MATCHER = /\Apresence-/.freeze
 
       # @return [Hash] Cache of existing channels.
       attr_accessor :channels
@@ -48,9 +48,10 @@ module PusherFake
       # @param [String] name The name of the channel.
       # @return [Class] The class to use for the channel.
       def class_for(name)
-        if name =~ PRIVATE_CHANNEL_MATCHER
+        case name
+        when PRIVATE_CHANNEL_MATCHER
           Private
-        elsif name =~ PRESENCE_CHANNEL_MATCHER
+        when PRESENCE_CHANNEL_MATCHER
           Presence
         else
           Public

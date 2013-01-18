@@ -45,6 +45,8 @@ module PusherFake
 
       # Remove the +connection+ from the channel.
       #
+      # If it is the last connection, trigger the channel_vacated webhook.
+      #
       # @param [Connection] connection The connection to remove.
       def remove(connection)
         connections.delete(connection)
@@ -64,8 +66,10 @@ module PusherFake
 
       private
 
-      # Notify the channel of the successful subscription and add the
+      # Notify the +connection+ of the successful subscription and add the
       # connection to the channel.
+      #
+      # If it is the first connection, trigger the channel_occupied webhook.
       #
       # @param [Connection] connection The connection a subscription succeeded for.
       # @param [Hash] options The options for the channel.
