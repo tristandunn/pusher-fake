@@ -1,9 +1,9 @@
 # Changelog
 
-## Unreleased
+## 0.5.0 — January 21, 2013
 
 * Support channel, channels, and user REST API endpoints. (Tristan Dunn)
-* Update depenencies. (Tristan Dunn)
+* Update dependencies. (Tristan Dunn)
 
 ## 0.4.0 — December 14, 2012
 
