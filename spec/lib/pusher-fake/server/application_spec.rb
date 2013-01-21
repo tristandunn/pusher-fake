@@ -314,3 +314,54 @@ describe PusherFake::Server::Application, ".channel, requesting a user count on 
     }.should raise_error(subject::CHANNEL_USER_COUNT_ERROR)
   end
 end
+
+describe PusherFake::Server::Application, ".users, for an occupied channel" do
+  let(:name)     { "public-1" }
+  let(:user_1)   { mock }
+  let(:user_2)   { mock }
+  let(:channel)  { stub(connections: [user_1, user_2]) }
+  let(:channels) { { name => channel } }
+
+  subject { PusherFake::Server::Application }
+
+  before do
+    PusherFake::Channel.stubs(channels: channels)
+  end
+
+  it "returns a hash with the occupied status" do
+    subject.users(name).should == { users: [
+      { id: user_1.object_id },
+      { id: user_2.object_id }
+    ] }
+  end
+end
+
+describe PusherFake::Server::Application, ".users, for an empty channel" do
+  let(:name)     { "public-1" }
+  let(:channel)  { stub(connections: []) }
+  let(:channels) { { name => channel } }
+
+  subject { PusherFake::Server::Application }
+
+  before do
+    PusherFake::Channel.stubs(channels: channels)
+  end
+
+  it "returns a hash with the occupied status" do
+    subject.users(name).should == { users: [] }
+  end
+end
+
+describe PusherFake::Server::Application, ".users, for an unknown channel" do
+  let(:channels) { {} }
+
+  subject { PusherFake::Server::Application }
+
+  before do
+    PusherFake::Channel.stubs(channels: channels)
+  end
+
+  it "returns a hash with the occupied status" do
+    subject.users("fake").should == { users: [] }
+  end
+end

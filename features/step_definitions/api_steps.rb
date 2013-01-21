@@ -27,3 +27,12 @@ end
 Then %{I should receive the following error:} do |string|
   @error.message.should include(string.strip)
 end
+
+Then /^I should receive JSON for (\d+) users?$/ do |count|
+  users = @response[:users]
+  users.length.should == count.to_i
+  users.each do |user|
+    object = ObjectSpace._id2ref(user["id"])
+    object.should be_a(PusherFake::Connection)
+  end
+end

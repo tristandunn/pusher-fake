@@ -20,8 +20,10 @@ module PusherFake
                      events(request)
                    when %r{\A/apps/#{id}/channels\Z}
                      channels(request)
-                   when %r{\A/apps/#{id}/channels/(.+)\Z}
+                   when %r{\A/apps/#{id}/channels/([^/]+)\Z}
                      channel($1, request)
+                   when %r{\A/apps/#{id}/channels/([^/]+)/users\Z}
+                     users($1)
                    end
 
         Rack::Response.new(MultiJson.dump(response)).finish
@@ -91,6 +93,23 @@ module PusherFake
 
           result
         end
+      end
+
+      # Returns a hash of the IDs for the users in the channel.
+      #
+      # @param [String] name The channel name.
+      # @return [Hash] A hash of user IDs.
+      def self.users(name)
+        channels = PusherFake::Channel.channels || {}
+        channel  = channels[name]
+
+        if channel
+          users = channel.connections.map do |connection|
+            { id: connection.object_id }
+          end
+        end
+
+        { users: users || [] }
       end
     end
   end
