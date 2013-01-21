@@ -234,3 +234,83 @@ describe PusherFake::Server::Application, ".channels, requesting a user count on
     }.should raise_error(subject::CHANNEL_FILTER_ERROR)
   end
 end
+
+describe PusherFake::Server::Application, ".channel, for an occupied channel" do
+  let(:name)     { "public-1" }
+  let(:request)  { stub(params: {}) }
+  let(:channel)  { stub(connections: [mock]) }
+  let(:channels) { { name => channel } }
+
+  subject { PusherFake::Server::Application }
+
+  before do
+    PusherFake::Channel.stubs(channels: channels)
+  end
+
+  it "returns a hash with the occupied status" do
+    subject.channel(name, request).should == { occupied: true }
+  end
+end
+
+describe PusherFake::Server::Application, ".channel, for an unoccupied channel" do
+  let(:name)     { "public-1" }
+  let(:request)  { stub(params: {}) }
+  let(:channel)  { stub(connections: []) }
+  let(:channels) { { name => channel } }
+
+  subject { PusherFake::Server::Application }
+
+  before do
+    PusherFake::Channel.stubs(channels: channels)
+  end
+
+  it "returns a hash with the occupied status" do
+    subject.channel(name, request).should == { occupied: false }
+  end
+end
+
+describe PusherFake::Server::Application, ".channel, for an unknown channel" do
+  let(:request)  { stub(params: {}) }
+  let(:channels) { {} }
+
+  subject { PusherFake::Server::Application }
+
+  before do
+    PusherFake::Channel.stubs(channels: channels)
+  end
+
+  it "returns a hash with the occupied status" do
+    subject.channel("fake", request).should == { occupied: false }
+  end
+end
+
+describe PusherFake::Server::Application, ".channel, request user count for a presence channel" do
+  let(:name)     { "presence-1" }
+  let(:params)   { { "info" => "user_count" } }
+  let(:request)  { stub(params: params) }
+  let(:channel)  { stub(connections: [mock, mock]) }
+  let(:channels) { { name => channel } }
+
+  subject { PusherFake::Server::Application }
+
+  before do
+    PusherFake::Channel.stubs(channels: channels)
+  end
+
+  it "returns a hash with the occupied status" do
+    subject.channel(name, request).should == { occupied: true, user_count: 2 }
+  end
+end
+
+describe PusherFake::Server::Application, ".channel, requesting a user count on a non-presence channel" do
+  let(:params)  { { "info" => "user_count" } }
+  let(:request) { stub(params: params) }
+
+  subject { PusherFake::Server::Application }
+
+  it "raises an error" do
+    lambda {
+      subject.channel("public-1", request)
+    }.should raise_error(subject::CHANNEL_USER_COUNT_ERROR)
+  end
+end

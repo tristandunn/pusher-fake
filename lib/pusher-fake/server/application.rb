@@ -4,6 +4,10 @@ module PusherFake
       CHANNEL_FILTER_ERROR = "user_count may only be requested for presence channels - " +
                                "please supply filter_by_prefix begining with presence-".freeze
 
+      CHANNEL_USER_COUNT_ERROR = "Cannot retrieve the user count unless the channel is a presence channel".freeze
+
+      PRESENCE_PREFIX_MATCHER = /\Apresence-/.freeze
+
       # Process an API request.
       #
       # @param [Hash] environment The request environment.
@@ -12,10 +16,12 @@ module PusherFake
         id       = PusherFake.configuration.app_id
         request  = Rack::Request.new(environment)
         response = case request.path
-                   when %r{/apps/#{id}/events}
+                   when %r{\A/apps/#{id}/events\Z}
                      events(request)
-                   when %r{/apps/#{id}/channels}
+                   when %r{\A/apps/#{id}/channels\Z}
                      channels(request)
+                   when %r{\A/apps/#{id}/channels/(.+)\Z}
+                     channel($1, request)
                    end
 
         Rack::Response.new(MultiJson.dump(response)).finish
@@ -36,6 +42,30 @@ module PusherFake
         {}
       end
 
+      # Return a hash of channel information.
+      #
+      # Occupied status is always included. A user count may be requested for
+      # presence channels.
+      #
+      # @param [String] name The channel name.
+      # @params [Rack::Request] request The HTTP request.
+      # @return [Hash] A hash of channel information.
+      def self.channel(name, request)
+        info = request.params["info"].to_s.split(",")
+
+        if info.include?("user_count") && name !~ PRESENCE_PREFIX_MATCHER
+          raise CHANNEL_USER_COUNT_ERROR
+        end
+
+        channels = PusherFake::Channel.channels || {}
+        channel  = channels[name]
+
+        {}.tap do |result|
+          result[:occupied]   = !channel.nil? && channel.connections.length > 0
+          result[:user_count] = channel.connections.length if channel && info.include?("user_count")
+        end
+      end
+
       # Returns a hash of occupied channels, optionally filtering with a prefix.
       #
       # When filtering to presence chanenls, the user count maybe also be requested.
@@ -46,7 +76,7 @@ module PusherFake
         info   = request.params["info"].to_s.split(",")
         prefix = request.params["filter_by_prefix"].to_s
 
-        if info.include?("user_count") && prefix != "presence-"
+        if info.include?("user_count") && prefix !~ PRESENCE_PREFIX_MATCHER
           raise CHANNEL_FILTER_ERROR
         end
 

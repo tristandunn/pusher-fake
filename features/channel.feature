@@ -70,3 +70,40 @@ Feature: Requesting channel information
       """
         user_count may only be requested for presence channels - please supply filter_by_prefix begining with presence-
       """
+
+  Scenario: Requesting a channel, with no occupants
+    When I request "/channels/empty"
+    Then I should receive the following JSON:
+    """
+      { "occupied" : false }
+    """
+
+  Scenario: Requesting a channel, with an occupant
+    Given I subscribe to the "non-empty" channel
+    When I request "/channels/non-empty"
+    Then I should receive the following JSON:
+    """
+      { "occupied" : true }
+    """
+
+  Scenario: Requesting a channel, with valid info attributes
+    Given I subscribe to the "presence-1" channel
+    And Bob is connected
+    And Bob is subscribed to the "presence-1" channel
+    When I request "/channels/presence-1" with the following options:
+      | info       |
+      | user_count |
+    Then I should receive the following JSON:
+    """
+      { "occupied"   : true,
+        "user_count" : 2 }
+    """
+
+  Scenario: Requesting a channel, with invalid info attributes
+    When I request "/channels/public-1" with the following options:
+      | info       |
+      | user_count |
+    Then I should receive the following error:
+      """
+        Cannot retrieve the user count unless the channel is a presence channel
+      """
