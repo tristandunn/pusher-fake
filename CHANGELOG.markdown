@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+* Support channel, channels, and user REST API endpoints. (Tristan Dunn)
 * Update depenencies. (Tristan Dunn)
 
 ## 0.4.0 — December 14, 2012
