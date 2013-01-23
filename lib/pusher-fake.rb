@@ -32,6 +32,6 @@ module PusherFake
 
   # @return [Configuration] Current configuration.
   def self.configuration
-    @@configuration ||= Configuration.new
+    @configuration ||= Configuration.new
   end
 end
