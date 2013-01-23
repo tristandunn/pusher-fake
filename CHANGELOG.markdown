@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+* Add a file for easily starting the fake server in Cucumber. (Tristan Dunn)
 * Add convenience method for the JS to override Pusher client configuration. (Tristan Dunn)
 * Update dependencies. (Tristan Dunn)
 
