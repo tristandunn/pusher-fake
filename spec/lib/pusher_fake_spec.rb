@@ -43,3 +43,22 @@ describe PusherFake, ".configuration" do
     subject.configuration.should == configuration
   end
 end
+
+describe PusherFake, ".javascript" do
+  let(:socket_host)   { "127.0.0.1" }
+  let(:socket_port)   { 1234 }
+  let(:configuration) { stub(socket_host: socket_host, socket_port: socket_port) }
+
+  subject { PusherFake }
+
+  before do
+    PusherFake.stubs(configuration: configuration)
+  end
+
+  it "returns JavaScript setting the host and port to the configured options" do
+    subject.javascript.should == <<-EOS
+      Pusher.host    = #{socket_host.to_json};
+      Pusher.ws_port = #{socket_port.to_json};
+    EOS
+  end
+end

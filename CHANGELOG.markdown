@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+* Add convenience method for the JS to override Pusher client configuration. (Tristan Dunn)
 * Update dependencies. (Tristan Dunn)
 
 ## 0.5.0 — January 21, 2013

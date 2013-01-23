@@ -34,4 +34,14 @@ module PusherFake
   def self.configuration
     @configuration ||= Configuration.new
   end
+
+  # Convenience method for the JS to override the Pusher client host and port.
+  #
+  # @return [String] JavaScript overriding the Pusher client host and port.
+  def self.javascript
+    <<-EOS
+      Pusher.host    = #{configuration.socket_host.to_json};
+      Pusher.ws_port = #{configuration.socket_port.to_json};
+    EOS
+  end
 end
