@@ -4,7 +4,7 @@ Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Tristan Dunn"]
   s.email       = "hello@tristandunn.com"
-  s.homepage    = "http://github.com/tristandunn/pusher-fake"
+  s.homepage    = "https://github.com/tristandunn/pusher-fake"
   s.summary     = "A fake Pusher server for development and testing."
   s.description = "A fake Pusher server for development and testing."
   s.license     = "MIT"
