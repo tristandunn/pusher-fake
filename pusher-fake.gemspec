@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.require_path = "lib"
 
   s.add_dependency "em-http-request", "1.0.3"
-  s.add_dependency "em-websocket",    "0.3.8"
+  s.add_dependency "em-websocket",    "0.4.0"
   s.add_dependency "thin",            "1.5.0"
   s.add_dependency "multi_json",      "1.5.0"
 
