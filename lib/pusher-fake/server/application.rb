@@ -24,6 +24,8 @@ module PusherFake
                      channel($1, request)
                    when %r{\A/apps/#{id}/channels/([^/]+)/users\Z}
                      users($1)
+                   else
+                     unknown_path(request.path)
                    end
 
         Rack::Response.new(MultiJson.dump(response)).finish
@@ -110,6 +112,15 @@ module PusherFake
         end
 
         { users: users || [] }
+      end
+
+      def self.unknown_path(path)
+        message = "Unknown path: #{path}"
+
+        logger = Logger.new(STDOUT)
+        logger.error(message)
+
+        raise message
       end
     end
   end

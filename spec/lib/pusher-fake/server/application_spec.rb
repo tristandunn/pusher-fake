@@ -74,6 +74,49 @@ describe PusherFake::Server::Application, ".call, for retrieving occupied channe
   end
 end
 
+describe PusherFake::Server::Application, ".call, with unknown path" do
+  let(:path)        { "/apps/fake/events" }
+  let(:request)     { stub(path: path) }
+  let(:message)     { "Unknown path: #{path}" }
+  let(:response)    { mock }
+  let(:environment) { mock }
+
+  before do
+    subject.stubs(:unknown_path).raises(message)
+
+    response.stubs(finish: response)
+
+    Rack::Request.stubs(new: request)
+    Rack::Response.stubs(new: response)
+  end
+
+  subject { PusherFake::Server::Application }
+
+  it "creates a request" do
+    subject.call(environment)
+    Rack::Request.should have_received(:new).with(environment)
+  end
+
+  it "calls unknown_path with the path" do
+    subject.call(environment)
+    subject.should have_received(:unknown_path).with(request.path)
+  end
+
+  it "creates a Rack response with the error message" do
+    subject.call(environment)
+    Rack::Response.should have_received(:new).with(message, 400)
+  end
+
+  it "finishes the response" do
+    subject.call(environment)
+    response.should have_received(:finish).with()
+  end
+
+  it "returns the response" do
+    subject.call(environment).should == response
+  end
+end
+
 describe PusherFake::Server::Application, ".call, raising an error" do
   let(:id)          { PusherFake.configuration.app_id }
   let(:path)        { "/apps/#{id}/channels" }
@@ -229,9 +272,9 @@ describe PusherFake::Server::Application, ".channels, requesting a user count on
   subject { PusherFake::Server::Application }
 
   it "raises an error" do
-    lambda {
+    expect {
       subject.channels(request)
-    }.should raise_error(subject::CHANNEL_FILTER_ERROR)
+    }.to raise_error(subject::CHANNEL_FILTER_ERROR)
   end
 end
 
@@ -309,9 +352,9 @@ describe PusherFake::Server::Application, ".channel, requesting a user count on 
   subject { PusherFake::Server::Application }
 
   it "raises an error" do
-    lambda {
+    expect {
       subject.channel("public-1", request)
-    }.should raise_error(subject::CHANNEL_USER_COUNT_ERROR)
+    }.to raise_error(subject::CHANNEL_USER_COUNT_ERROR)
   end
 end
 
@@ -363,5 +406,33 @@ describe PusherFake::Server::Application, ".users, for an unknown channel" do
 
   it "returns a hash with the occupied status" do
     subject.users("fake").should == { users: [] }
+  end
+end
+
+describe PusherFake::Server::Application, ".unknown_path" do
+  let(:path)    { "/apps/fake/events" }
+  let(:logger)  { stub(error: true) }
+  let(:message) { "Unknown path: #{path}" }
+
+  before do
+    Logger.stubs(new: logger)
+  end
+
+  subject { PusherFake::Server::Application }
+
+  it "creates a logger" do
+    expect { subject.unknown_path(path) }.to raise_error
+    Logger.should have_received(:new).with(STDOUT)
+  end
+
+  it "logs the error message" do
+    expect { subject.unknown_path(path) }.to raise_error
+    logger.should have_received(:error).with(message)
+  end
+
+  it "raises an error" do
+    expect {
+      subject.unknown_path(path)
+    }.to raise_error(message)
   end
 end
