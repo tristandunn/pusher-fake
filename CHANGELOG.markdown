@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+* Update dependencies. (Tristan Dunn)
+
 ## 0.6.0 — January 23, 2013
 
 * Add a file for easily starting the fake server in Cucumber. (Tristan Dunn)
