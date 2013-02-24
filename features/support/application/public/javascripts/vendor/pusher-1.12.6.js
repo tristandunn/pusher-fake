@@ -1,5 +1,5 @@
 /*!
- * Pusher JavaScript Library v1.12.5
+ * Pusher JavaScript Library v1.12.6
  * http://pusherapp.com/
  *
  * Copyright 2011, Pusher
@@ -81,7 +81,7 @@
     },
 
     subscribeAll: function() {
-      var channel;
+      var channelName;
       for (channelName in this.channels.channels) {
         if (this.channels.channels.hasOwnProperty(channelName)) {
           this.subscribe(channelName);
@@ -123,7 +123,8 @@
     },
 
     checkAppKey: function() {
-      if(this.key === null || this.key === undefined) {
+      if (!this.key) {
+        // do not allow undefined, null or empty string
         Pusher.warn('Warning', 'You must pass your app key when you instantiate Pusher.');
       }
     }
@@ -183,7 +184,7 @@
   };
 
   // Pusher defaults
-  Pusher.VERSION = '1.12.5';
+  Pusher.VERSION = '1.12.6';
   // WS connection parameters
   Pusher.host = 'ws.pusherapp.com';
   Pusher.ws_port = 80;
@@ -1019,22 +1020,26 @@ Example:
 
   var Members = function(channel) {
     var self = this;
+    var channelData = null;
 
     var reset = function() {
-      this._members_map = {};
-      this.count = 0;
-      this.me = null;
+      self._members_map = {};
+      self.count = 0;
+      self.me = null;
+      channelData = null;
     };
-    reset.call(this);
+    reset();
+
+    var subscriptionSucceeded = function(subscriptionData) {
+      self._members_map = subscriptionData.presence.hash;
+      self.count = subscriptionData.presence.count;
+      self.me = self.get(channelData.user_id);
+      channel.emit('pusher:subscription_succeeded', self);
+    };
 
     channel.bind('pusher_internal:authorized', function(authorizedData) {
-      var channelData = JSON.parse(authorizedData.channel_data);
-      channel.bind("pusher_internal:subscription_succeeded", function(subscriptionData) {
-        self._members_map = subscriptionData.presence.hash;
-        self.count = subscriptionData.presence.count;
-        self.me = self.get(channelData.user_id);
-        channel.emit('pusher:subscription_succeeded', self);
-      });
+      channelData = JSON.parse(authorizedData.channel_data);
+      channel.bind("pusher_internal:subscription_succeeded", subscriptionSucceeded);
     });
 
     channel.bind('pusher_internal:member_added', function(data) {
@@ -1056,7 +1061,8 @@ Example:
     });
 
     channel.bind('pusher_internal:disconnected', function() {
-      reset.call(self);
+      reset();
+      channel.unbind("pusher_internal:subscription_succeeded", subscriptionSucceeded);
     });
   };
 
@@ -1091,6 +1097,7 @@ Example:
     return channel;
   };
 }).call(this);
+
 ;(function() {
   Pusher.Channel.Authorizer = function(channel, type, options) {
     this.channel = channel;
@@ -1245,10 +1252,22 @@ var _require = (function() {
     deps.push(root + '/json2' + Pusher.dependency_suffix + '.js');
   }
   if (!window['WebSocket']) {
-    // Try to use web-socket-js (flash WebSocket emulation)
-    window.WEB_SOCKET_DISABLE_AUTO_INITIALIZATION = true;
-    window.WEB_SOCKET_SUPPRESS_CROSS_DOMAIN_SWF_ERROR = true;
-    deps.push(root + '/flashfallback' + Pusher.dependency_suffix + '.js');
+    var flashSupported;
+    try {
+      flashSupported = Boolean(new ActiveXObject('ShockwaveFlash.ShockwaveFlash'));
+    } catch (e) {
+      flashSupported = navigator.mimeTypes["application/x-shockwave-flash"] !== undefined;
+    }
+
+    if (flashSupported) {
+      // Try to use web-socket-js (flash WebSocket emulation)
+      window.WEB_SOCKET_DISABLE_AUTO_INITIALIZATION = true;
+      window.WEB_SOCKET_SUPPRESS_CROSS_DOMAIN_SWF_ERROR = true;
+      deps.push(root + '/flashfallback' + Pusher.dependency_suffix + '.js');
+    } else {
+      // Use SockJS when Flash is not available
+      deps.push(root + '/sockjs' + Pusher.dependency_suffix + '.js');
+    }
   }
 
   var initialize = function() {
@@ -1271,13 +1290,10 @@ var _require = (function() {
           })
           WebSocket.__initialize();
         } else {
-          // web-socket-js cannot initialize (most likely flash not installed)
-          sockjsPath = root + '/sockjs' + Pusher.dependency_suffix + '.js';
-          _require([sockjsPath], function() {
-            Pusher.Transport = SockJS;
-            Pusher.TransportType = 'sockjs';
-            Pusher.ready();
-          })
+          // Flash fallback was not loaded, using SockJS
+          Pusher.Transport = window.SockJS;
+          Pusher.TransportType = 'sockjs';
+          Pusher.ready();
         }
       }
     }
