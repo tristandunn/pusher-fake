@@ -82,7 +82,7 @@ GEM
       rubyzip
       websocket (~> 1.0.4)
     signature (0.1.6)
-    sinatra (1.3.4)
+    sinatra (1.3.5)
       rack (~> 1.4)
       rack-protection (~> 1.3)
       tilt (~> 1.3, >= 1.3.3)
@@ -94,7 +94,7 @@ GEM
     websocket (1.0.7)
     xpath (1.0.0)
       nokogiri (~> 1.3)
-    yard (0.8.4.1)
+    yard (0.8.5)
 
 PLATFORMS
   ruby
@@ -108,5 +108,5 @@ DEPENDENCIES
   rake (= 10.0.3)
   redcarpet (= 2.2.2)
   rspec (= 2.13.0)
-  sinatra (= 1.3.4)
-  yard (= 0.8.4.1)
+  sinatra (= 1.3.5)
+  yard (= 0.8.5)
