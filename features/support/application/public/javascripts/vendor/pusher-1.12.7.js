@@ -1,5 +1,5 @@
 /*!
- * Pusher JavaScript Library v1.12.6
+ * Pusher JavaScript Library v1.12.7
  * http://pusherapp.com/
  *
  * Copyright 2011, Pusher
@@ -184,7 +184,7 @@
   };
 
   // Pusher defaults
-  Pusher.VERSION = '1.12.6';
+  Pusher.VERSION = '1.12.7';
   // WS connection parameters
   Pusher.host = 'ws.pusherapp.com';
   Pusher.ws_port = 80;
