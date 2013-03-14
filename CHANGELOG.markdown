@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+* Update dependencies. (Tristan Dunn)
+
 ## 0.7.0 — February 25, 2013
 
 * Raise and log on unknown server paths. (Tristan Dunn)
