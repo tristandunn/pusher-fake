@@ -2,6 +2,22 @@
 
 A fake [Pusher](http://pusher.com) server for development and testing.
 
+## Usage
+
+#### 1. Use the PusherFake server host and port for the Pusher JS client.
+
+```erb
+<script>
+  <%== PusherFake.javascript if defined?(PusherFake) %>
+</script>
+```
+
+#### 2. Start PusherFake in Cucumber environment. If you aren't using Cucumber, see [pusher-fake/cucumber.rb](https://github.com/tristandunn/pusher-fake/blob/master/lib/pusher-fake/cucumber.rb).
+
+```ruby
+require "pusher-fake/cucumber"
+```
+
 ## Examples
 
 * [pusher-fake-example](https://github.com/tristandunn/pusher-fake-example) - An example of using pusher-fake with Cucumber to test a Rails application.
