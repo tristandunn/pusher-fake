@@ -1,5 +1,5 @@
 /*!
- * Pusher JavaScript Library v2.0.0
+ * Pusher JavaScript Library v2.0.4
  * http://pusherapp.com/
  *
  * Copyright 2013, Pusher
@@ -500,7 +500,7 @@
 }).call(this);
 
 ;(function() {
-  Pusher.VERSION = '2.0.0';
+  Pusher.VERSION = '2.0.4';
   Pusher.PROTOCOL = 6;
 
   // WS connection parameters
@@ -651,9 +651,11 @@
   CallbackRegistry.prototype.remove = function(eventName, callback) {
     if(this.get(eventName)) {
       var index = Pusher.Util.arrayIndexOf(this.get(eventName), callback);
-      var callbacksCopy = this._callbacks[this._prefix(eventName)].slice(0);
-      callbacksCopy.splice(index, 1);
-      this._callbacks[this._prefix(eventName)] = callbacksCopy;
+      if (index !== -1){
+        var callbacksCopy = this._callbacks[this._prefix(eventName)].slice(0);
+        callbacksCopy.splice(index, 1);
+        this._callbacks[this._prefix(eventName)] = callbacksCopy;
+      }
     }
   };
 
@@ -1171,7 +1173,7 @@
 
   prototype.connect = function(minPriority, callback) {
     return connect(this.strategies, minPriority, function(i, runners) {
-      return function(error, connection) {
+      return function(error, handshake) {
         runners[i].error = error;
         if (error) {
           if (allRunnersFailed(runners)) {
@@ -1180,9 +1182,9 @@
           return;
         }
         Pusher.Util.apply(runners, function(runner) {
-          runner.forceMinPriority(connection.priority);
+          runner.forceMinPriority(handshake.transport.priority);
         });
-        callback(null, connection);
+        callback(null, handshake);
       };
     });
   };
@@ -1267,7 +1269,7 @@
     var startTimestamp = Pusher.Util.now();
     var runner = strategies.pop().connect(
       minPriority,
-      function cb(error, connection) {
+      function cb(error, handshake) {
         if (error) {
           flushTransportInfo();
           if (strategies.length > 0) {
@@ -1278,8 +1280,8 @@
           }
         } else {
           var latency = Pusher.Util.now() - startTimestamp;
-          storeTransportInfo(connection.name, latency);
-          callback(null, connection);
+          storeTransportInfo(handshake.transport.name, latency);
+          callback(null, handshake);
         }
       }
     );
@@ -1311,17 +1313,21 @@
   function storeTransportInfo(transport, latency) {
     var storage = Pusher.Util.getLocalStorage();
     if (storage) {
-      storage.pusherTransport = JSON.stringify({
-        timestamp: Pusher.Util.now(),
-        transport: transport,
-        latency: latency
-      });
+      try {
+        storage.pusherTransport = JSON.stringify({
+          timestamp: Pusher.Util.now(),
+          transport: transport,
+          latency: latency
+        });
+      } catch(e) {
+        // catch over quota exceptions raised by localStorage
+      }
     }
   }
 
   function flushTransportInfo() {
     var storage = Pusher.Util.getLocalStorage();
-    if (storage) {
+    if (storage && storage.pusherTransport) {
       delete storage.pusherTransport;
     }
   }
@@ -1391,11 +1397,11 @@
   prototype.connect = function(minPriority, callback) {
     var runner = this.strategy.connect(
       minPriority,
-      function(error, connection) {
-        if (connection) {
+      function(error, handshake) {
+        if (handshake) {
           runner.abort();
         }
-        callback(error, connection);
+        callback(error, handshake);
       }
     );
     return runner;
@@ -1463,9 +1469,9 @@
     var timeout = this.timeout;
     var runner = null;
 
-    var tryNextStrategy = function(error, connection) {
-      if (connection) {
-        callback(null, connection);
+    var tryNextStrategy = function(error, handshake) {
+      if (handshake) {
+        callback(null, handshake);
       } else {
         current = current + 1;
         if (self.loop) {
@@ -1516,7 +1522,7 @@
     var timer = null;
     var runner = null;
 
-    runner = strategy.connect(minPriority, function(error, connection) {
+    runner = strategy.connect(minPriority, function(error, handshake) {
       if (error && timer && timer.isRunning() && !options.failFast) {
         // advance to the next strategy after the timeout
         return;
@@ -1524,7 +1530,7 @@
       if (timer) {
         timer.ensureAborted();
       }
-      callback(error, connection);
+      callback(error, handshake);
     });
 
     if (options.timeout > 0) {
@@ -1589,17 +1595,22 @@
     }
 
     var self = this;
-    var connection = this.transport.createConnection(
+    var connected = false;
+
+    var transport = this.transport.createConnection(
       this.name, this.priority, this.options.key, this.options
     );
 
     var onInitialized = function() {
-      connection.unbind("initialized", onInitialized);
-      connection.connect();
+      transport.unbind("initialized", onInitialized);
+      transport.connect();
     };
     var onOpen = function() {
-      unbindListeners();
-      callback(null, connection);
+      var handshake = new Pusher.Handshake(transport, function(result) {
+        connected = true;
+        unbindListeners();
+        callback(null, result);
+      });
     };
     var onError = function(error) {
       unbindListeners();
@@ -1607,39 +1618,39 @@
     };
     var onClosed = function() {
       unbindListeners();
-      callback(new Pusher.Errors.TransportClosed(this.transport));
+      callback(new Pusher.Errors.TransportClosed(transport));
     };
 
     var unbindListeners = function() {
-      connection.unbind("initialized", onInitialized);
-      connection.unbind("open", onOpen);
-      connection.unbind("error", onError);
-      connection.unbind("closed", onClosed);
+      transport.unbind("initialized", onInitialized);
+      transport.unbind("open", onOpen);
+      transport.unbind("error", onError);
+      transport.unbind("closed", onClosed);
     };
 
-    connection.bind("initialized", onInitialized);
-    connection.bind("open", onOpen);
-    connection.bind("error", onError);
-    connection.bind("closed", onClosed);
+    transport.bind("initialized", onInitialized);
+    transport.bind("open", onOpen);
+    transport.bind("error", onError);
+    transport.bind("closed", onClosed);
 
     // connect will be called automatically after initialization
-    connection.initialize();
+    transport.initialize();
 
     return {
       abort: function() {
-        if (connection.state === "open") {
+        if (connected) {
           return;
         }
         unbindListeners();
-        connection.close();
+        transport.close();
       },
       forceMinPriority: function(p) {
-        if (connection.state === "open") {
+        if (connected) {
           return;
         }
         if (self.priority < p) {
-          // TODO close connection in a nicer way
-          connection.close();
+          // TODO close transport in a nicer way
+          transport.close();
         }
       }
     };
@@ -1752,7 +1763,17 @@
       return false;
     }
 
-    this.socket = this.createSocket(url);
+    try {
+      this.socket = this.createSocket(url);
+    } catch (e) {
+      var self = this;
+      new Pusher.Timer(0, function() {
+        self.onError(e);
+        self.changeState("closed");
+      });
+      return false;
+    }
+
     this.bindListeners();
 
     Pusher.debug("Connecting", { transport: this.name, url: url });
@@ -1944,9 +1965,13 @@
       return false;
     }
     try {
-      return !!(new ActiveXObject('ShockwaveFlash.ShockwaveFlash'));
+      return Boolean(new ActiveXObject('ShockwaveFlash.ShockwaveFlash'));
     } catch (e) {
-      return navigator.mimeTypes["application/x-shockwave-flash"] !== undefined;
+      return Boolean(
+        navigator &&
+        navigator.mimeTypes &&
+        navigator.mimeTypes["application/x-shockwave-flash"] !== undefined
+      );
     }
   };
 
@@ -1997,6 +2022,7 @@
    */
   function SockJSTransport(name, priority, key, options) {
     Pusher.AbstractTransport.call(this, name, priority, key, options);
+    this.options.ignoreNullOrigin = options.ignoreNullOrigin;
   }
   var prototype = SockJSTransport.prototype;
   Pusher.Util.extend(prototype, Pusher.AbstractTransport.prototype);
@@ -2047,12 +2073,11 @@
 
   /** @protected */
   prototype.createSocket = function(url) {
-    // exclude iframe transports until we link to correct SockJS version
-    // inside the iframe
     return new SockJS(url, null, {
       js_path: Pusher.Dependencies.getPath("sockjs", {
         encrypted: this.options.encrypted
-      })
+      }),
+      ignore_null_origin: this.options.ignoreNullOrigin
     });
   };
 
@@ -2191,8 +2216,8 @@
     return connection;
   };
 
-  prototype.isSupported = function() {
-    return this.manager.isAlive() && this.transport.isSupported();
+  prototype.isSupported = function(environment) {
+    return this.manager.isAlive() && this.transport.isSupported(environment);
   };
 
   Pusher.AssistantToTheTransportManager = AssistantToTheTransportManager;
@@ -2269,7 +2294,8 @@
         key: context.key,
         encrypted: context.encrypted,
         timeline: context.timeline,
-        disableFlash: context.disableFlash
+        disableFlash: context.disableFlash,
+        ignoreNullOrigin: context.ignoreNullOrigin
       }, options);
       if (manager) {
         transportClass = manager.getAssistant(transportClass);
@@ -2391,29 +2417,165 @@
 
 ;(function() {
   /**
+   * Provides functions for handling Pusher protocol-specific messages.
+   */
+  Protocol = {};
+
+  /**
+   * Decodes a message in a Pusher format.
+   *
+   * Throws errors when messages are not parse'able.
+   *
+   * @param  {Object} message
+   * @return {Object}
+   */
+  Protocol.decodeMessage = function(message) {
+    try {
+      var params = JSON.parse(message.data);
+      if (typeof params.data === 'string') {
+        try {
+          params.data = JSON.parse(params.data);
+        } catch (e) {
+          if (!(e instanceof SyntaxError)) {
+            // TODO looks like unreachable code
+            // https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/JSON/parse
+            throw e;
+          }
+        }
+      }
+      return params;
+    } catch (e) {
+      throw { type: 'MessageParseError', error: e, data: message.data};
+    }
+  };
+
+  /**
+   * Encodes a message to be sent.
+   *
+   * @param  {Object} message
+   * @return {String}
+   */
+  Protocol.encodeMessage = function(message) {
+    return JSON.stringify(message);
+  };
+
+  /** Processes a handshake message and returns appropriate actions.
+   *
+   * Returns an object with an 'action' and other action-specific properties.
+   *
+   * There are three outcomes when calling this function. First is a successful
+   * connection attempt, when pusher:connection_established is received, which
+   * results in a 'connected' action with an 'id' property. When passed a
+   * pusher:error event, it returns a result with action appropriate to the
+   * close code and an error. Otherwise, it raises an exception.
+   *
+   * @param {String} message
+   * @result Object
+   */
+  Protocol.processHandshake = function(message) {
+    message = this.decodeMessage(message);
+
+    if (message.event === "pusher:connection_established") {
+      return { action: "connected", id: message.data.socket_id };
+    } else if (message.event === "pusher:error") {
+      // From protocol 6 close codes are sent only once, so this only
+      // happens when connection does not support close codes
+      return {
+        action: this.getCloseAction(message.data),
+        error: this.getCloseError(message.data)
+      };
+    } else {
+      throw "Invalid handshake";
+    }
+  };
+
+  /**
+   * Dispatches the close event and returns an appropriate action name.
+   *
+   * See:
+   * 1. https://developer.mozilla.org/en-US/docs/WebSockets/WebSockets_reference/CloseEvent
+   * 2. http://pusher.com/docs/pusher_protocol
+   *
+   * @param  {CloseEvent} closeEvent
+   * @return {String} close action name
+   */
+  Protocol.getCloseAction = function(closeEvent) {
+    if (closeEvent.code < 4000) {
+      // ignore 1000 CLOSE_NORMAL, 1001 CLOSE_GOING_AWAY,
+      //        1005 CLOSE_NO_STATUS, 1006 CLOSE_ABNORMAL
+      // ignore 1007...3999
+      // handle 1002 CLOSE_PROTOCOL_ERROR, 1003 CLOSE_UNSUPPORTED,
+      //        1004 CLOSE_TOO_LARGE
+      if (closeEvent.code >= 1002 && closeEvent.code <= 1004) {
+        return "backoff";
+      } else {
+        return null;
+      }
+    } else if (closeEvent.code === 4000) {
+      return "ssl_only";
+    } else if (closeEvent.code < 4100) {
+      return "refused";
+    } else if (closeEvent.code < 4200) {
+      return "backoff";
+    } else if (closeEvent.code < 4300) {
+      return "retry";
+    } else {
+      // unknown error
+      return "refused";
+    }
+  };
+
+  /**
+   * Returns an error or null basing on the close event.
+   *
+   * Null is returned when connection was closed cleanly. Otherwise, an object
+   * with error details is returned.
+   *
+   * @param  {CloseEvent} closeEvent
+   * @return {Object} error object
+   */
+  Protocol.getCloseError = function(closeEvent) {
+    if (closeEvent.code !== 1000 && closeEvent.code !== 1001) {
+      return {
+        type: 'PusherError',
+        data: {
+          code: closeEvent.code,
+          message: closeEvent.reason || closeEvent.message
+        }
+      };
+    } else {
+      return null;
+    }
+  };
+
+  Pusher.Protocol = Protocol;
+}).call(this);
+
+;(function() {
+  /**
    * Provides Pusher protocol interface for transports.
    *
    * Emits following events:
-   * - connected - after establishing connection and receiving a socket id
    * - message - on received messages
    * - ping - on ping requests
    * - pong - on pong responses
    * - error - when the transport emits an error
    * - closed - after closing the transport
-   * - ssl_only - after trying to connect without ssl to a ssl-only app
-   * - retry - when closed connection should be retried immediately
-   * - backoff - when closed connection should be retried with a delay
-   * - refused - when closed connection should not be retried
    *
+   * It also emits more events when connection closes with a code.
+   * See Protocol.getCloseAction to get more details.
+   *
+   * @param {Number} id
    * @param {AbstractTransport} transport
    */
-  function ProtocolWrapper(transport) {
+  function Connection(id, transport) {
     Pusher.EventsDispatcher.call(this);
+
+    this.id = id;
     this.transport = transport;
     this.bindListeners();
   }
-  var prototype = ProtocolWrapper.prototype;
-
+  var prototype = Connection.prototype;
   Pusher.Util.extend(prototype, Pusher.EventsDispatcher.prototype);
 
   /** Returns whether used transport handles ping/pong by itself
@@ -2440,19 +2602,14 @@
    * @returns {Boolean} whether message was sent or not
    */
   prototype.send_event = function(name, data, channel) {
-    var payload = {
-      event: name,
-      data: data
-    };
+    var message = { event: name, data: data };
     if (channel) {
-      payload.channel = channel;
+      message.channel = channel;
     }
-
-    Pusher.debug('Event sent', payload);
-    return this.send(JSON.stringify(payload));
+    return this.send(Pusher.Protocol.encodeMessage(message));
   };
 
-  /** Closes the transport.  */
+  /** Closes the connection. */
   prototype.close = function() {
     this.transport.close();
   };
@@ -2461,26 +2618,17 @@
   prototype.bindListeners = function() {
     var self = this;
 
-    var onMessageOpen = function(message) {
-      message = self.parseMessage(message);
-
-      if (message !== undefined) {
-        if (message.event === 'pusher:connection_established') {
-          self.id = message.data.socket_id;
-          self.transport.unbind("message", onMessageOpen);
-          self.transport.bind("message", onMessageConnected);
-          self.transport.bind("ping_request", onPingRequest);
-          self.emit("connected", self.id);
-        } else if (message.event === "pusher:error") {
-          // From protocol 6 close codes are sent only once, so this only
-          // happens when connection does not support close codes
-          self.handleCloseCode(message.data.code, message.data.message);
-          self.transport.close();
-        }
+    var onMessage = function(m) {
+      var message;
+      try {
+        message = Pusher.Protocol.decodeMessage(m);
+      } catch(e) {
+        self.emit('error', {
+          type: 'MessageParseError',
+          error: e,
+          data: m.data
+        });
       }
-    };
-    var onMessageConnected = function(message) {
-      message = self.parseMessage(message);
 
       if (message !== undefined) {
         Pusher.debug('Event recd', message);
@@ -2505,80 +2653,115 @@
     var onError = function(error) {
       self.emit("error", { type: "WebSocketError", error: error });
     };
-    var onClosed = function(error) {
-      if (error && error.code) {
-        self.handleCloseCode(error.code, error.reason);
+    var onClosed = function(closeEvent) {
+      unbindListeners();
+
+      if (closeEvent && closeEvent.code) {
+        self.handleCloseEvent(closeEvent);
       }
-      self.transport.unbind("message", onMessageOpen);
-      self.transport.unbind("message", onMessageConnected);
-      self.transport.unbind("ping_request", onPingRequest);
-      self.transport.unbind("error", onError);
-      self.transport.unbind("closed", onClosed);
+
       self.transport = null;
       self.emit("closed");
     };
 
-    this.transport.bind("message", onMessageOpen);
-    this.transport.bind("error", onError);
-    this.transport.bind("closed", onClosed);
+    var unbindListeners = function() {
+      self.transport.unbind("closed", onClosed);
+      self.transport.unbind("error", onError);
+      self.transport.unbind("ping_request", onPingRequest);
+      self.transport.unbind("message", onMessage);
+    };
+
+    self.transport.bind("message", onMessage);
+    self.transport.bind("ping_request", onPingRequest);
+    self.transport.bind("error", onError);
+    self.transport.bind("closed", onClosed);
   };
 
   /** @private */
-  prototype.parseMessage = function(message) {
-    try {
-      var params = JSON.parse(message.data);
+  prototype.handleCloseEvent = function(closeEvent) {
+    var action = Pusher.Protocol.getCloseAction(closeEvent);
+    var error = Pusher.Protocol.getCloseError(closeEvent);
+    if (error) {
+      this.emit('error', error);
+    }
+    if (action) {
+      this.emit(action);
+    }
+  };
 
-      if (typeof params.data === 'string') {
-        try {
-          params.data = JSON.parse(params.data);
-        } catch (e) {
-          if (!(e instanceof SyntaxError)) {
-            throw e;
-          }
+  Pusher.Connection = Connection;
+}).call(this);
+
+;(function() {
+  /**
+   * Handles Pusher protocol handshakes for transports.
+   *
+   * Calls back with a result object after handshake is completed. Results
+   * always have two fields:
+   * - action - string describing action to be taken after the handshake
+   * - transport - the transport object passed to the constructor
+   *
+   * Different actions can set different additional properties on the result.
+   * In the case of 'connected' action, there will be a 'connection' property
+   * containing a Connection object for the transport. Other actions should
+   * carry an 'error' property.
+   *
+   * @param {AbstractTransport} transport
+   * @param {Function} callback
+   */
+  function Handshake(transport, callback) {
+    this.transport = transport;
+    this.callback = callback;
+    this.bindListeners();
+  }
+  var prototype = Handshake.prototype;
+
+  /** @private */
+  prototype.bindListeners = function() {
+    var self = this;
+
+    var unbindListeners = function() {
+      self.transport.unbind("message", onMessage);
+      self.transport.unbind("closed", onClosed);
+    };
+
+    var onMessage = function(m) {
+      unbindListeners();
+      try {
+        var result = Pusher.Protocol.processHandshake(m);
+        if (result.action === "connected") {
+          self.finish("connected", {
+            connection: new Pusher.Connection(result.id, self.transport)
+          });
+        } else {
+          self.finish(result.action, { error: result.error });
+          self.transport.close();
         }
+      } catch (e) {
+        self.finish("error", { error: e });
+        self.transport.close();
       }
+    };
+    var onClosed = function(closeEvent) {
+      unbindListeners();
 
-      return params;
-    } catch (e) {
-      this.emit(
-        'error', { type: 'MessageParseError', error: e, data: message.data}
-      );
-    }
+      var action = Pusher.Protocol.getCloseAction(closeEvent) || "backoff";
+      var error = Pusher.Protocol.getCloseError(closeEvent);
+      self.finish(action, { error: error });
+    };
+
+    self.transport.bind("message", onMessage);
+    self.transport.bind("closed", onClosed);
   };
 
   /** @private */
-  prototype.handleCloseCode = function(code, message) {
-    this.emit(
-      'error', { type: 'PusherError', data: { code: code, message: message } }
+  prototype.finish = function(action, params) {
+    this.callback(
+      Pusher.Util.extend({ transport: this.transport, action: action }, params)
     );
-
-    // See:
-    // 1. https://developer.mozilla.org/en-US/docs/WebSockets/WebSockets_reference/CloseEvent
-    // 2. http://pusher.com/docs/pusher_protocol
-    if (code < 4000) {
-      // ignore 1000 CLOSE_NORMAL, 1001 CLOSE_GOING_AWAY,
-      //        1005 CLOSE_NO_STATUS, 1006 CLOSE_ABNORMAL
-      // ignore 1007...3999
-      // handle 1002 CLOSE_PROTOCOL_ERROR, 1003 CLOSE_UNSUPPORTED,
-      //        1004 CLOSE_TOO_LARGE
-      if (code >= 1002 && code <= 1004) {
-        this.emit("backoff");
-      }
-    } else if (code === 4000) {
-      this.emit("ssl_only");
-    } else if (code < 4100) {
-      this.emit("refused");
-    } else if (code < 4200) {
-      this.emit("backoff");
-    } else if (code < 4300) {
-      this.emit("retry");
-    } else {
-      // unknown error
-      this.emit("refused");
-    }
   };
 
-  Pusher.ProtocolWrapper = ProtocolWrapper;
+  Pusher.Handshake = Handshake;
 }).call(this);
 
 ;(function() {
@@ -2617,6 +2800,10 @@
     this.encrypted = !!options.encrypted;
     this.timeline = this.options.getTimeline();
 
+    this.connectionCallbacks = this.buildConnectionCallbacks();
+    this.errorCallbacks = this.buildErrorCallbacks();
+    this.handshakeCallbacks = this.buildHandshakeCallbacks(this.errorCallbacks);
+
     var self = this;
 
     Pusher.Network.bind("online", function() {
@@ -2638,6 +2825,8 @@
     };
     this.bind("connected", sendTimeline);
     setInterval(sendTimeline, 60000);
+
+    this.updateStrategy();
   }
   var prototype = ConnectionManager.prototype;
 
@@ -2649,48 +2838,43 @@
    * to find events emitted on connection attempts.
    */
   prototype.connect = function() {
-    if (this.connection) {
+    var self = this;
+
+    if (self.connection) {
       return;
     }
-    if (this.state === "connecting") {
+    if (self.state === "connecting") {
       return;
     }
 
-    var strategy = this.options.getStrategy({
-      key: this.key,
-      timeline: this.timeline,
-      encrypted: this.encrypted
-    });
-
-    if (!strategy.isSupported()) {
-      this.updateState("failed");
+    if (!self.strategy.isSupported()) {
+      self.updateState("failed");
       return;
     }
     if (Pusher.Network.isOnline() === false) {
-      this.updateState("unavailable");
+      self.updateState("unavailable");
       return;
     }
 
-    this.updateState("connecting");
-    this.timelineSender = this.options.getTimelineSender(
-      this.timeline,
-      { encrypted: this.encrypted },
-      this
+    self.updateState("connecting");
+    self.timelineSender = self.options.getTimelineSender(
+      self.timeline,
+      { encrypted: self.encrypted },
+      self
     );
 
-    var self = this;
-    var callback = function(error, transport) {
+    var callback = function(error, handshake) {
       if (error) {
-        self.runner = strategy.connect(0, callback);
+        self.runner = self.strategy.connect(0, callback);
       } else {
         // we don't support switching connections yet
         self.runner.abort();
-        self.setConnection(self.wrapTransport(transport));
+        self.handshakeCallbacks[handshake.action](handshake);
       }
     };
-    this.runner = strategy.connect(0, callback);
+    self.runner = self.strategy.connect(0, callback);
 
-    this.setUnavailableTimer();
+    self.setUnavailableTimer();
   };
 
   /** Sends raw data.
@@ -2732,48 +2916,50 @@
     // we're in disconnected state, so closing will not cause reconnecting
     if (this.connection) {
       this.connection.close();
-      this.connection = null;
+      this.abandonConnection();
     }
+  };
+
+  /** @private */
+  prototype.updateStrategy = function() {
+    this.strategy = this.options.getStrategy({
+      key: this.key,
+      timeline: this.timeline,
+      encrypted: this.encrypted
+    });
   };
 
   /** @private */
   prototype.retryIn = function(delay) {
     var self = this;
-    this.retryTimer = setTimeout(function() {
-      if (self.retryTimer === null) {
-        return;
-      }
-      self.retryTimer = null;
+    this.retryTimer = new Pusher.Timer(delay || 0, function() {
       self.disconnect();
       self.connect();
-    }, delay || 0);
+    });
   };
 
   /** @private */
   prototype.clearRetryTimer = function() {
     if (this.retryTimer) {
-      clearTimeout(this.retryTimer);
-      this.retryTimer = null;
+      this.retryTimer.ensureAborted();
     }
   };
 
   /** @private */
   prototype.setUnavailableTimer = function() {
     var self = this;
-    this.unavailableTimer = setTimeout(function() {
-      if (!self.unavailableTimer) {
-        return;
+    self.unavailableTimer = new Pusher.Timer(
+      self.options.unavailableTimeout,
+      function() {
+        self.updateState("unavailable");
       }
-      self.updateState("unavailable");
-      self.unavailableTimer = null;
-    }, this.options.unavailableTimeout);
+    );
   };
 
   /** @private */
   prototype.clearUnavailableTimer = function() {
     if (this.unavailableTimer) {
-      clearTimeout(this.unavailableTimer);
-      this.unavailableTimer = null;
+      this.unavailableTimer.ensureAborted();
     }
   };
 
@@ -2783,92 +2969,109 @@
     // send ping after inactivity
     if (!this.connection.supportsPing()) {
       var self = this;
-      this.activityTimer = setTimeout(function() {
-        self.send_event('pusher:ping', {});
-        // wait for pong response
-        self.activityTimer = setTimeout(function() {
-          self.connection.close();
-        }, (self.options.pongTimeout));
-      }, (this.options.activityTimeout));
+      self.activityTimer = new Pusher.Timer(
+        self.options.activityTimeout,
+        function() {
+          self.send_event('pusher:ping', {});
+          // wait for pong response
+          self.activityTimer = new Pusher.Timer(
+            self.options.pongTimeout,
+            function() {
+              self.connection.close();
+            }
+          );
+        }
+      );
     }
   };
 
   /** @private */
   prototype.stopActivityCheck = function() {
     if (this.activityTimer) {
-      clearTimeout(this.activityTimer);
-      this.activityTimer = null;
+      this.activityTimer.ensureAborted();
     }
+  };
+
+  /** @private */
+  prototype.buildConnectionCallbacks = function() {
+    var self = this;
+    return {
+      message: function(message) {
+        // includes pong messages from server
+        self.resetActivityCheck();
+        self.emit('message', message);
+      },
+      ping: function() {
+        self.send_event('pusher:pong', {});
+      },
+      ping_request: function() {
+        self.send_event('pusher:ping', {});
+      },
+      error: function(error) {
+        // just emit error to user - socket will already be closed by browser
+        self.emit("error", { type: "WebSocketError", error: error });
+      },
+      closed: function() {
+        self.abandonConnection();
+        if (self.shouldRetry()) {
+          self.retryIn(1000);
+        }
+      }
+    };
+  };
+
+  /** @private */
+  prototype.buildHandshakeCallbacks = function(errorCallbacks) {
+    var self = this;
+    return Pusher.Util.extend({}, errorCallbacks, {
+      connected: function(handshake) {
+        self.clearUnavailableTimer();
+        self.setConnection(handshake.connection);
+        self.socket_id = self.connection.id;
+        self.updateState("connected");
+      }
+    });
+  };
+
+  /** @private */
+  prototype.buildErrorCallbacks = function() {
+    var self = this;
+    return {
+      ssl_only: function() {
+        self.encrypted = true;
+        self.updateStrategy();
+        self.retryIn(0);
+      },
+      refused: function() {
+        self.disconnect();
+      },
+      backoff: function() {
+        self.retryIn(1000);
+      },
+      retry: function() {
+        self.retryIn(0);
+      }
+    };
   };
 
   /** @private */
   prototype.setConnection = function(connection) {
     this.connection = connection;
-
-    var self = this;
-    var onConnected = function(id) {
-      self.clearUnavailableTimer();
-      self.socket_id = id;
-      self.updateState("connected");
-      self.resetActivityCheck();
-    };
-    var onMessage = function(message) {
-      // includes pong messages from server
-      self.resetActivityCheck();
-      self.emit('message', message);
-    };
-    var onPing = function() {
-      self.send_event('pusher:pong', {});
-    };
-    var onPingRequest = function() {
-      self.send_event('pusher:ping', {});
-    };
-    var onError = function(error) {
-      // just emit error to user - socket will already be closed by browser
-      self.emit("error", { type: "WebSocketError", error: error });
-    };
-    var onClosed = function() {
-      connection.unbind("connected", onConnected);
-      connection.unbind("message", onMessage);
-      connection.unbind("ping", onPing);
-      connection.unbind("ping_request", onPingRequest);
-      connection.unbind("error", onError);
-      connection.unbind("closed", onClosed);
-      self.connection = null;
-
-      if (self.shouldRetry()) {
-        self.retryIn(1000);
-      }
-    };
-
-    // handling close conditions
-    var onSSLOnly = function() {
-      self.encrypted = true;
-      self.retryIn(0);
-    };
-    var onRefused = function() {
-      self.disconnect();
-    };
-    var onBackoff = function() {
-      self.retryIn(1000);
-    };
-    var onRetry = function() {
-      self.retryIn(0);
-    };
-
-    connection.bind("connected", onConnected);
-    connection.bind("message", onMessage);
-    connection.bind("ping", onPing);
-    connection.bind("ping_request", onPingRequest);
-    connection.bind("error", onError);
-    connection.bind("closed", onClosed);
-
-    connection.bind("ssl_only", onSSLOnly);
-    connection.bind("refused", onRefused);
-    connection.bind("backoff", onBackoff);
-    connection.bind("retry", onRetry);
-
+    for (var event in this.connectionCallbacks) {
+      this.connection.bind(event, this.connectionCallbacks[event]);
+    }
     this.resetActivityCheck();
+  };
+
+  /** @private */
+  prototype.abandonConnection = function() {
+    if (!this.connection) {
+      return;
+    }
+    for (var event in this.connectionCallbacks) {
+      this.connection.unbind(event, this.connectionCallbacks[event]);
+    }
+    this.connection = null;
   };
 
   /** @private */
@@ -2888,11 +3091,6 @@
   /** @private */
   prototype.shouldRetry = function() {
     return this.state === "connecting" || this.state === "connected";
-  };
-
-  /** @private */
-  prototype.wrapTransport = function(transport) {
-    return new Pusher.ProtocolWrapper(transport);
   };
 
   Pusher.ConnectionManager = ConnectionManager;
