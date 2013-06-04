@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.0 — Unreleased
+
+* Update dependencies. (Tristan Dunn)
+
 ## 0.8.0 — May 11, 2013
 
 * Update dependencies. (Tristan Dunn)

@@ -1,5 +1,5 @@
 /*!
- * Pusher JavaScript Library v2.0.4
+ * Pusher JavaScript Library v2.0.5
  * http://pusherapp.com/
  *
  * Copyright 2013, Pusher
@@ -28,7 +28,7 @@
       return new Pusher.Timeline(self.key, self.sessionID, {
         features: Pusher.Util.getClientFeatures(),
         params: self.options.timelineParams || {},
-        limit: 25,
+        limit: 50,
         level: Pusher.Timeline.INFO,
         version: Pusher.VERSION
       });
@@ -99,13 +99,16 @@
   };
 
   Pusher.warn = function() {
-    if (window.console && window.console.warn) {
-      window.console.warn(Pusher.Util.stringify.apply(this, arguments));
-    } else {
-      if (!Pusher.log) {
-        return;
+    var message = Pusher.Util.stringify.apply(this, arguments);
+    if (window.console) {
+      if (window.console.warn) {
+        window.console.warn(message);
+      } else if (window.console.log) {
+        window.console.log(message);
       }
-      Pusher.log(Pusher.Util.stringify.apply(this, arguments));
+    }
+    if (Pusher.log) {
+      Pusher.log(message);
     }
   };
 
@@ -500,7 +503,7 @@
 }).call(this);
 
 ;(function() {
-  Pusher.VERSION = '2.0.4';
+  Pusher.VERSION = '2.0.5';
   Pusher.PROTOCOL = 6;
 
   // WS connection parameters
@@ -1328,7 +1331,11 @@
   function flushTransportInfo() {
     var storage = Pusher.Util.getLocalStorage();
     if (storage && storage.pusherTransport) {
-      delete storage.pusherTransport;
+      try {
+        delete storage.pusherTransport;
+      } catch(e) {
+        storage.pusherTransport = undefined;
+      }
     }
   }
 
@@ -1600,13 +1607,14 @@
     var transport = this.transport.createConnection(
       this.name, this.priority, this.options.key, this.options
     );
+    var handshake = null;
 
     var onInitialized = function() {
       transport.unbind("initialized", onInitialized);
       transport.connect();
     };
     var onOpen = function() {
-      var handshake = new Pusher.Handshake(transport, function(result) {
+      handshake = new Pusher.Handshake(transport, function(result) {
         connected = true;
         unbindListeners();
         callback(null, result);
@@ -1642,15 +1650,22 @@
           return;
         }
         unbindListeners();
-        transport.close();
+        if (handshake) {
+          handshake.close();
+        } else {
+          transport.close();
+        }
       },
       forceMinPriority: function(p) {
         if (connected) {
           return;
         }
         if (self.priority < p) {
-          // TODO close transport in a nicer way
-          transport.close();
+          if (handshake) {
+            handshake.close();
+          } else {
+            transport.close();
+          }
         }
       }
     };
@@ -2606,6 +2621,7 @@
     if (channel) {
       message.channel = channel;
     }
+    Pusher.debug('Event sent', message);
     return this.send(Pusher.Protocol.encodeMessage(message));
   };
 
@@ -2716,17 +2732,18 @@
   }
   var prototype = Handshake.prototype;
 
+  prototype.close = function() {
+    this.unbindListeners();
+    this.transport.close();
+  };
+
   /** @private */
   prototype.bindListeners = function() {
     var self = this;
 
-    var unbindListeners = function() {
-      self.transport.unbind("message", onMessage);
-      self.transport.unbind("closed", onClosed);
-    };
+    self.onMessage = function(m) {
+      self.unbindListeners();
 
-    var onMessage = function(m) {
-      unbindListeners();
       try {
         var result = Pusher.Protocol.processHandshake(m);
         if (result.action === "connected") {
@@ -2742,16 +2759,23 @@
         self.transport.close();
       }
     };
-    var onClosed = function(closeEvent) {
-      unbindListeners();
+
+    self.onClosed = function(closeEvent) {
+      self.unbindListeners();
 
       var action = Pusher.Protocol.getCloseAction(closeEvent) || "backoff";
       var error = Pusher.Protocol.getCloseError(closeEvent);
       self.finish(action, { error: error });
     };
 
-    self.transport.bind("message", onMessage);
-    self.transport.bind("closed", onClosed);
+    self.transport.bind("message", self.onMessage);
+    self.transport.bind("closed", self.onClosed);
+  };
+
+  /** @private */
+  prototype.unbindListeners = function() {
+    this.transport.unbind("message", this.onMessage);
+    this.transport.unbind("closed", this.onClosed);
   };
 
   /** @private */
@@ -2807,11 +2831,13 @@
     var self = this;
 
     Pusher.Network.bind("online", function() {
+      self.timeline.info({ netinfo: "online" });
       if (self.state === "unavailable") {
         self.connect();
       }
     });
     Pusher.Network.bind("offline", function() {
+      self.timeline.info({ netinfo: "offline" });
       if (self.shouldRetry()) {
         self.disconnect();
         self.updateState("unavailable");
@@ -2932,7 +2958,8 @@
   /** @private */
   prototype.retryIn = function(delay) {
     var self = this;
-    this.retryTimer = new Pusher.Timer(delay || 0, function() {
+    self.timeline.info({ action: "retry", delay: delay });
+    self.retryTimer = new Pusher.Timer(delay || 0, function() {
       self.disconnect();
       self.connect();
     });
@@ -3036,21 +3063,31 @@
   /** @private */
   prototype.buildErrorCallbacks = function() {
     var self = this;
+
+    function withErrorEmitted(callback) {
+      return function(result) {
+        if (result.error) {
+          self.emit("error", { type: "WebSocketError", error: result.error });
+        }
+        callback(result);
+      };
+    }
+
     return {
-      ssl_only: function() {
+      ssl_only: withErrorEmitted(function() {
         self.encrypted = true;
         self.updateStrategy();
         self.retryIn(0);
-      },
-      refused: function() {
+      }),
+      refused: withErrorEmitted(function() {
         self.disconnect();
-      },
-      backoff: function() {
+      }),
+      backoff: withErrorEmitted(function() {
         self.retryIn(1000);
-      },
-      retry: function() {
+      }),
+      retry: withErrorEmitted(function() {
         self.retryIn(0);
-      }
+      })
     };
   };
 
@@ -3083,6 +3120,7 @@
     if (previousState !== newState) {
       Pusher.debug('State changed', previousState + ' -> ' + newState);
 
+      this.timeline.info({ state: newState });
       this.emit('state_change', { previous: previousState, current: newState });
       this.emit(newState, data);
     }
@@ -3328,8 +3366,8 @@
 
   Pusher.Channel.Authorizer.prototype = {
     composeQuery: function(socketId) {
-      var query = '&socket_id=' + encodeURIComponent(socketId)
-        + '&channel_name=' + encodeURIComponent(this.channel.name);
+      var query = '&socket_id=' + encodeURIComponent(socketId) +
+        '&channel_name=' + encodeURIComponent(this.channel.name);
 
       for(var i in this.authOptions.params) {
         query += "&" + encodeURIComponent(i) + "=" + encodeURIComponent(this.authOptions.params[i]);
@@ -3343,6 +3381,7 @@
     }
   };
 
+  var nextAuthCallbackID = 1;
 
   Pusher.auth_callbacks = {};
   Pusher.authorizers = {
@@ -3358,7 +3397,7 @@
       xhr.open("POST", Pusher.channel_auth_endpoint, true);
 
       // add request headers
-      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded")
+      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
       for(var headerName in this.authOptions.headers) {
         xhr.setRequestHeader(headerName, this.authOptions.headers[headerName]);
       }
@@ -3394,17 +3433,20 @@
         Pusher.warn("Warn", "To send headers with the auth request, you must use AJAX, rather than JSONP.");
       }
 
+      var callbackName = nextAuthCallbackID.toString();
+      nextAuthCallbackID++;
+
       var script = document.createElement("script");
       // Hacked wrapper.
-      Pusher.auth_callbacks[this.channel.name] = function(data) {
+      Pusher.auth_callbacks[callbackName] = function(data) {
         callback(false, data);
       };
 
-      var callback_name = "Pusher.auth_callbacks['" + this.channel.name + "']";
-      script.src = Pusher.channel_auth_endpoint
-        + '?callback='
-        + encodeURIComponent(callback_name)
-        + this.composeQuery(socketId);
+      var callback_name = "Pusher.auth_callbacks['" + callbackName + "']";
+      script.src = Pusher.channel_auth_endpoint +
+        '?callback=' +
+        encodeURIComponent(callback_name) +
+        this.composeQuery(socketId);
 
       var head = document.getElementsByTagName("head")[0] || document.documentElement;
       head.insertBefore( script, head.firstChild );
