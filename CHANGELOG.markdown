@@ -2,6 +2,7 @@
 
 ## 0.9.0 — Unreleased
 
+* Use fuzzy version requirement for runtime dependencies. (Patrick Van Stee)
 * Update dependencies. (Tristan Dunn)
 
 ## 0.8.0 — May 11, 2013
