@@ -19,10 +19,3 @@ Then "I should be connected" do
     state == "connected"
   end
 end
-
-Then "I should not be connected" do
-  timeout_after(5) do
-    state = page.evaluate_script("Pusher.instance.connection.state")
-    state == "unavailable"
-  end
-end
