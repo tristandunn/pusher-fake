@@ -1,4 +1,5 @@
 require "bundler/setup"
+require "coveralls/rake/task"
 require "cucumber/rake/task"
 require "rspec/core/rake_task"
 require "yard"
@@ -18,4 +19,6 @@ YARD::Rake::YardocTask.new do |t|
   t.options = ["--no-private"]
 end
 
-task default: [:spec, :cucumber]
+Coveralls::RakeTask.new
+
+task default: [:spec, :cucumber, "coveralls:push"]

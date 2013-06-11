@@ -20,6 +20,7 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency "bourne",          "1.4.0"
   s.add_development_dependency "capybara-webkit", "1.0.0"
+  s.add_development_dependency "coveralls",       "0.6.7"
   s.add_development_dependency "cucumber",        "1.3.2"
   s.add_development_dependency "pusher",          "0.11.3"
   s.add_development_dependency "rake",            "10.0.4"

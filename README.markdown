@@ -1,4 +1,4 @@
-# pusher-fake [![Build Status](https://secure.travis-ci.org/tristandunn/pusher-fake.png?branch=master)](http://travis-ci.org/tristandunn/pusher-fake) [![Dependency Status](https://gemnasium.com/tristandunn/pusher-fake.png)](https://gemnasium.com/tristandunn/pusher-fake) [![Code Climate](https://codeclimate.com/github/tristandunn/pusher-fake.png)](https://codeclimate.com/github/tristandunn/pusher-fake)
+# pusher-fake [![Build Status](https://secure.travis-ci.org/tristandunn/pusher-fake.png?branch=master)](http://travis-ci.org/tristandunn/pusher-fake) [![Dependency Status](https://gemnasium.com/tristandunn/pusher-fake.png)](https://gemnasium.com/tristandunn/pusher-fake) [![Code Climate](https://codeclimate.com/github/tristandunn/pusher-fake.png)](https://codeclimate.com/github/tristandunn/pusher-fake) [![Coverage Status](https://coveralls.io/repos/tristandunn/pusher-fake/badge.png)](https://coveralls.io/r/tristandunn/pusher-fake)
 
 A fake [Pusher](http://pusher.com) server for development and testing.
 
