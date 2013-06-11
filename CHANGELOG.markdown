@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.9.0 — Unreleased
+## 0.9.0 — June 6, 2013
 
 * Use fuzzy version requirement for runtime dependencies. (Patrick Van Stee)
 * Update dependencies. (Tristan Dunn)
