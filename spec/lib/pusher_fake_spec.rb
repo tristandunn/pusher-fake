@@ -45,20 +45,20 @@ describe PusherFake, ".configuration" do
 end
 
 describe PusherFake, ".javascript" do
-  let(:socket_host)   { "127.0.0.1" }
-  let(:socket_port)   { 1234 }
-  let(:configuration) { stub(socket_host: socket_host, socket_port: socket_port) }
+  let(:options)       { { custom: "option" } }
+  let(:configuration) { subject.configuration }
 
   subject { PusherFake }
 
-  before do
-    PusherFake.stubs(configuration: configuration)
-  end
-
   it "returns JavaScript setting the host and port to the configured options" do
     subject.javascript.should == <<-EOS
-      Pusher.host    = #{socket_host.to_json};
-      Pusher.ws_port = #{socket_port.to_json};
+      new Pusher(#{configuration.key.to_json}, #{configuration.to_options.to_json})
+    EOS
+  end
+
+  it "supports passing custom options" do
+    subject.javascript(options).should == <<-EOS
+      new Pusher(#{configuration.key.to_json}, #{configuration.to_options(options).to_json})
     EOS
   end
 end

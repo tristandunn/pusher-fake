@@ -4,11 +4,17 @@ A fake [Pusher](http://pusher.com) server for development and testing.
 
 ## Usage
 
-#### 1. Use the PusherFake server host and port for the Pusher JS client.
+#### 1. Use the PusherFake JS for the Pusher JS instance.
 
 ```erb
 <script>
-  <%== PusherFake.javascript if defined?(PusherFake) %>
+  <% if defined?(PusherFake) %>
+    // Test environment.
+    var instance = <%= PusherFake.javascript %>;
+  <% else %>
+    // Other environments, such as production.
+    var instance = new Pusher(...);
+  <% end %>
 </script>
 ```
 

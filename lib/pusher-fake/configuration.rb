@@ -35,5 +35,15 @@ module PusherFake
       self.web_port    = 8081
       self.webhooks    = []
     end
+
+    # Convert the configuration to a hash sutiable for Pusher JS options.
+    #
+    # @param [Hash] options Custom options for Pusher client.
+    def to_options(options = {})
+      options.merge({
+        wsHost: socket_host,
+        wsPort: socket_port
+      })
+    end
   end
 end

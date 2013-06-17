@@ -37,11 +37,11 @@ module PusherFake
 
   # Convenience method for the JS to override the Pusher client host and port.
   #
+  # @param [Hash] options Custom options for Pusher client.
   # @return [String] JavaScript overriding the Pusher client host and port.
-  def self.javascript
+  def self.javascript(options = {})
     <<-EOS
-      Pusher.host    = #{configuration.socket_host.to_json};
-      Pusher.ws_port = #{configuration.socket_port.to_json};
+      new Pusher(#{configuration.key.to_json}, #{configuration.to_options(options).to_json})
     EOS
   end
 end
