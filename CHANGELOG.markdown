@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.0 — Unreleased
+
+* Update the Pusher JS client to version 2.1.0. (Tristan Dunn)
+
 ## 0.9.0 — June 6, 2013
 
 * Use fuzzy version requirement for runtime dependencies. (Patrick Van Stee)
