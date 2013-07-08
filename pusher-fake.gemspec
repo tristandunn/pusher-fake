@@ -21,11 +21,11 @@ Gem::Specification.new do |s|
   s.add_development_dependency "bourne",          "1.5.0"
   s.add_development_dependency "capybara-webkit", "1.0.0"
   s.add_development_dependency "coveralls",       "0.6.7"
-  s.add_development_dependency "cucumber",        "1.3.2"
+  s.add_development_dependency "cucumber",        "1.3.3"
   s.add_development_dependency "pusher",          "0.11.3"
   s.add_development_dependency "rake",            "10.1.0"
   s.add_development_dependency "redcarpet",       "2.3.0"
-  s.add_development_dependency "rspec",           "2.13.0"
+  s.add_development_dependency "rspec",           "2.14.0"
   s.add_development_dependency "sinatra",         "1.4.3"
   s.add_development_dependency "yard",            "0.8.6.2"
 end

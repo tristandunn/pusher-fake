@@ -1,5 +1,5 @@
 /*!
- * Pusher JavaScript Library v2.1.0
+ * Pusher JavaScript Library v2.1.1
  * http://pusherapp.com/
  *
  * Copyright 2013, Pusher
@@ -491,7 +491,11 @@
     },
 
     getLocalStorage: function() {
-      return window.localStorage;
+      try {
+        return window.localStorage;
+      } catch (e) {
+        return undefined;
+      }
     },
 
     getClientFeatures: function() {
@@ -506,7 +510,7 @@
 }).call(this);
 
 ;(function() {
-  Pusher.VERSION = '2.1.0';
+  Pusher.VERSION = '2.1.1';
   Pusher.PROTOCOL = 6;
 
   // DEPRECATED: WS connection parameters
@@ -1884,14 +1888,20 @@
   /** @protected */
   prototype.onError = function(error) {
     this.emit("error", { type: 'WebSocketError', error: error });
-    this.timeline.error(this.buildTimelineMessage({
-      error: getErrorDetails(error)
-    }));
+    this.timeline.error(this.buildTimelineMessage({}));
   };
 
   /** @protected */
   prototype.onClose = function(closeEvent) {
-    this.changeState("closed", closeEvent);
+    if (closeEvent) {
+      this.changeState("closed", {
+        code: closeEvent.code,
+        reason: closeEvent.reason,
+        wasClean: closeEvent.wasClean
+      });
+    } else {
+      this.changeState("closed");
+    }
     this.socket = undefined;
   };
 
@@ -1962,22 +1972,6 @@
   prototype.buildTimelineMessage = function(message) {
     return Pusher.Util.extend({ cid: this.id }, message);
   };
-
-  function getErrorDetails(error) {
-    if (typeof error === "string") {
-      return error;
-    }
-    if (typeof error === "object") {
-      return Pusher.Util.mapObject(error, function(value) {
-        var valueType = typeof value;
-        if (valueType === "object" || valueType == "function") {
-          return valueType;
-        }
-        return value;
-      });
-    }
-    return typeof error;
-  }
 
   Pusher.AbstractTransport = AbstractTransport;
 }).call(this);
@@ -2251,11 +2245,11 @@
         pingTimer = null;
       }
 
-      if (closeEvent.wasClean) {
-        return;
-      }
-
-      if (openTimestamp) {
+      if (closeEvent.code === 1002 || closeEvent.code === 1003) {
+        // we don't want to use transports not obeying the protocol
+        self.manager.reportDeath();
+      } else if (!closeEvent.wasClean && openTimestamp) {
+        // report deaths only for short-living transport
         var lifespan = Pusher.Util.now() - openTimestamp;
         if (lifespan < 2 * self.maxPingDelay) {
           self.manager.reportDeath();
@@ -2930,9 +2924,13 @@
       if (error) {
         self.runner = self.strategy.connect(0, callback);
       } else {
-        // we don't support switching connections yet
-        self.runner.abort();
-        self.handshakeCallbacks[handshake.action](handshake);
+        if (handshake.action === "error") {
+          self.timeline.error({ handshakeError: handshake.error });
+        } else {
+          // we don't support switching connections yet
+          self.runner.abort();
+          self.handshakeCallbacks[handshake.action](handshake);
+        }
       }
     };
     self.runner = self.strategy.connect(0, callback);
@@ -2996,6 +2994,9 @@
   prototype.retryIn = function(delay) {
     var self = this;
     self.timeline.info({ action: "retry", delay: delay });
+    if (delay > 0) {
+      self.emit("connecting_in", Math.round(delay / 1000));
+    }
     self.retryTimer = new Pusher.Timer(delay || 0, function() {
       self.disconnect();
       self.connect();
