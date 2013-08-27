@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.10.0 — Unreleased
+## 0.10.0 — August 26, 2013
 
 * Resolve dependency issue. (Tristan Dunn)
 * Update the Pusher JS client to version 2.1.2. (Tristan Dunn)
