@@ -1,5 +1,5 @@
 /*!
- * Pusher JavaScript Library v2.1.1
+ * Pusher JavaScript Library v2.1.2
  * http://pusherapp.com/
  *
  * Copyright 2013, Pusher
@@ -8,6 +8,7 @@
 
 ;(function() {
   function Pusher(app_key, options) {
+    checkAppKey(app_key);
     options = options || {};
 
     var self = this;
@@ -23,7 +24,19 @@
     this.global_emitter = new Pusher.EventsDispatcher();
     this.sessionID = Math.floor(Math.random() * 1000000000);
 
-    checkAppKey(this.key);
+    this.timeline = new Pusher.Timeline(this.key, this.sessionID, {
+      features: Pusher.Util.getClientFeatures(),
+      params: this.config.timelineParams || {},
+      limit: 50,
+      level: Pusher.Timeline.INFO,
+      version: Pusher.VERSION
+    });
+    if (!this.config.disableStats) {
+      this.timelineSender = new Pusher.TimelineSender(this.timeline, {
+        host: this.config.statsHost,
+        path: "/timeline"
+      });
+    }
 
     var getStrategy = function(options) {
       return Pusher.StrategyBuilder.build(
@@ -31,32 +44,12 @@
         Pusher.Util.extend({}, self.config, options)
       );
     };
-    var getTimeline = function() {
-      return new Pusher.Timeline(self.key, self.sessionID, {
-        features: Pusher.Util.getClientFeatures(),
-        params: self.config.timelineParams || {},
-        limit: 50,
-        level: Pusher.Timeline.INFO,
-        version: Pusher.VERSION
-      });
-    };
-    var getTimelineSender = function(timeline, options) {
-      if (self.config.disableStats) {
-        return null;
-      }
-      return new Pusher.TimelineSender(timeline, {
-        encrypted: self.isEncrypted() || !!options.encrypted,
-        host: self.config.statsHost,
-        path: "/timeline"
-      });
-    };
 
     this.connection = new Pusher.ConnectionManager(
       this.key,
       Pusher.Util.extend(
         { getStrategy: getStrategy,
-          getTimeline: getTimeline,
-          getTimelineSender: getTimelineSender,
+          timeline: this.timeline,
           activityTimeout: this.config.activity_timeout,
           pongTimeout: this.config.pong_timeout,
           unavailableTimeout: this.config.unavailable_timeout
@@ -68,6 +61,9 @@
 
     this.connection.bind('connected', function() {
       self.subscribeAll();
+      if (self.timelineSender) {
+        self.timelineSender.send(self.connection.isEncrypted());
+      }
     });
     this.connection.bind('message', function(params) {
       var internal = (params.event.indexOf('pusher_internal:') === 0);
@@ -78,7 +74,9 @@
         }
       }
       // Emit globaly [deprecated]
-      if (!internal) self.global_emitter.emit(params.event, params.data);
+      if (!internal) {
+        self.global_emitter.emit(params.event, params.data);
+      }
     });
     this.connection.bind('disconnected', function() {
       self.channels.disconnect();
@@ -132,10 +130,25 @@
 
   prototype.connect = function() {
     this.connection.connect();
+
+    if (this.timelineSender) {
+      if (!this.timelineSenderTimer) {
+        var encrypted = this.connection.isEncrypted();
+        var timelineSender = this.timelineSender;
+        this.timelineSenderTimer = new Pusher.PeriodicTimer(60000, function() {
+          timelineSender.send(encrypted);
+        });
+      }
+    }
   };
 
   prototype.disconnect = function() {
     this.connection.disconnect();
+
+    if (this.timelineSenderTimer) {
+      this.timelineSenderTimer.ensureAborted();
+      this.timelineSenderTimer = null;
+    }
   };
 
   prototype.bind = function(event_name, callback) {
@@ -158,31 +171,17 @@
   };
 
   prototype.subscribe = function(channel_name) {
-    var self = this;
     var channel = this.channels.add(channel_name, this);
-
     if (this.connection.state === 'connected') {
-      channel.authorize(this.connection.socket_id, function(err, data) {
-        if (err) {
-          channel.handleEvent('pusher:subscription_error', data);
-        } else {
-          self.send_event('pusher:subscribe', {
-            channel: channel_name,
-            auth: data.auth,
-            channel_data: data.channel_data
-          });
-        }
-      });
+      channel.subscribe();
     }
     return channel;
   };
 
   prototype.unsubscribe = function(channel_name) {
-    this.channels.remove(channel_name);
+    var channel = this.channels.remove(channel_name);
     if (this.connection.state === 'connected') {
-      this.send_event('pusher:unsubscribe', {
-        channel: channel_name
-      });
+      channel.unsubscribe();
     }
   };
 
@@ -194,7 +193,7 @@
     if (Pusher.Util.getDocumentLocation().protocol === "https:") {
       return true;
     } else {
-      return !!this.config.encrypted;
+      return Boolean(this.config.encrypted);
     }
   };
 
@@ -510,7 +509,7 @@
 }).call(this);
 
 ;(function() {
-  Pusher.VERSION = '2.1.1';
+  Pusher.VERSION = '2.1.2';
   Pusher.PROTOCOL = 6;
 
   // DEPRECATED: WS connection parameters
@@ -738,24 +737,22 @@
 
     if (this.loaded[name]) {
       callback();
-      return;
-    }
+    } else if (this.loading[name] && this.loading[name].length > 0) {
+      this.loading[name].push(callback);
+    } else {
+      this.loading[name] = [callback];
 
-    if (!this.loading[name]) {
-      this.loading[name] = [];
-    }
-    this.loading[name].push(callback);
-    if (this.loading[name].length > 1) {
-      return;
-    }
+      require(this.getPath(name), function() {
+        self.loaded[name] = true;
 
-    require(this.getPath(name), function() {
-      for (var i = 0; i < self.loading[name].length; i++) {
-        self.loading[name][i]();
-      }
-      delete self.loading[name];
-      self.loaded[name] = true;
-    });
+        if (self.loading[name]) {
+          for (var i = 0; i < self.loading[name].length; i++) {
+            self.loading[name][i]();
+          }
+          delete self.loading[name];
+        }
+      });
+    }
   };
 
   /** Returns a root URL for pusher-js CDN.
@@ -889,6 +886,42 @@
   };
 
   Pusher.Timer = Timer;
+}).call(this);
+
+;(function() {
+  /** Cross-browser compatible periodic timer abstraction.
+   *
+   * @param {Number} interval
+   * @param {Function} callback
+   */
+  function PeriodicTimer(interval, callback) {
+    var self = this;
+
+    this.interval = setInterval(function() {
+      if (self.interval !== null) {
+        callback();
+      }
+    }, interval);
+  }
+  var prototype = PeriodicTimer.prototype;
+
+  /** Returns whether the timer is still running.
+   *
+   * @return {Boolean}
+   */
+  prototype.isRunning = function() {
+    return this.interval !== null;
+  };
+
+  /** Aborts a timer when it's running. */
+  prototype.ensureAborted = function() {
+    if (this.interval) {
+      clearInterval(this.interval);
+      this.interval = null;
+    }
+  };
+
+  Pusher.PeriodicTimer = PeriodicTimer;
 }).call(this);
 
 (function() {
@@ -1155,7 +1188,9 @@
       if (!error) {
         self.sent++;
       }
-      callback(error, result);
+      if (callback) {
+        callback(error, result);
+      }
     });
 
     return true;
@@ -1176,26 +1211,30 @@
   }
   var prototype = TimelineSender.prototype;
 
-  prototype.send = function(callback) {
+  prototype.send = function(encrypted, callback) {
     if (this.timeline.isEmpty()) {
       return;
     }
 
-    var options = this.options;
-    var scheme = "http" + (this.isEncrypted() ? "s" : "") + "://";
+    var self = this;
+    var scheme = "http" + (encrypted ? "s" : "") + "://";
 
     var sendJSONP = function(data, callback) {
-      return Pusher.JSONPRequest.send({
+      var params = {
         data: data,
-        url: scheme + options.host + options.path,
+        url: scheme + (self.host || self.options.host) + self.options.path,
         receiver: Pusher.JSONP
-      }, callback);
+      };
+      return Pusher.JSONPRequest.send(params, function(error, result) {
+        if (result.host) {
+          self.host = result.host;
+        }
+        if (callback) {
+          callback(error, result);
+        }
+      });
     };
-    this.timeline.send(sendJSONP, callback);
-  };
-
-  prototype.isEncrypted = function() {
-    return !!this.options.encrypted;
+    self.timeline.send(sendJSONP, callback);
   };
 
   Pusher.TimelineSender = TimelineSender;
@@ -1867,7 +1906,9 @@
       // Workaround for MobileSafari bug (see https://gist.github.com/2052006)
       var self = this;
       setTimeout(function() {
-        self.socket.send(data);
+        if (self.socket) {
+          self.socket.send(data);
+        }
       }, 0);
       return true;
     } else {
@@ -2853,7 +2894,7 @@
     this.state = "initialized";
     this.connection = null;
     this.encrypted = !!options.encrypted;
-    this.timeline = this.options.getTimeline();
+    this.timeline = this.options.timeline;
 
     this.connectionCallbacks = this.buildConnectionCallbacks();
     this.errorCallbacks = this.buildErrorCallbacks();
@@ -2874,14 +2915,6 @@
         self.updateState("unavailable");
       }
     });
-
-    var sendTimeline = function() {
-      if (self.timelineSender) {
-        self.timelineSender.send(function() {});
-      }
-    };
-    this.bind("connected", sendTimeline);
-    setInterval(sendTimeline, 60000);
 
     this.updateStrategy();
   }
@@ -2914,11 +2947,6 @@
     }
 
     self.updateState("connecting");
-    self.timelineSender = self.options.getTimelineSender(
-      self.timeline,
-      { encrypted: self.encrypted },
-      self
-    );
 
     var callback = function(error, handshake) {
       if (error) {
@@ -2979,6 +3007,10 @@
       this.connection.close();
       this.abandonConnection();
     }
+  };
+
+  prototype.isEncrypted = function() {
+    return this.encrypted;
   };
 
   /** @private */
@@ -3042,6 +3074,7 @@
           self.activityTimer = new Pusher.Timer(
             self.options.pongTimeout,
             function() {
+              self.timeline.error({ pong_timed_out: self.options.pongTimeout });
               self.connection.close();
             }
           );
@@ -3093,6 +3126,7 @@
         self.clearUnavailableTimer();
         self.setConnection(handshake.connection);
         self.socket_id = self.connection.id;
+        self.timeline.info({ socket_id: self.socket_id });
         self.updateState("connected");
       }
     });
@@ -3351,6 +3385,30 @@
     }
   };
 
+  /** Sends a subscription request. For internal use only. */
+  prototype.subscribe = function() {
+    var self = this;
+
+    self.authorize(self.pusher.connection.socket_id, function(error, data) {
+      if (error) {
+        self.handleEvent('pusher:subscription_error', data);
+      } else {
+        self.pusher.send_event('pusher:subscribe', {
+          auth: data.auth,
+          channel_data: data.channel_data,
+          channel: self.name
+        });
+      }
+    });
+  };
+
+  /** Sends an unsubscription request. For internal use only. */
+  prototype.unsubscribe = function() {
+    this.pusher.send_event('pusher:unsubscribe', {
+      channel: this.name
+    });
+  };
+
   Pusher.Channel = Channel;
 }).call(this);
 
@@ -3488,7 +3546,9 @@
    * @param {String} name
    */
   prototype.remove = function(name) {
+    var channel = this.channels[name];
     delete this.channels[name];
+    return channel;
   };
 
   /** Proxies disconnection signal to all channels. */
@@ -3592,6 +3652,7 @@
       var callbackName = nextAuthCallbackID.toString();
       nextAuthCallbackID++;
 
+      var document = Pusher.Util.getDocument();
       var script = document.createElement("script");
       // Hacked wrapper.
       Pusher.auth_callbacks[callbackName] = function(data) {
