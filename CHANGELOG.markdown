@@ -2,6 +2,7 @@
 
 ## 0.10.0 — Unreleased
 
+* Resolve dependency issue. (Tristan Dunn)
 * Update the Pusher JS client to version 2.1.1. (Tristan Dunn)
 * Update dependencies. (Tristan Dunn)
 
