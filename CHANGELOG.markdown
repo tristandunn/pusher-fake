@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.11.0 — Unreleased
+
+* Update dependencies. (Tristan Dunn)
+
 ## 0.10.0 — August 26, 2013
 
 * Resolve dependency issue. (Tristan Dunn)
