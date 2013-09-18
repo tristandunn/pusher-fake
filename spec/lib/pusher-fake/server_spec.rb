@@ -37,9 +37,9 @@ end
 describe PusherFake::Server, ".start_socket_server" do
   let(:data)          { stub }
   let(:socket)        { stub(onopen: nil, onmessage: nil, onclose: nil) }
-  let(:options)       { { host: configuration.socket_host, port: configuration.socket_port } }
+  let(:options)       { configuration.socket_options }
   let(:connection)    { stub(establish: nil, process: nil) }
-  let(:configuration) { stub(socket_host: "192.168.0.1", socket_port: 8080) }
+  let(:configuration) { stub(socket_options: { host: "192.168.0.1", port: 8080 }) }
 
   subject { PusherFake::Server }
 
@@ -128,12 +128,13 @@ end
 describe PusherFake::Server, ".start_web_server" do
   let(:host)          { "192.168.0.1" }
   let(:port)          { 8081 }
-  let(:configuration) { stub(web_host: host, web_port: port) }
+  let(:server)        { stub(:start! => true, :ssl= => true) }
+  let(:configuration) { stub(web_options: { host: host, port: port, ssl: true }) }
 
   subject { PusherFake::Server }
 
   before do
-    Thin::Server.stubs(:start)
+    Thin::Server.stubs(new: server)
     Thin::Logging.stubs(:silent=)
     PusherFake.stubs(configuration: configuration)
   end
@@ -143,8 +144,18 @@ describe PusherFake::Server, ".start_web_server" do
     Thin::Logging.should have_received(:silent=).with(true)
   end
 
+  it "creates the web server" do
+    subject.start_web_server
+    Thin::Server.should have_received(:new).with(host, port, PusherFake::Server::Application)
+  end
+
+  it "assigns custom options to the server" do
+    subject.start_web_server
+    server.should have_received(:ssl=).with(true)
+  end
+
   it "starts the web server" do
     subject.start_web_server
-    Thin::Server.should have_received(:start).with(host, port, PusherFake::Server::Application)
+    server.should have_received(:start!).with()
   end
 end

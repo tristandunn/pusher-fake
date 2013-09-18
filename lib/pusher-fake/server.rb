@@ -13,7 +13,7 @@ module PusherFake
 
     # Start the WebSocket server.
     def self.start_socket_server
-      EventMachine::WebSocket.start(socket_server_options) do |socket|
+      EventMachine::WebSocket.start(configuration.socket_options) do |socket|
         socket.onopen do
           connection = Connection.new(socket)
           connection.establish
@@ -30,8 +30,16 @@ module PusherFake
 
     # Start the web server.
     def self.start_web_server
+      options = configuration.web_options.dup
+
       Thin::Logging.silent = true
-      Thin::Server.start(configuration.web_host, configuration.web_port, Application)
+      Thin::Server.new(options.delete(:host), options.delete(:port), Application).tap do |server|
+        options.each do |key, value|
+          server.__send__("#{key}=", value)
+        end
+
+        server.start!
+      end
     end
 
     private

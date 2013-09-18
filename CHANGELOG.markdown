@@ -2,6 +2,7 @@
 
 ## 0.11.0 — Unreleased
 
+* Support setting custom options on the socket and web server. (Tristan Dunn)
 * Update the Pusher JS client to version 2.1.3. (Tristan Dunn)
 * Update dependencies. (Tristan Dunn)
 

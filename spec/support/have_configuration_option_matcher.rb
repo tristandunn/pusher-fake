@@ -7,7 +7,19 @@ module BartenderHelper
     def matches?(configuration)
       @configuration = configuration
       @configuration.respond_to?(@option).should == true
-      @configuration.__send__(@option).should == @default if instance_variables.include?("@default")
+
+      if instance_variables.include?(:@default)
+        actual = @configuration.__send__(@option)
+
+        if @default.is_a?(Hash)
+          @default.each do |key, value|
+            actual[key].should == value
+          end
+        else
+          actual.should == @default
+        end
+      end
+
       @configuration.__send__(:"#{@option}=", "value")
       @configuration.__send__(@option).should == "value"
     end
