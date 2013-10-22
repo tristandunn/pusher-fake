@@ -13,15 +13,12 @@
   <ul></ul>
 </section>
 
-<script src="/javascripts/vendor/pusher-2.1.2.js"></script>
+<script src="/javascripts/vendor/pusher-2.1.3.js"></script>
 <script>
 window.addEventListener("DOMContentLoaded", function() {
   // Create the client instance using the PusherFake server.
   Pusher.instance = <%= PusherFake.javascript %>;
   Pusher.instance.events = {};
-
-  // Force the connection to go unavailable after a single attempt.
-  Pusher.instance.connection.connectionAttempts = 4;
 
   // Record all events.
   Pusher.instance.connection.bind("message", function(message) {
