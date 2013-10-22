@@ -6,8 +6,10 @@ PusherFake.configure do |configuration|
 end
 
 # Set the host and port to the fake web server.
-Pusher.host = PusherFake.configuration.web_host
-Pusher.port = PusherFake.configuration.web_port
+PusherFake.configuration.web_options.tap do |options|
+  Pusher.host = options[:host]
+  Pusher.port = options[:port]
+end
 
 # Start the fake web server.
 fork { PusherFake::Server.start }.tap do |id|
