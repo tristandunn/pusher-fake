@@ -16,7 +16,7 @@ require "pusher-fake/webhook"
 
 module PusherFake
   # The current version string.
-  VERSION = "0.10.0"
+  VERSION = "0.11.0"
 
   # Call this method to modify the defaults.
   #

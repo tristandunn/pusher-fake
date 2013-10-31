@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.11.0 — Unreleased
+## 0.11.0 — October 30, 2013
 
 * Support setting custom options on the socket and web server. (Tristan Dunn)
 * Update the Pusher JS client to version 2.1.3. (Tristan Dunn)
