@@ -10,7 +10,7 @@ A fake [Pusher](http://pusher.com) server for development and testing.
 <script>
   <% if defined?(PusherFake) %>
     // Test environment.
-    var instance = <%= PusherFake.javascript %>;
+    var instance = <%== PusherFake.javascript %>;
   <% else %>
     // Other environments, such as production.
     var instance = new Pusher(...);
