@@ -11,28 +11,40 @@ end
 
 describe PusherFake::Configuration, "#socket_host=" do
   it "sets socket options host value" do
-    subject.socket_host = "192.168.0.1"
+    silence_warnings do
+      subject.socket_host = "192.168.0.1"
+    end
+
     subject.socket_options[:host].should == "192.168.0.1"
   end
 end
 
 describe PusherFake::Configuration, "#socket_post=" do
   it "sets socket options host value" do
-    subject.socket_port = 443
+    silence_warnings do
+      subject.socket_port = 443
+    end
+
     subject.socket_options[:port].should == 443
   end
 end
 
 describe PusherFake::Configuration, "#web_host=" do
   it "sets web options host value" do
-    subject.web_host = "192.168.0.1"
+    silence_warnings do
+      subject.web_host = "192.168.0.1"
+    end
+
     subject.web_options[:host].should == "192.168.0.1"
   end
 end
 
 describe PusherFake::Configuration, "#web_post=" do
   it "sets web options host value" do
-    subject.web_port = 443
+    silence_warnings do
+      subject.web_port = 443
+    end
+
     subject.web_options[:port].should == 443
   end
 end
