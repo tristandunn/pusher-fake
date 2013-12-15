@@ -1,4 +1,4 @@
-module BartenderHelper
+module ConfigurationHelper
   class ConfigurationOption
     def initialize(option)
       @option = option
