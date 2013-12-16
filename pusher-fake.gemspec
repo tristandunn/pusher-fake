@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   s.test_files   = Dir["{features,spec}/**/*"].to_a
   s.require_path = "lib"
 
-  s.add_dependency "em-http-request", "~> 1.0.0"
+  s.add_dependency "em-http-request", "~> 1.1.1"
   s.add_dependency "em-websocket",    "~> 0.5"
   s.add_dependency "thin",            "~> 1.5"
   s.add_dependency "multi_json",      "~> 1.6"
