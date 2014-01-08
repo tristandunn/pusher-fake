@@ -33,46 +33,6 @@ module PusherFake
       self.web_options    = { host: "127.0.0.1", port: 8081 }
     end
 
-    # Set the host on which the socket server listens.
-    #
-    # @deprecated Please use {#socket_options} +Hash+ instead.
-    # @param host String
-    def socket_host=(host)
-      warn "[DEPRECATION] `socket_host=` is deprecated.  Please use `socket_options=` instead."
-
-      socket_options[:host] = host
-    end
-
-    # Set the port on which the socket server listens.
-    #
-    # @deprecated Please use {#socket_options} +Hash+ instead.
-    # @param port Integer
-    def socket_port=(port)
-      warn "[DEPRECATION] `socket_port=` is deprecated.  Please use `socket_options=` instead."
-
-      socket_options[:port] = port
-    end
-
-    # Set the host on which the web server listens.
-    #
-    # @deprecated Please use {#web_options} +Hash+ instead.
-    # @param host String
-    def web_host=(host)
-      warn "[DEPRECATION] `web_host=` is deprecated.  Please use `web_options=` instead."
-
-      web_options[:host] = host
-    end
-
-    # Set the port on which the web server listens.
-    #
-    # @deprecated Please use {#web_options} +Hash+ instead.
-    # @param port Integer
-    def web_port=(port)
-      warn "[DEPRECATION] `web_port=` is deprecated.  Please use `web_options=` instead."
-
-      web_options[:port] = port
-    end
-
     # Convert the configuration to a hash sutiable for Pusher JS options.
     #
     # @param [Hash] options Custom options for Pusher client.
