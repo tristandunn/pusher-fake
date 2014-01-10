@@ -27,7 +27,7 @@ module PusherFake
 
     # Notify the Pusher client that a connection has been established.
     def establish
-      emit("pusher:connection_established", socket_id: socket.object_id)
+      emit("pusher:connection_established", socket_id: socket.object_id, activity_timeout: 120)
     end
 
     # Process an event.

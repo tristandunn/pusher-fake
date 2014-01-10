@@ -44,7 +44,8 @@ describe PusherFake::Connection, "#establish" do
 
   it "emits the connection established event with the socket ID" do
     subject.establish
-    subject.should have_received(:emit).with("pusher:connection_established", socket_id: socket.object_id)
+    subject.should have_received(:emit)
+      .with("pusher:connection_established", socket_id: socket.object_id, activity_timeout: 120)
   end
 end
 
