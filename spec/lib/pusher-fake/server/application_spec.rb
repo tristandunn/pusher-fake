@@ -82,8 +82,6 @@ describe PusherFake::Server::Application, ".call, with unknown path" do
   let(:environment) { mock }
 
   before do
-    subject.stubs(:unknown_path).raises(message)
-
     response.stubs(finish: response)
 
     Rack::Request.stubs(new: request)
@@ -95,11 +93,6 @@ describe PusherFake::Server::Application, ".call, with unknown path" do
   it "creates a request" do
     subject.call(environment)
     Rack::Request.should have_received(:new).with(environment)
-  end
-
-  it "calls unknown_path with the path" do
-    subject.call(environment)
-    subject.should have_received(:unknown_path).with(request.path)
   end
 
   it "creates a Rack response with the error message" do
@@ -406,33 +399,5 @@ describe PusherFake::Server::Application, ".users, for an unknown channel" do
 
   it "returns a hash with the occupied status" do
     subject.users("fake").should == { users: [] }
-  end
-end
-
-describe PusherFake::Server::Application, ".unknown_path" do
-  let(:path)    { "/apps/fake/events" }
-  let(:logger)  { stub(error: true) }
-  let(:message) { "Unknown path: #{path}" }
-
-  before do
-    Logger.stubs(new: logger)
-  end
-
-  subject { PusherFake::Server::Application }
-
-  it "creates a logger" do
-    expect { subject.unknown_path(path) }.to raise_error
-    Logger.should have_received(:new).with(STDOUT)
-  end
-
-  it "logs the error message" do
-    expect { subject.unknown_path(path) }.to raise_error
-    logger.should have_received(:error).with(message)
-  end
-
-  it "raises an error" do
-    expect {
-      subject.unknown_path(path)
-    }.to raise_error(message)
   end
 end
