@@ -1,7 +1,4 @@
-require "pusher"
 require "sinatra"
-
-Pusher.url = "http://PUSHER_API_KEY:PUSHER_API_SECRET@localhost:8081/apps/PUSHER_APP_ID"
 
 class Sinatra::Application
   set :root,          Proc.new { File.join(File.dirname(__FILE__), "application") }
@@ -15,13 +12,19 @@ class Sinatra::Application
   end
 
   post "/pusher/auth" do
-    data    = nil
-    channel = Pusher[params[:channel_name]]
+    channel  = Pusher[params[:channel_name]]
+    response = channel.authenticate(params[:socket_id], channel_data)
 
-    if params[:channel_name] =~ /^presence-/
-      data = { user_id: params[:socket_id], user_info: { name: "Alan Turing" } }
-    end
+    MultiJson.dump(response)
+  end
 
-    MultiJson.dump(channel.authenticate(params[:socket_id], data))
+  protected
+
+  def channel_data
+    return unless params[:channel_name] =~ /^presence-/
+
+    { user_id:   params[:socket_id],
+      user_info: { name: "Alan Turing" }
+    }
   end
 end
