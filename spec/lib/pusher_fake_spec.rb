@@ -1,16 +1,12 @@
 require "spec_helper"
 
 describe PusherFake, ".configure" do
-  let(:configuration) { mock }
-
   subject { PusherFake }
 
-  before do
-    subject.stubs(configuration: configuration)
-  end
-
   it "yields the configuration" do
-    expect { |block| subject.configure(&block) }.to yield_with_args(configuration)
+    expect { |block|
+      subject.configure(&block)
+    }.to yield_with_args(subject.configuration)
   end
 end
 
