@@ -20,11 +20,13 @@ A fake [Pusher](http://pusher.com) server for development and testing.
 </script>
 ```
 
-#### 2. Start PusherFake in Cucumber environment. If you aren't using Cucumber, see [pusher-fake/cucumber.rb](https://github.com/tristandunn/pusher-fake/blob/master/lib/pusher-fake/cucumber.rb).
+#### 2. Start PusherFake in the Cucumber environment.
 
 ```ruby
 require "pusher-fake/cucumber"
 ```
+
+Not using Cucumber? See [pusher-fake/cucumber.rb](https://github.com/tristandunn/pusher-fake/blob/master/lib/pusher-fake/cucumber.rb) for starting it manually.
 
 ## Examples
 
