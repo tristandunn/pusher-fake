@@ -4,19 +4,15 @@ require "multi_json"
 require "openssl"
 require "thin"
 
-require "pusher-fake/channel"
-require "pusher-fake/channel/public"
-require "pusher-fake/channel/private"
-require "pusher-fake/channel/presence"
-require "pusher-fake/configuration"
-require "pusher-fake/connection"
-require "pusher-fake/server"
-require "pusher-fake/server/application"
-require "pusher-fake/webhook"
-
 module PusherFake
   # The current version string.
   VERSION = "0.12.0"
+
+  autoload :Channel,       "pusher-fake/channel"
+  autoload :Configuration, "pusher-fake/configuration"
+  autoload :Connection,    "pusher-fake/connection"
+  autoload :Server,        "pusher-fake/server"
+  autoload :Webhook,       "pusher-fake/webhook"
 
   # Call this method to modify the defaults.
   #

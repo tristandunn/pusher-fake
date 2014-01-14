@@ -1,5 +1,9 @@
 module PusherFake
   module Channel
+    autoload :Public,   "pusher-fake/channel/public"
+    autoload :Private,  "pusher-fake/channel/private"
+    autoload :Presence, "pusher-fake/channel/presence"
+
     class << self
       # Name matcher for private channels.
       PRIVATE_CHANNEL_MATCHER  = /\Aprivate-/.freeze

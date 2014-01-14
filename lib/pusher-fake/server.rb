@@ -1,5 +1,7 @@
 module PusherFake
   module Server
+    autoload :Application, "pusher-fake/server/application"
+
     # Start the servers.
     #
     # @see start_socket_server
