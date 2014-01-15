@@ -4,6 +4,8 @@
 
 * Remove deprecated configuration options. (Tristan Dunn)
 * Update the Pusher JS client to version 2.1.6. (Tristan Dunn)
+* Miscellaneous clean up. (Tristan Dunn)
+* Update dependencies. (Tristan Dunn)
 
 ## 0.12.0 — December 21, 2013
 
