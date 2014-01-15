@@ -47,14 +47,14 @@ describe PusherFake, ".javascript" do
   subject { PusherFake }
 
   it "returns JavaScript setting the host and port to the configured options" do
-    subject.javascript.should == <<-EOS
-      new Pusher(#{configuration.key.to_json}, #{configuration.to_options.to_json})
-    EOS
+    arguments = [configuration.key, configuration.to_options].map(&:to_json).join(",")
+
+    subject.javascript.should == "new Pusher(#{arguments})"
   end
 
   it "supports passing custom options" do
-    subject.javascript(options).should == <<-EOS
-      new Pusher(#{configuration.key.to_json}, #{configuration.to_options(options).to_json})
-    EOS
+    arguments = [configuration.key, configuration.to_options(options)].map(&:to_json).join(",")
+
+    subject.javascript(options).should == "new Pusher(#{arguments})"
   end
 end

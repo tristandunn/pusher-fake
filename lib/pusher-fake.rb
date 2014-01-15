@@ -36,8 +36,11 @@ module PusherFake
   # @param [Hash] options Custom options for Pusher client.
   # @return [String] JavaScript overriding the Pusher client host and port.
   def self.javascript(options = {})
-    <<-EOS
-      new Pusher(#{configuration.key.to_json}, #{configuration.to_options(options).to_json})
-    EOS
+    arguments = [
+      configuration.key,
+      configuration.to_options(options)
+    ].map(&:to_json).join(",")
+
+    "new Pusher(#{arguments})"
   end
 end
