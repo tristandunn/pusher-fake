@@ -21,4 +21,8 @@ end
 
 Coveralls::RakeTask.new
 
-task default: [:spec, :cucumber, "coveralls:push"]
+task default: [:spec, :cucumber]
+
+if ENV["CI"]
+  Rake::Task["default"].enhance(["coveralls:push"])
+end
