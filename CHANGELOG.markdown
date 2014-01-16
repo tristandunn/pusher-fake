@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.13.0 — Unreleased
+## 0.13.0 — January 15, 2014
 
 * Remove deprecated configuration options. (Tristan Dunn)
 * Update the Pusher JS client to version 2.1.6. (Tristan Dunn)
