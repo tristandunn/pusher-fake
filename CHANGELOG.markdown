@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.14.0 — Unreleased
+
+* Change coveralls to be a test dependency. (Tristan Dunn)
+
 ## 0.13.0 — January 15, 2014
 
 * Remove deprecated configuration options. (Tristan Dunn)
