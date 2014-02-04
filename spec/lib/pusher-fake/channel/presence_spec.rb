@@ -143,6 +143,35 @@ describe PusherFake::Channel::Presence, "#remove" do
   end
 end
 
+describe PusherFake::Channel::Presence, "#remove, for an unsubscribed connection" do
+  let(:name)         { "name" }
+  let(:user_id)      { "1234" }
+  let(:connection)   { stub }
+  let(:channel_data) { { user_id: user_id } }
+
+  subject { PusherFake::Channel::Presence.new(name) }
+
+  before do
+    subject.stubs(connections: [], emit: nil, trigger: nil)
+  end
+
+  it "does not raise an error" do
+    expect {
+      subject.remove(connection)
+    }.to_not raise_error
+  end
+
+  it "does not trigger an event" do
+    subject.remove(connection)
+    PusherFake::Webhook.should have_received(:trigger).with("member_removed", channel: name, user_id: user_id).never
+  end
+
+  it "does not emit an event" do
+    subject.remove(connection)
+    subject.should have_received(:emit).with("pusher_internal:member_removed", channel_data).never
+  end
+end
+
 describe PusherFake::Channel::Presence, "#subscription_data" do
   let(:other)   { { user_id: 2, name: "Beau" } }
   let(:member)  { { user_id: 1, name: "Bob" } }
