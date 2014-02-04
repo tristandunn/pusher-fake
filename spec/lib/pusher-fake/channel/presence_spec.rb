@@ -118,28 +118,40 @@ describe PusherFake::Channel::Presence, "#remove" do
 
   before do
     PusherFake::Webhook.stubs(:trigger)
-    subject.members[connection] = channel_data
     subject.stubs(connections: [connection], emit: nil)
   end
 
-  it "removes the connection from the channel" do
-    subject.remove(connection)
-    subject.connections.should be_empty
+  context "connection is subscribed to channel" do
+    before do
+      subject.connections << connection
+      subject.members[connection] = channel_data
+    end
+
+    it "removes the connection from the channel" do
+      subject.remove(connection)
+      subject.connections.should be_empty
+    end
+
+    it "removes the connection from the members hash" do
+      subject.remove(connection)
+      subject.members.should_not have_key(connection)
+    end
+
+    it "triggers the member removed webhook" do
+      subject.remove(connection)
+      PusherFake::Webhook.should have_received(:trigger).with("member_removed", channel: name, user_id: user_id).once
+    end
+
+    it "notifies the channel of the removed member" do
+      subject.remove(connection)
+      subject.should have_received(:emit).with("pusher_internal:member_removed", channel_data)
+    end
   end
 
-  it "removes the connection from the members hash" do
-    subject.remove(connection)
-    subject.members.should_not have_key(connection)
-  end
-
-  it "triggers the member removed webhook" do
-    subject.remove(connection)
-    PusherFake::Webhook.should have_received(:trigger).with("member_removed", channel: name, user_id: user_id).once
-  end
-
-  it "notifies the channel of the removed member" do
-    subject.remove(connection)
-    subject.should have_received(:emit).with("pusher_internal:member_removed", channel_data)
+  context "connection is not subscribed to channel" do
+    it "does not raise an error" do
+      subject.remove(connection)
+    end
   end
 end
 
