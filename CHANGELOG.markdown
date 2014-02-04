@@ -2,6 +2,7 @@
 
 ## 0.14.0 — Unreleased
 
+* Avoid issue when removing unsubscribed connection from presence channel. (Mark Thorn)
 * Change coveralls to be a test dependency. (Tristan Dunn)
 
 ## 0.13.0 — January 15, 2014
