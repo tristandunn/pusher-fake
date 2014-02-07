@@ -58,3 +58,31 @@ describe PusherFake, ".javascript" do
     subject.javascript(options).should == "new Pusher(#{arguments})"
   end
 end
+
+describe PusherFake, ".info" do
+  let(:logger)        { stub(info: true) }
+  let(:message)       { "Hello world." }
+  let(:configuration) { subject.configuration }
+
+  subject { PusherFake }
+
+  before do
+    configuration.logger = logger
+  end
+
+  it "forwards message to Logger#info when verbose" do
+    configuration.verbose = true
+
+    subject.info(message)
+
+    logger.should have_received(:info).with(message).once
+  end
+
+  it "does not forward message when not verbose" do
+    configuration.verbose = false
+
+    subject.info(message)
+
+    logger.should have_received(:info).never
+  end
+end

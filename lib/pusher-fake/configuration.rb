@@ -6,6 +6,9 @@ module PusherFake
     # @return [String] The Pusher API key. (Defaults to +PUSHER_API_KEY+.)
     attr_accessor :key
 
+    # @return [Logger] Instance of a Logger class for verbose logging.
+    attr_accessor :logger
+
     # @return [String] The Pusher API token. (Defaults to +PUSHER_API_SECRET+.)
     attr_accessor :secret
 
@@ -13,6 +16,9 @@ module PusherFake
     #
     # @return [Hash] Options for the socket server.
     attr_accessor :socket_options
+
+    # @return [Boolean] Enable verbose logging.
+    attr_accessor :verbose
 
     # Options for the web server. See +Thin::Server+ for options.
     #
@@ -26,7 +32,9 @@ module PusherFake
     def initialize
       self.app_id   = "PUSHER_APP_ID"
       self.key      = "PUSHER_API_KEY"
+      self.logger   = Logger.new(STDOUT)
       self.secret   = "PUSHER_API_SECRET"
+      self.verbose  = false
       self.webhooks = []
 
       self.socket_options = { host: "127.0.0.1", port: 8080 }
