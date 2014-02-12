@@ -59,8 +59,8 @@ describe PusherFake, ".javascript" do
   end
 end
 
-describe PusherFake, ".info" do
-  let(:logger)        { stub(info: true) }
+describe PusherFake, ".log" do
+  let(:logger)        { stub(:<< => "") }
   let(:message)       { "Hello world." }
   let(:configuration) { subject.configuration }
 
@@ -70,19 +70,19 @@ describe PusherFake, ".info" do
     configuration.logger = logger
   end
 
-  it "forwards message to Logger#info when verbose" do
+  it "forwards message to logger when verbose" do
     configuration.verbose = true
 
-    subject.info(message)
+    subject.log(message)
 
-    logger.should have_received(:info).with(message).once
+    logger.should have_received(:<<).with(message + "\n").once
   end
 
   it "does not forward message when not verbose" do
     configuration.verbose = false
 
-    subject.info(message)
+    subject.log(message)
 
-    logger.should have_received(:info).never
+    logger.should have_received(:<<).never
   end
 end

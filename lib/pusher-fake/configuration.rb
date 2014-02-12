@@ -6,7 +6,7 @@ module PusherFake
     # @return [String] The Pusher API key. (Defaults to +PUSHER_API_KEY+.)
     attr_accessor :key
 
-    # @return [Logger] Instance of a Logger class for verbose logging.
+    # @return [IO] An IO instance for verbose logging.
     attr_accessor :logger
 
     # @return [String] The Pusher API token. (Defaults to +PUSHER_API_SECRET+.)
@@ -32,7 +32,7 @@ module PusherFake
     def initialize
       self.app_id   = "PUSHER_APP_ID"
       self.key      = "PUSHER_API_KEY"
-      self.logger   = Logger.new(STDOUT)
+      self.logger   = STDOUT.to_io
       self.secret   = "PUSHER_API_SECRET"
       self.verbose  = false
       self.webhooks = []

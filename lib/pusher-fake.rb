@@ -44,9 +44,9 @@ module PusherFake
     "new Pusher(#{arguments})"
   end
 
-  def self.info(message)
+  def self.log(message)
     if configuration.verbose
-      configuration.logger.info(message)
+      configuration.logger << "#{message}\n"
     end
   end
 end
