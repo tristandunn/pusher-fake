@@ -5,6 +5,7 @@
 * Avoid issue when removing unsubscribed connection from presence channel. (Mark Thorn)
 * Add initial support for verbose logging. (Tristan Dunn)
 * Change coveralls to be a test dependency. (Tristan Dunn)
+* Miscellaneous clean up. (Tristan Dunn)
 
 ## 0.13.0 — January 15, 2014
 
