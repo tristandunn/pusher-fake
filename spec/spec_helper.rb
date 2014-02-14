@@ -8,5 +8,4 @@ end
 
 RSpec.configure do |config|
   config.mock_with :mocha
-  config.include(ConfigurationHelper)
 end
