@@ -34,11 +34,10 @@ module PusherFake
     #
     # @param [String] data The event data as JSON.
     def process(data)
-      message      = MultiJson.load(data, symbolize_keys: true)
-      data         = message[:data]
-      event        = message[:event]
-      channel_name = message[:channel] || data.delete(:channel)
-      channel      = Channel.factory(channel_name)
+      message = MultiJson.load(data, symbolize_keys: true)
+      data    = message[:data]
+      event   = message[:event]
+      channel = Channel.factory(message[:channel] || data.delete(:channel))
 
       case event
       when "pusher:subscribe"
@@ -46,10 +45,9 @@ module PusherFake
       when "pusher:unsubscribe"
         channel.remove(self)
       when CLIENT_EVENT_MATCHER
-        return unless channel.is_a?(Channel::Private)
-        return unless channel.includes?(self)
-
-        channel.emit(event, data, socket_id: socket.object_id)
+        if channel.is_a?(Channel::Private) && channel.includes?(self)
+          channel.emit(event, data, socket_id: socket.object_id)
+        end
       end
     end
   end

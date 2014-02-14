@@ -45,10 +45,10 @@ module PusherFake
     #
     # @param [Hash] options Custom options for Pusher client.
     def to_options(options = {})
-      options.merge({
+      options.merge(
         wsHost: socket_options[:host],
         wsPort: socket_options[:port]
-      })
+      )
     end
   end
 end

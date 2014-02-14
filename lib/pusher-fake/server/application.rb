@@ -86,7 +86,7 @@ module PusherFake
 
         filter   = Regexp.new(%r{\A#{prefix}})
         channels = PusherFake::Channel.channels || {}
-        channels.inject({ channels: {} }) do |result, (name, channel)|
+        channels.inject(channels: {}) do |result, (name, channel)|
           unless filter && name !~ filter
             channels = result[:channels]
             channels[name] = {}

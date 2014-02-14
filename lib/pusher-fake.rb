@@ -23,7 +23,7 @@ module PusherFake
   #
   # @yield [Configuration] The current configuration.
   def self.configure
-    yield(configuration)
+    yield configuration
   end
 
   # @return [Configuration] Current configuration.

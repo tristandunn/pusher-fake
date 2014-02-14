@@ -2,10 +2,10 @@ module PusherFake
   class Webhook
     class << self
       def trigger(name, data = {})
-        payload = MultiJson.dump({
+        payload = MultiJson.dump(
           events:  [data.merge(name: name)],
           time_ms: Time.now.to_i
-        })
+        )
 
         PusherFake.configuration.webhooks.each do |url|
           http = EventMachine::HttpRequest.new(url)
@@ -23,7 +23,10 @@ module PusherFake
       end
 
       def signature_for(payload)
-        OpenSSL::HMAC.hexdigest(OpenSSL::Digest::SHA256.new, PusherFake.configuration.secret, payload)
+        digest = OpenSSL::Digest::SHA256.new
+        secret = PusherFake.configuration.secret
+
+        OpenSSL::HMAC.hexdigest(digest, secret, payload)
       end
     end
   end
