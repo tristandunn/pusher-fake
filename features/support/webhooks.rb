@@ -21,7 +21,7 @@ Thread.new do
 
   EventMachine.run do
     Thin::Logging.silent = true
-    Thin::Server.start('0.0.0.0', 8082, WebhookEndpoint)
+    Thin::Server.start("0.0.0.0", 8082, WebhookEndpoint)
     Thread.current[:ready] = true
   end
 end.tap do |thread|

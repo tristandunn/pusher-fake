@@ -1,6 +1,8 @@
 Given "I am connected" do
-  step %{I am on the homepage}
-  step %{I should be connected}
+  steps %{
+    Given I am on the homepage
+    Then I should be connected
+  }
 end
 
 Given %{$name is connected} do |name|

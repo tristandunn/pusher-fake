@@ -1,6 +1,8 @@
 Given %{I am subscribed to the "$channel" channel} do |channel|
-  step %{I subscribe to the "#{channel}" channel}
-  step %{I should be subscribed to the "#{channel}" channel}
+  steps %{
+    When I subscribe to the "#{channel}" channel
+    Then I should be subscribed to the "#{channel}" channel
+  }
 end
 
 Given %{$name is subscribed to the "$channel" channel} do |name, channel|

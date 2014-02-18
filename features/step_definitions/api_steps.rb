@@ -17,8 +17,7 @@ end
 Then %{I should receive the following JSON:} do |string|
   expected = MultiJson.load(string)
   expected = expected.inject({}) do |result, (key, value)|
-    result[key.to_sym] = value
-    result
+    result.merge(key.to_sym => value)
   end
 
   @response.should == expected
@@ -29,10 +28,12 @@ Then %{I should receive the following error:} do |string|
 end
 
 Then /^I should receive JSON for (\d+) users?$/ do |count|
-  users = @response[:users]
-  users.length.should == count.to_i
-  users.each do |user|
-    object = ObjectSpace._id2ref(user["id"])
-    object.should be_a(PusherFake::Connection)
+  @response[:users].tap do |users|
+    users.length.should == count.to_i
+    users.map do |user|
+      ObjectSpace._id2ref(user["id"])
+    end.each do |object|
+      object.should be_a(PusherFake::Connection)
+    end
   end
 end
