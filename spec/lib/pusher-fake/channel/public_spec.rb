@@ -45,11 +45,7 @@ describe PusherFake::Channel, "#add" do
   it "triggers channel occupied webhook for the first connection added" do
     subject.unstub(:connections)
 
-    subject.add(connection)
-
-    expect(PusherFake::Webhook).to have_received(:trigger).with("channel_occupied", channel: name).once
-
-    subject.add(connection)
+    2.times { subject.add(connection) }
 
     expect(PusherFake::Webhook).to have_received(:trigger).with("channel_occupied", channel: name).once
   end

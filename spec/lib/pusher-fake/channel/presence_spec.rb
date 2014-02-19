@@ -87,11 +87,7 @@ describe PusherFake::Channel::Presence, "#add" do
     subject.unstub(:connections)
     subject.stubs(authorized?: true)
 
-    subject.add(connection, data)
-
-    expect(PusherFake::Webhook).to have_received(:trigger).with("channel_occupied", channel: name).once
-
-    subject.add(connection, data)
+    2.times { subject.add(connection, data) }
 
     expect(PusherFake::Webhook).to have_received(:trigger).with("channel_occupied", channel: name).once
   end
@@ -116,11 +112,7 @@ describe PusherFake::Channel::Presence, "#add" do
     subject.unstub(:connections)
     subject.stubs(authorized?: false)
 
-    subject.add(connection, data)
-
-    expect(PusherFake::Webhook).to have_received(:trigger).never
-
-    subject.add(connection, data)
+    2.times { subject.add(connection, data) }
 
     expect(PusherFake::Webhook).to have_received(:trigger).never
   end
