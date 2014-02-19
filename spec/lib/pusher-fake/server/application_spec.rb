@@ -19,26 +19,32 @@ shared_examples_for "an API request" do
 
   it "creates a request" do
     subject.call(environment)
-    Rack::Request.should have_received(:new).with(environment)
+
+    expect(Rack::Request).to have_received(:new).with(environment)
   end
 
   it "dumps the response hash to JSON" do
     subject.call(environment)
-    MultiJson.should have_received(:dump).with(hash)
+
+    expect(MultiJson).to have_received(:dump).with(hash)
   end
 
   it "creates a Rack response with the response JSON" do
     subject.call(environment)
-    Rack::Response.should have_received(:new).with(string)
+
+    expect(Rack::Response).to have_received(:new).with(string)
   end
 
   it "finishes the response" do
     subject.call(environment)
-    response.should have_received(:finish).with()
+
+    expect(response).to have_received(:finish).with()
   end
 
   it "returns the response" do
-    subject.call(environment).should == response
+    result = subject.call(environment)
+
+    expect(result).to eq(response)
   end
 end
 
@@ -53,7 +59,8 @@ describe PusherFake::Server::Application, ".call, for triggering events" do
 
     it "emits events" do
       subject.call(environment)
-      subject.should have_received(:events).with(request)
+
+      expect(subject).to have_received(:events).with(request)
     end
   end
 end
@@ -69,7 +76,8 @@ describe PusherFake::Server::Application, ".call, for retrieving occupied channe
 
     it "filters the occupied channels" do
       subject.call(environment)
-      subject.should have_received(:channels).with(request)
+
+      expect(subject).to have_received(:channels).with(request)
     end
   end
 end
@@ -92,21 +100,26 @@ describe PusherFake::Server::Application, ".call, with unknown path" do
 
   it "creates a request" do
     subject.call(environment)
-    Rack::Request.should have_received(:new).with(environment)
+
+    expect(Rack::Request).to have_received(:new).with(environment)
   end
 
   it "creates a Rack response with the error message" do
     subject.call(environment)
-    Rack::Response.should have_received(:new).with(message, 400)
+
+    expect(Rack::Response).to have_received(:new).with(message, 400)
   end
 
   it "finishes the response" do
     subject.call(environment)
-    response.should have_received(:finish).with()
+
+    expect(response).to have_received(:finish).with()
   end
 
   it "returns the response" do
-    subject.call(environment).should == response
+    result = subject.call(environment)
+
+    expect(result).to eq(response)
   end
 end
 
@@ -131,21 +144,26 @@ describe PusherFake::Server::Application, ".call, raising an error" do
 
   it "creates a request" do
     subject.call(environment)
-    Rack::Request.should have_received(:new).with(environment)
+
+    expect(Rack::Request).to have_received(:new).with(environment)
   end
 
   it "creates a Rack response with the error message" do
     subject.call(environment)
-    Rack::Response.should have_received(:new).with(message, 400)
+
+    expect(Rack::Response).to have_received(:new).with(message, 400)
   end
 
   it "finishes the response" do
     subject.call(environment)
-    response.should have_received(:finish).with()
+
+    expect(response).to have_received(:finish).with()
   end
 
   it "returns the response" do
-    subject.call(environment).should == response
+    result = subject.call(environment)
+
+    expect(result).to eq(response)
   end
 end
 
@@ -171,22 +189,23 @@ describe PusherFake::Server::Application, ".events" do
 
   it "parses the request body as JSON" do
     subject.events(request)
-    MultiJson.should have_received(:load).with(json)
+
+    expect(MultiJson).to have_received(:load).with(json)
   end
 
   it "creates channels by name" do
     subject.events(request)
 
     channels.each do |channel|
-      PusherFake::Channel.should have_received(:factory).with(channel)
+      expect(PusherFake::Channel).to have_received(:factory).with(channel)
     end
   end
 
   it "emits the event to the channels" do
     subject.events(request)
 
-    channel_1.should have_received(:emit).with(name, data, socket_id: socket_id)
-    channel_2.should have_received(:emit).with(name, data, socket_id: socket_id)
+    expect(channel_1).to have_received(:emit).with(name, data, socket_id: socket_id)
+    expect(channel_2).to have_received(:emit).with(name, data, socket_id: socket_id)
   end
 end
 
@@ -201,12 +220,9 @@ describe PusherFake::Server::Application, ".channels, requesting all channels" d
   end
 
   it "returns a hash of all the channels" do
-    subject.channels(request).should == {
-      channels: {
-        "channel-1" => {},
-        "channel-2" => {}
-      }
-    }
+    hash = subject.channels(request)
+
+    expect(hash).to eq({ channels: { "channel-1" => {}, "channel-2" => {} } })
   end
 end
 
@@ -222,7 +238,9 @@ describe PusherFake::Server::Application, ".channels, requesting channels with a
   end
 
   it "returns a hash of the channels matching the filter" do
-    subject.channels(request).should == { channels: { "public-1" => {} } }
+    hash = subject.channels(request)
+
+    expect(hash).to eq({ channels: { "public-1" => {} } })
   end
 end
 
@@ -239,7 +257,9 @@ describe PusherFake::Server::Application, ".channels, requesting user count for 
   end
 
   it "returns a hash of the channels matching the filter and include the user count" do
-    subject.channels(request).should == { channels: { "presence-1" => { user_count: 2 } } }
+    hash = subject.channels(request)
+
+    expect(hash).to eq({ channels: { "presence-1" => { user_count: 2 } } })
   end
 end
 
@@ -254,7 +274,9 @@ describe PusherFake::Server::Application, ".channels, requesting all channels wi
   end
 
   it "returns a hash of no channels" do
-    subject.channels(request).should == { channels: {} }
+    hash = subject.channels(request)
+
+    expect(hash).to eq({ channels: {} })
   end
 end
 
@@ -284,7 +306,9 @@ describe PusherFake::Server::Application, ".channel, for an occupied channel" do
   end
 
   it "returns a hash with the occupied status" do
-    subject.channel(name, request).should == { occupied: true }
+    hash = subject.channel(name, request)
+
+    expect(hash).to eq({ occupied: true })
   end
 end
 
@@ -301,7 +325,9 @@ describe PusherFake::Server::Application, ".channel, for an unoccupied channel" 
   end
 
   it "returns a hash with the occupied status" do
-    subject.channel(name, request).should == { occupied: false }
+    hash = subject.channel(name, request)
+
+    expect(hash).to eq({ occupied: false })
   end
 end
 
@@ -316,7 +342,9 @@ describe PusherFake::Server::Application, ".channel, for an unknown channel" do
   end
 
   it "returns a hash with the occupied status" do
-    subject.channel("fake", request).should == { occupied: false }
+    hash = subject.channel("fake", request)
+
+    expect(hash).to eq({ occupied: false })
   end
 end
 
@@ -334,7 +362,9 @@ describe PusherFake::Server::Application, ".channel, request user count for a pr
   end
 
   it "returns a hash with the occupied status" do
-    subject.channel(name, request).should == { occupied: true, user_count: 2 }
+    hash = subject.channel(name, request)
+
+    expect(hash).to eq({ occupied: true, user_count: 2 })
   end
 end
 
@@ -365,10 +395,12 @@ describe PusherFake::Server::Application, ".users, for an occupied channel" do
   end
 
   it "returns a hash with the occupied status" do
-    subject.users(name).should == { users: [
+    hash = subject.users(name)
+
+    expect(hash).to eq({ users: [
       { id: user_1.object_id },
       { id: user_2.object_id }
-    ] }
+    ] })
   end
 end
 
@@ -384,7 +416,9 @@ describe PusherFake::Server::Application, ".users, for an empty channel" do
   end
 
   it "returns a hash with the occupied status" do
-    subject.users(name).should == { users: [] }
+    hash = subject.users(name)
+
+    expect(hash).to eq({ users: [] })
   end
 end
 
@@ -398,6 +432,8 @@ describe PusherFake::Server::Application, ".users, for an unknown channel" do
   end
 
   it "returns a hash with the occupied status" do
-    subject.users("fake").should == { users: [] }
+    hash = subject.users("fake")
+
+    expect(hash).to eq({ users: [] })
   end
 end

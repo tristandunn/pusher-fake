@@ -19,17 +19,21 @@ describe PusherFake::Webhook, ".trigger" do
 
   it "generates a signature" do
     subject.trigger(name, data)
-    OpenSSL::HMAC.should have_received(:hexdigest).with(kind_of(OpenSSL::Digest::SHA256), configuration.secret, payload)
+
+    expect(OpenSSL::HMAC).to have_received(:hexdigest)
+      .with(kind_of(OpenSSL::Digest::SHA256), configuration.secret, payload)
   end
 
   it "creates a HTTP request for each webhook URL" do
     subject.trigger(name, data)
-    EventMachine::HttpRequest.should have_received(:new).with(webhooks.first)
+
+    expect(EventMachine::HttpRequest).to have_received(:new).with(webhooks.first)
   end
 
   it "posts the payload to the webhook URL" do
     subject.trigger(name, data)
-    http.should have_received(:post).with(
+
+    expect(http).to have_received(:post).with(
       body: payload,
       head: {
         "Content-Type"       => "application/json",

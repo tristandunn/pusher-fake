@@ -26,36 +26,39 @@ describe PusherFake, ".configuration" do
 
   it "initializes a configuration object" do
     subject.configuration
-    PusherFake::Configuration.should have_received(:new)
+
+    expect(PusherFake::Configuration).to have_received(:new)
   end
 
   it "memoizes the configuration" do
-    subject.configuration
-    subject.configuration
-    PusherFake::Configuration.should have_received(:new).once
+    2.times { subject.configuration }
+
+    expect(PusherFake::Configuration).to have_received(:new).once
   end
 
   it "returns the configuration" do
-    subject.configuration.should == configuration
+    expect(subject.configuration).to eq(configuration)
   end
 end
 
 describe PusherFake, ".javascript" do
-  let(:options)       { { custom: "option" } }
   let(:configuration) { subject.configuration }
 
   subject { PusherFake }
 
   it "returns JavaScript setting the host and port to the configured options" do
-    arguments = [configuration.key, configuration.to_options].map(&:to_json).join(",")
+    arguments  = [configuration.key, configuration.to_options].map(&:to_json).join(",")
+    javascript = subject.javascript
 
-    subject.javascript.should == "new Pusher(#{arguments})"
+    expect(javascript).to eq("new Pusher(#{arguments})")
   end
 
   it "supports passing custom options" do
-    arguments = [configuration.key, configuration.to_options(options)].map(&:to_json).join(",")
+    options    = { custom: "option" }
+    arguments  = [configuration.key, configuration.to_options(options)].map(&:to_json).join(",")
+    javascript = subject.javascript(options)
 
-    subject.javascript(options).should == "new Pusher(#{arguments})"
+    expect(javascript).to eq("new Pusher(#{arguments})")
   end
 end
 
@@ -75,7 +78,7 @@ describe PusherFake, ".log" do
 
     subject.log(message)
 
-    logger.should have_received(:<<).with(message + "\n").once
+    expect(logger).to have_received(:<<).with(message + "\n").once
   end
 
   it "does not forward message when not verbose" do
@@ -83,6 +86,6 @@ describe PusherFake, ".log" do
 
     subject.log(message)
 
-    logger.should have_received(:<<).never
+    expect(logger).to have_received(:<<).never
   end
 end

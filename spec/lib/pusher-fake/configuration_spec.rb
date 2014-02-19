@@ -13,14 +13,20 @@ end
 
 describe PusherFake::Configuration, "#to_options" do
   it "includes the socket host as wsHost" do
-    subject.to_options.should include(wsHost: subject.socket_options[:host])
+    options = subject.to_options
+
+    expect(options).to include(wsHost: subject.socket_options[:host])
   end
 
   it "includes the socket port as wsPort" do
-    subject.to_options.should include(wsPort: subject.socket_options[:port])
+    options = subject.to_options
+
+    expect(options).to include(wsPort: subject.socket_options[:port])
   end
 
   it "supports passing custom options" do
-    subject.to_options(custom: "option").should include(custom: "option")
+    options = subject.to_options(custom: "option")
+
+    expect(options).to include(custom: "option")
   end
 end

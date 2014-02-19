@@ -10,27 +10,32 @@ describe PusherFake::Server, ".start" do
 
   it "runs the event loop" do
     subject.start
-    EventMachine.should have_received(:run).with()
+
+    expect(EventMachine).to have_received(:run).with()
   end
 
   it "starts the socket web server when run yields" do
     subject.start
-    subject.should have_received(:start_web_server).never
+
+    expect(subject).to have_received(:start_web_server).never
 
     EventMachine.stubs(:run).yields
 
     subject.start
-    subject.should have_received(:start_web_server).with()
+
+    expect(subject).to have_received(:start_web_server).with()
   end
 
   it "starts the socket server when run yields" do
     subject.start
-    subject.should have_received(:start_socket_server).never
+
+    expect(subject).to have_received(:start_socket_server).never
 
     EventMachine.stubs(:run).yields
 
     subject.start
-    subject.should have_received(:start_socket_server).with()
+
+    expect(subject).to have_received(:start_socket_server).with()
   end
 end
 
@@ -52,76 +57,90 @@ describe PusherFake::Server, ".start_socket_server" do
 
   it "creates a WebSocket server" do
     subject.start_socket_server
-    EventMachine::WebSocket.should have_received(:start).with(options)
+
+    expect(EventMachine::WebSocket).to have_received(:start).with(options)
   end
 
   it "defines an open callback on the socket" do
     subject.start_socket_server
-    socket.should have_received(:onopen).with()
+
+    expect(socket).to have_received(:onopen).with()
   end
 
   it "creates a connection with the provided socket when onopen yields" do
     subject.start_socket_server
-    PusherFake::Connection.should have_received(:new).never
+
+    expect(PusherFake::Connection).to have_received(:new).never
 
     socket.stubs(:onopen).yields
 
     subject.start_socket_server
-    PusherFake::Connection.should have_received(:new).with(socket)
+
+    expect(PusherFake::Connection).to have_received(:new).with(socket)
   end
 
   it "establishes the connection when onopen yields" do
     subject.start_socket_server
-    connection.should have_received(:establish).never
+
+    expect(connection).to have_received(:establish).never
 
     socket.stubs(:onopen).yields
 
     subject.start_socket_server
-    connection.should have_received(:establish).with()
+
+    expect(connection).to have_received(:establish).with()
   end
 
   it "defines a message callback on the socket when onopen yields" do
     subject.start_socket_server
-    socket.should have_received(:onmessage).never
+
+    expect(socket).to have_received(:onmessage).never
 
     socket.stubs(:onopen).yields
 
     subject.start_socket_server
-    socket.should have_received(:onmessage).with()
+
+    expect(socket).to have_received(:onmessage).with()
   end
 
   it "triggers process on the connection when onmessage yields" do
     socket.stubs(:onopen).yields
 
     subject.start_socket_server
-    connection.should have_received(:process).never
+
+    expect(connection).to have_received(:process).never
 
     socket.stubs(:onmessage).yields(data)
 
     subject.start_socket_server
-    connection.should have_received(:process).with(data)
+
+    expect(connection).to have_received(:process).with(data)
   end
 
   it "defines a close callback on the socket when onopen yields" do
     subject.start_socket_server
-    socket.should have_received(:onclose).never
+
+    expect(socket).to have_received(:onclose).never
 
     socket.stubs(:onopen).yields
 
     subject.start_socket_server
-    socket.should have_received(:onclose).with()
+
+    expect(socket).to have_received(:onclose).with()
   end
 
   it "removes the connection from all channels when onclose yields" do
     socket.stubs(:onopen).yields
 
     subject.start_socket_server
-    PusherFake::Channel.should have_received(:remove).never
+
+    expect(PusherFake::Channel).to have_received(:remove).never
 
     socket.stubs(:onclose).yields
 
     subject.start_socket_server
-    PusherFake::Channel.should have_received(:remove).with(connection)
+
+    expect(PusherFake::Channel).to have_received(:remove).with(connection)
   end
 end
 
@@ -141,21 +160,25 @@ describe PusherFake::Server, ".start_web_server" do
 
   it "silences the logging" do
     subject.start_web_server
-    Thin::Logging.should have_received(:silent=).with(true)
+
+    expect(Thin::Logging).to have_received(:silent=).with(true)
   end
 
   it "creates the web server" do
     subject.start_web_server
-    Thin::Server.should have_received(:new).with(host, port, PusherFake::Server::Application)
+
+    expect(Thin::Server).to have_received(:new).with(host, port, PusherFake::Server::Application)
   end
 
   it "assigns custom options to the server" do
     subject.start_web_server
-    server.should have_received(:ssl=).with(true)
+
+    expect(server).to have_received(:ssl=).with(true)
   end
 
   it "starts the web server" do
     subject.start_web_server
-    server.should have_received(:start!).with()
+
+    expect(server).to have_received(:start!).with()
   end
 end

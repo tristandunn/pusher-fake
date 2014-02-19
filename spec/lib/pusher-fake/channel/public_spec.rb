@@ -7,12 +7,14 @@ describe PusherFake::Channel::Public do
 
   it "assigns the provided name" do
     channel = subject.new(name)
-    channel.name.should == name
+
+    expect(channel.name).to eq(name)
   end
 
   it "creates an empty connections array" do
     channel = subject.new(name)
-    channel.connections.should == []
+
+    expect(channel.connections).to eq([])
   end
 end
 
@@ -30,21 +32,26 @@ describe PusherFake::Channel, "#add" do
 
   it "adds the connection" do
     subject.add(connection)
-    connections.should have_received(:push).with(connection)
+
+    expect(connections).to have_received(:push).with(connection)
   end
 
   it "successfully subscribes the connection" do
     subject.add(connection)
-    connection.should have_received(:emit).with("pusher_internal:subscription_succeeded", {}, subject.name)
+
+    expect(connection).to have_received(:emit).with("pusher_internal:subscription_succeeded", {}, subject.name)
   end
 
   it "triggers channel occupied webhook for the first connection added" do
     subject.unstub(:connections)
 
     subject.add(connection)
-    PusherFake::Webhook.should have_received(:trigger).with("channel_occupied", channel: name).once
+
+    expect(PusherFake::Webhook).to have_received(:trigger).with("channel_occupied", channel: name).once
+
     subject.add(connection)
-    PusherFake::Webhook.should have_received(:trigger).with("channel_occupied", channel: name).once
+
+    expect(PusherFake::Webhook).to have_received(:trigger).with("channel_occupied", channel: name).once
   end
 end
 
@@ -66,14 +73,16 @@ describe PusherFake::Channel, "#emit" do
 
   it "emits the event for each connection in the channel" do
     subject.emit(event, data)
-    connection_1.should have_received(:emit).with(event, data, name)
-    connection_2.should have_received(:emit).with(event, data, name)
+
+    expect(connection_1).to have_received(:emit).with(event, data, name)
+    expect(connection_2).to have_received(:emit).with(event, data, name)
   end
 
   it "ignores connection if socket_id matches the connections socket object_id" do
     subject.emit(event, data, socket_id: socket_2.object_id)
-    connection_1.should have_received(:emit).with(event, data, name)
-    connection_2.should have_received(:emit).never
+
+    expect(connection_1).to have_received(:emit).with(event, data, name)
+    expect(connection_2).to have_received(:emit).never
   end
 end
 
@@ -84,12 +93,14 @@ describe PusherFake::Channel, "#includes?" do
 
   it "returns true if the connection is in the channel" do
     subject.stubs(connections: [connection])
-    subject.includes?(connection).should be_true
+
+    expect(subject).to be_includes(connection)
   end
 
   it "returns false if the connection is not in the channel" do
     subject.stubs(connections: [])
-    subject.includes?(connection).should be_false
+
+    expect(subject).to_not be_includes(connection)
   end
 end
 
@@ -107,14 +118,18 @@ describe PusherFake::Channel, "#remove" do
 
   it "removes the connection from the channel" do
     subject.remove(connection_1)
-    subject.connections.should_not include(connection_1)
+
+    expect(subject.connections).to_not include(connection_1)
   end
 
   it "triggers channel vacated webhook when all connections are removed" do
     subject.remove(connection_1)
-    PusherFake::Webhook.should have_received(:trigger).never
+
+    expect(PusherFake::Webhook).to have_received(:trigger).never
+
     subject.remove(connection_2)
-    PusherFake::Webhook.should have_received(:trigger).with("channel_vacated", channel: name).once
+
+    expect(PusherFake::Webhook).to have_received(:trigger).with("channel_vacated", channel: name).once
   end
 end
 
@@ -122,6 +137,6 @@ describe PusherFake::Channel::Public, "#subscription_data" do
   subject { PusherFake::Channel::Public.new("name") }
 
   it "returns an empty hash" do
-    subject.subscription_data.should == {}
+    expect(subject.subscription_data).to eq({})
   end
 end

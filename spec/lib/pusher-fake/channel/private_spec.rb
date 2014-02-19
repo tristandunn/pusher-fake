@@ -4,7 +4,7 @@ describe PusherFake::Channel::Private do
   subject { PusherFake::Channel::Private }
 
   it "inherits from public channel" do
-    subject.ancestors.should include(PusherFake::Channel::Public)
+    expect(subject.ancestors).to include(PusherFake::Channel::Public)
   end
 end
 
@@ -24,20 +24,26 @@ describe PusherFake::Channel::Private, "#add" do
 
   it "authorizes the connection" do
     subject.stubs(authorized?: nil)
+
     subject.add(connection, data)
-    subject.should have_received(:authorized?).with(connection, data)
+
+    expect(subject).to have_received(:authorized?).with(connection, data)
   end
 
   it "adds the connection to the channel when authorized" do
     subject.stubs(authorized?: true)
+
     subject.add(connection, data)
-    connections.should have_received(:push).with(connection)
+
+    expect(connections).to have_received(:push).with(connection)
   end
 
   it "successfully subscribes the connection when authorized" do
     subject.stubs(authorized?: true)
+
     subject.add(connection, data)
-    connection.should have_received(:emit).with("pusher_internal:subscription_succeeded", {}, subject.name)
+
+    expect(connection).to have_received(:emit).with("pusher_internal:subscription_succeeded", {}, subject.name)
   end
 
   it "triggers channel occupied webhook for the first connection added when authorized" do
@@ -45,15 +51,20 @@ describe PusherFake::Channel::Private, "#add" do
     subject.stubs(authorized?: true)
 
     subject.add(connection, data)
-    PusherFake::Webhook.should have_received(:trigger).with("channel_occupied", channel: name).once
+
+    expect(PusherFake::Webhook).to have_received(:trigger).with("channel_occupied", channel: name).once
+
     subject.add(connection, data)
-    PusherFake::Webhook.should have_received(:trigger).with("channel_occupied", channel: name).once
+
+    expect(PusherFake::Webhook).to have_received(:trigger).with("channel_occupied", channel: name).once
   end
 
   it "unsuccessfully subscribes the connection when not authorized" do
     subject.stubs(authorized?: false)
+
     subject.add(connection, data)
-    connection.should have_received(:emit).with("pusher_internal:subscription_error", {}, subject.name)
+
+    expect(connection).to have_received(:emit).with("pusher_internal:subscription_error", {}, subject.name)
   end
 
   it "does not trigger channel occupied webhook when not authorized" do
@@ -61,9 +72,12 @@ describe PusherFake::Channel::Private, "#add" do
     subject.stubs(authorized?: false)
 
     subject.add(connection, data)
-    PusherFake::Webhook.should have_received(:trigger).never
+
+    expect(PusherFake::Webhook).to have_received(:trigger).never
+
     subject.add(connection, data)
-    PusherFake::Webhook.should have_received(:trigger).never
+
+    expect(PusherFake::Webhook).to have_received(:trigger).never
   end
 end
 
@@ -83,11 +97,15 @@ describe PusherFake::Channel::Private, "#authentication_for" do
 
   it "generates a signature" do
     subject.authentication_for(id)
-    OpenSSL::HMAC.should have_received(:hexdigest).with(kind_of(OpenSSL::Digest::SHA256), configuration.secret, string)
+
+    expect(OpenSSL::HMAC).to have_received(:hexdigest)
+      .with(kind_of(OpenSSL::Digest::SHA256), configuration.secret, string)
   end
 
   it "returns the authentication string" do
-    subject.authentication_for(id).should == "#{configuration.key}:#{signature}"
+    string = subject.authentication_for(id)
+
+    expect(string).to eq("#{configuration.key}:#{signature}")
   end
 end
 
@@ -108,11 +126,15 @@ describe PusherFake::Channel::Private, "#authentication_for, with channel data" 
 
   it "generates a signature" do
     subject.authentication_for(id, channel_data)
-    OpenSSL::HMAC.should have_received(:hexdigest).with(kind_of(OpenSSL::Digest::SHA256), configuration.secret, string)
+
+    expect(OpenSSL::HMAC).to have_received(:hexdigest)
+      .with(kind_of(OpenSSL::Digest::SHA256), configuration.secret, string)
   end
 
   it "returns the authentication string" do
-    subject.authentication_for(id, channel_data).should == "#{configuration.key}:#{signature}"
+    string = subject.authentication_for(id, channel_data)
+
+    expect(string).to eq("#{configuration.key}:#{signature}")
   end
 end
 
@@ -132,16 +154,19 @@ describe PusherFake::Channel::Private, "#authorized?" do
 
   it "generates authentication for the connection socket ID" do
     subject.authorized?(connection, data)
-    subject.should have_received(:authentication_for).with(socket.object_id, channel_data)
+
+    expect(subject).to have_received(:authentication_for).with(socket.object_id, channel_data)
   end
 
   it "returns true if the authentication matches" do
     subject.stubs(authentication_for: authentication)
-    subject.authorized?(connection, data).should be_true
+
+    expect(subject).to be_authorized(connection, data)
   end
 
   it "returns false if the authentication matches" do
     subject.stubs(authentication_for: "")
-    subject.authorized?(connection, data).should be_false
+
+    expect(subject).to_not be_authorized(connection, data)
   end
 end
