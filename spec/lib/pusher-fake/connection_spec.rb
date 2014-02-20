@@ -118,6 +118,37 @@ describe PusherFake::Connection, "#process, with an unsubscribe event" do
   end
 end
 
+describe PusherFake::Connection, "#process, with a ping event" do
+  let(:json)    { stub }
+  let(:message) { { event: "pusher:ping", data: {} } }
+
+  subject { PusherFake::Connection.new(stub) }
+
+  before do
+    MultiJson.stubs(load: message)
+    PusherFake::Channel.stubs(:factory)
+    subject.stubs(:emit)
+  end
+
+  it "parses the JSON data" do
+    subject.process(json)
+
+    expect(MultiJson).to have_received(:load).with(json, symbolize_keys: true)
+  end
+
+  it "creates no channels" do
+    subject.process(json)
+
+    expect(PusherFake::Channel).to have_received(:factory).never
+  end
+
+  it "emits a pong event" do
+    subject.process(json)
+
+    expect(subject).to have_received(:emit).with("pusher:pong")
+  end
+end
+
 describe PusherFake::Connection, "#process, with a client event" do
   let(:data)    { {} }
   let(:json)    { stub }

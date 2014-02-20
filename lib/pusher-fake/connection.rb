@@ -37,13 +37,16 @@ module PusherFake
       message = MultiJson.load(data, symbolize_keys: true)
       data    = message[:data]
       event   = message[:event]
-      channel = Channel.factory(message[:channel] || data.delete(:channel))
+      name    = message[:channel] || data.delete(:channel)
+      channel = Channel.factory(name) if name
 
       case event
       when "pusher:subscribe"
         channel.add(self, data)
       when "pusher:unsubscribe"
         channel.remove(self)
+      when "pusher:ping"
+        emit("pusher:pong")
       when CLIENT_EVENT_MATCHER
         if channel.is_a?(Channel::Private) && channel.includes?(self)
           channel.emit(event, data, socket_id: socket.object_id)
