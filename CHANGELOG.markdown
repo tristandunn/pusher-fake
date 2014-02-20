@@ -2,6 +2,7 @@
 
 ## 0.14.0 — Unreleased
 
+* Handle pusher:ping events from client. (Mark Thorn)
 * Avoid issue when removing unsubscribed connection from presence channel. (Mark Thorn)
 * Add initial support for verbose logging. (Tristan Dunn)
 * Change coveralls to be a test dependency. (Tristan Dunn)
