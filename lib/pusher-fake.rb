@@ -6,7 +6,7 @@ require "thin"
 
 module PusherFake
   # The current version string.
-  VERSION = "0.13.0"
+  VERSION = "0.14.0"
 
   autoload :Channel,       "pusher-fake/channel"
   autoload :Configuration, "pusher-fake/configuration"

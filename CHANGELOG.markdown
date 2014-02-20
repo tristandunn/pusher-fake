@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.14.0 — Unreleased
+## 0.14.0 — February 19th, 2014
 
 * Handle pusher:ping events from client. (Mark Thorn)
 * Avoid issue when removing unsubscribed connection from presence channel. (Mark Thorn)
