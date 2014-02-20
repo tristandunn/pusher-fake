@@ -20,20 +20,21 @@ Then %{I should receive the following JSON:} do |string|
     result.merge(key.to_sym => value)
   end
 
-  @response.should == expected
+  expect(@response).to eq(expected)
 end
 
 Then %{I should receive the following error:} do |string|
-  @error.message.should include(string.strip)
+  expect(@error.message).to include(string.strip)
 end
 
 Then /^I should receive JSON for (\d+) users?$/ do |count|
   @response[:users].tap do |users|
-    users.length.should == count.to_i
+    expect(users).to have(count).items
+
     users.map do |user|
       ObjectSpace._id2ref(user["id"])
     end.each do |object|
-      object.should be_a(PusherFake::Connection)
+      expect(object).to be_a(PusherFake::Connection)
     end
   end
 end

@@ -37,7 +37,8 @@ Then /^([^ ]+) should receive a "([^"]+)" event on the "([^"]+)" channel$/ do |n
   using_session(name) do
     wait do
       events = page.evaluate_script("Pusher.instance.events[#{MultiJson.dump([channel, event].join(":"))}]")
-      events.length.should == 1
+
+      expect(events).to have(1).item
     end
   end
 end
@@ -48,7 +49,8 @@ Then /^([^ ]+) should not receive a "([^"]+)" event on the "([^"]+)" channel$/ d
   using_session(name) do
     wait do
       events = page.evaluate_script("Pusher.instance.events[#{MultiJson.dump([channel, event].join(":"))}]")
-      events.should be_nil
+
+      expect(events).to be_nil
     end
   end
 end

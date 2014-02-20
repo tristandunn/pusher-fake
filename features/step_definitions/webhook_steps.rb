@@ -16,6 +16,6 @@ end
 
 Then /^the server should have received no events$/ do
   wait do
-    $events.should be_empty
+    expect($events).to be_empty
   end
 end

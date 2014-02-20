@@ -80,6 +80,7 @@ Then %{I should not be subscribed to the "$channel" channel} do |channel|
       channel = Pusher.instance.channel(#{MultiJson.dump(channel)});
       channel && channel.subscribed;
     })
-    subscribed.should be_false
+
+    expect(subscribed).to be_false
   end
 end
