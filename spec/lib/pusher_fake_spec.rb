@@ -78,7 +78,7 @@ describe PusherFake, ".log" do
 
     subject.log(message)
 
-    expect(logger).to have_received(:<<).with(message + "\n").once
+    expect(logger).to have_received(:<<).with("#{message}\n").once
   end
 
   it "does not forward message when not verbose" do

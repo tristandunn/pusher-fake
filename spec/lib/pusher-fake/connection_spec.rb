@@ -1,5 +1,28 @@
 require "spec_helper"
 
+shared_examples_for "#process" do
+  let(:json) { stub }
+
+  subject { PusherFake::Connection.new(stub) }
+
+  before do
+    PusherFake.stubs(:log)
+    MultiJson.stubs(load: message)
+  end
+
+  it "parses the JSON data" do
+    subject.process(json)
+
+    expect(MultiJson).to have_received(:load).with(json, symbolize_keys: true)
+  end
+
+  it "logs receiving the event" do
+    subject.process(json)
+
+    expect(PusherFake).to have_received(:log).with("#{subject.id} - Recv: #{message}")
+  end
+end
+
 describe PusherFake::Connection do
   let(:socket) { stub }
 
@@ -23,6 +46,10 @@ describe PusherFake::Connection, "#emit" do
 
   subject { PusherFake::Connection.new(socket) }
 
+  before do
+    PusherFake.stubs(:log)
+  end
+
   it "sends the event to the socket as JSON" do
     subject.emit(event, data)
 
@@ -33,6 +60,12 @@ describe PusherFake::Connection, "#emit" do
     subject.emit(event, data, channel)
 
     expect(socket).to have_received(:send).with(channel_json)
+  end
+
+  it "logs sending the event" do
+    subject.emit(event, data)
+
+    expect(PusherFake).to have_received(:log).with("#{subject.id} - Send: #{message}")
   end
 end
 
@@ -53,196 +86,165 @@ describe PusherFake::Connection, "#establish" do
   end
 end
 
+describe PusherFake::Connection, "#id" do
+  let(:socket) { stub }
+
+  subject { PusherFake::Connection.new(socket) }
+
+  it "returns the object ID of the socket" do
+    expect(subject.id).to eq(socket.object_id)
+  end
+end
+
 describe PusherFake::Connection, "#process, with a subscribe event" do
-  let(:data)    { { channel: name, auth: "auth" } }
-  let(:json)    { stub }
-  let(:name)    { "channel" }
-  let(:channel) { stub(add: nil) }
-  let(:message) { { event: "pusher:subscribe", data: data } }
+  it_should_behave_like "#process" do
+    let(:data)    { { channel: name, auth: "auth" } }
+    let(:name)    { "channel" }
+    let(:channel) { stub(add: nil) }
+    let(:message) { { event: "pusher:subscribe", data: data } }
 
-  subject { PusherFake::Connection.new(stub) }
+    before do
+      PusherFake::Channel.stubs(factory: channel)
+    end
 
-  before do
-    MultiJson.stubs(load: message)
-    PusherFake::Channel.stubs(factory: channel)
-  end
+    it "creates a channel from the event data" do
+      subject.process(json)
 
-  it "parses the JSON data" do
-    subject.process(json)
+      expect(PusherFake::Channel).to have_received(:factory).with(name)
+    end
 
-    expect(MultiJson).to have_received(:load).with(json, symbolize_keys: true)
-  end
+    it "attempts to add the connection to the channel" do
+      subject.process(json)
 
-  it "creates a channel from the event data" do
-    subject.process(json)
-
-    expect(PusherFake::Channel).to have_received(:factory).with(name)
-  end
-
-  it "attempts to add the connection to the channel" do
-    subject.process(json)
-
-    expect(channel).to have_received(:add).with(subject, data)
+      expect(channel).to have_received(:add).with(subject, data)
+    end
   end
 end
 
 describe PusherFake::Connection, "#process, with an unsubscribe event" do
-  let(:json)    { stub }
-  let(:name)    { "channel" }
-  let(:channel) { stub(remove: nil) }
-  let(:message) { { event: "pusher:unsubscribe", channel: name } }
+  it_should_behave_like "#process" do
+    let(:name)    { "channel" }
+    let(:channel) { stub(remove: nil) }
+    let(:message) { { event: "pusher:unsubscribe", channel: name } }
 
-  subject { PusherFake::Connection.new(stub) }
+    before do
+      PusherFake::Channel.stubs(factory: channel)
+    end
 
-  before do
-    MultiJson.stubs(load: message)
-    PusherFake::Channel.stubs(factory: channel)
-  end
+    it "creates a channel from the event data" do
+      subject.process(json)
 
-  it "parses the JSON data" do
-    subject.process(json)
+      expect(PusherFake::Channel).to have_received(:factory).with(name)
+    end
 
-    expect(MultiJson).to have_received(:load).with(json, symbolize_keys: true)
-  end
+    it "removes the connection from the channel" do
+      subject.process(json)
 
-  it "creates a channel from the event data" do
-    subject.process(json)
-
-    expect(PusherFake::Channel).to have_received(:factory).with(name)
-  end
-
-  it "removes the connection from the channel" do
-    subject.process(json)
-
-    expect(channel).to have_received(:remove).with(subject)
+      expect(channel).to have_received(:remove).with(subject)
+    end
   end
 end
 
 describe PusherFake::Connection, "#process, with a ping event" do
-  let(:json)    { stub }
-  let(:message) { { event: "pusher:ping", data: {} } }
+  it_should_behave_like "#process" do
+    let(:message) { { event: "pusher:ping", data: {} } }
 
-  subject { PusherFake::Connection.new(stub) }
+    before do
+      subject.stubs(:emit)
+    end
 
-  before do
-    MultiJson.stubs(load: message)
-    PusherFake::Channel.stubs(:factory)
-    subject.stubs(:emit)
-  end
+    it "does not create a channel" do
+      subject.process(json)
 
-  it "parses the JSON data" do
-    subject.process(json)
+      expect(PusherFake::Channel).to have_received(:factory).never
+    end
 
-    expect(MultiJson).to have_received(:load).with(json, symbolize_keys: true)
-  end
+    it "emits a pong event" do
+      subject.process(json)
 
-  it "does not create a channel" do
-    subject.process(json)
-
-    expect(PusherFake::Channel).to have_received(:factory).never
-  end
-
-  it "emits a pong event" do
-    subject.process(json)
-
-    expect(subject).to have_received(:emit).with("pusher:pong")
+      expect(subject).to have_received(:emit).with("pusher:pong")
+    end
   end
 end
 
 describe PusherFake::Connection, "#process, with a client event" do
-  let(:data)    { {} }
-  let(:json)    { stub }
-  let(:name)    { "channel" }
-  let(:event)   { "client-hello-world" }
-  let(:channel) { stub(emit: nil, includes?: nil, is_a?: true) }
-  let(:message) { { event: event, data: data, channel: name } }
+  it_should_behave_like "#process" do
+    let(:data)    { {} }
+    let(:name)    { "channel" }
+    let(:event)   { "client-hello-world" }
+    let(:channel) { stub(emit: nil, includes?: nil, is_a?: true) }
+    let(:message) { { event: event, data: data, channel: name } }
 
-  subject { PusherFake::Connection.new(stub) }
+    before do
+      PusherFake::Channel.stubs(factory: channel)
+    end
 
-  before do
-    MultiJson.stubs(load: message)
-    PusherFake::Channel.stubs(factory: channel)
-  end
+    it "creates a channel from the event data" do
+      subject.process(json)
 
-  it "parses the JSON data" do
-    subject.process(json)
+      expect(PusherFake::Channel).to have_received(:factory).with(name)
+    end
 
-    expect(MultiJson).to have_received(:load).with(json, symbolize_keys: true)
-  end
+    it "ensures the channel is private" do
+      subject.process(json)
 
-  it "creates a channel from the event data" do
-    subject.process(json)
+      expect(channel).to have_received(:is_a?).with(PusherFake::Channel::Private)
+    end
 
-    expect(PusherFake::Channel).to have_received(:factory).with(name)
-  end
+    it "checks if the connection is in the channel" do
+      subject.process(json)
 
-  it "ensures the channel is private" do
-    subject.process(json)
+      expect(channel).to have_received(:includes?).with(subject)
+    end
 
-    expect(channel).to have_received(:is_a?).with(PusherFake::Channel::Private)
-  end
+    it "emits the event to the channel when the connection is in the channel" do
+      channel.stubs(includes?: true)
 
-  it "checks if the connection is in the channel" do
-    subject.process(json)
+      subject.process(json)
 
-    expect(channel).to have_received(:includes?).with(subject)
-  end
+      expect(channel).to have_received(:emit).with(event, data, socket_id: subject.socket.object_id)
+    end
 
-  it "emits the event to the channel when the connection is in the channel" do
-    channel.stubs(includes?: true)
+    it "does not emit the event to the channel when the channel is not private" do
+      channel.stubs(includes?: true, is_a?: false)
 
-    subject.process(json)
+      subject.process(json)
 
-    expect(channel).to have_received(:emit).with(event, data, socket_id: subject.socket.object_id)
-  end
+      expect(channel).to have_received(:emit).never
+    end
 
-  it "does not emit the event to the channel when the channel is not private" do
-    channel.stubs(includes?: true, is_a?: false)
+    it "does not emit the event to the channel when the connection is not in the channel" do
+      channel.stubs(includes?: false)
 
-    subject.process(json)
+      subject.process(json)
 
-    expect(channel).to have_received(:emit).never
-  end
-
-  it "does not emit the event to the channel when the connection is not in the channel" do
-    channel.stubs(includes?: false)
-
-    subject.process(json)
-
-    expect(channel).to have_received(:emit).never
+      expect(channel).to have_received(:emit).never
+    end
   end
 end
 
 describe PusherFake::Connection, "#process, with an unknown event" do
-  let(:data)    { {} }
-  let(:json)    { stub }
-  let(:name)    { "channel" }
-  let(:event)   { "hello-world" }
-  let(:channel) { stub(emit: nil) }
-  let(:message) { { event: event, data: data, channel: name } }
+  it_should_behave_like "#process" do
+    let(:data)    { {} }
+    let(:name)    { "channel" }
+    let(:event)   { "hello-world" }
+    let(:channel) { stub(emit: nil) }
+    let(:message) { { event: event, data: data, channel: name } }
 
-  subject { PusherFake::Connection.new(stub) }
+    before do
+      PusherFake::Channel.stubs(factory: channel)
+    end
 
-  before do
-    MultiJson.stubs(load: message)
-    PusherFake::Channel.stubs(factory: channel)
-  end
+    it "creates a channel from the event data" do
+      subject.process(json)
 
-  it "parses the JSON data" do
-    subject.process(json)
+      expect(PusherFake::Channel).to have_received(:factory).with(name)
+    end
 
-    expect(MultiJson).to have_received(:load).with(json, symbolize_keys: true)
-  end
+    it "does not emit the event" do
+      subject.process(json)
 
-  it "creates a channel from the event data" do
-    subject.process(json)
-
-    expect(PusherFake::Channel).to have_received(:factory).with(name)
-  end
-
-  it "does not emit the event" do
-    subject.process(json)
-
-    expect(channel).to have_received(:emit).never
+      expect(channel).to have_received(:emit).never
+    end
   end
 end

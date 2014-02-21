@@ -13,6 +13,13 @@ module PusherFake
       @socket = socket
     end
 
+    # The ID of the connection.
+    #
+    # @return [Integer] The object ID of the socket.
+    def id
+      socket.object_id
+    end
+
     # Emit an event to the connection.
     #
     # @param [String] event The event name.
@@ -22,12 +29,14 @@ module PusherFake
       message = { event: event, data: data }
       message[:channel] = channel if channel
 
+      PusherFake.log("#{id} - Send: #{message}")
+
       socket.send(MultiJson.dump(message))
     end
 
     # Notify the Pusher client that a connection has been established.
     def establish
-      emit("pusher:connection_established", socket_id: socket.object_id, activity_timeout: 120)
+      emit("pusher:connection_established", socket_id: id, activity_timeout: 120)
     end
 
     # Process an event.
@@ -35,9 +44,12 @@ module PusherFake
     # @param [String] data The event data as JSON.
     def process(data)
       message = MultiJson.load(data, symbolize_keys: true)
+
+      PusherFake.log("#{id} - Recv: #{message}")
+
       data    = message[:data]
       event   = message[:event]
-      name    = message[:channel] || data.delete(:channel)
+      name    = message[:channel] || data[:channel]
       channel = Channel.factory(name) if name
 
       case event
