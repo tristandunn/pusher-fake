@@ -14,6 +14,7 @@ describe PusherFake::Webhook, ".trigger" do
   before do
     OpenSSL::HMAC.stubs(hexdigest: signature)
     EventMachine::HttpRequest.stubs(new: http)
+    PusherFake.stubs(:log)
     PusherFake.stubs(configuration: configuration)
   end
 
@@ -41,5 +42,11 @@ describe PusherFake::Webhook, ".trigger" do
         "X-Pusher-Signature" => signature
       }
     )
+  end
+
+  it "logs sending the hook" do
+    subject.trigger(name, data)
+
+    expect(PusherFake).to have_received(:log).with("HOOK: #{payload}")
   end
 end

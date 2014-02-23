@@ -7,6 +7,7 @@ module PusherFake
           time_ms: Time.now.to_i
         )
 
+        PusherFake.log("HOOK: #{payload}")
         PusherFake.configuration.webhooks.each do |url|
           http = EventMachine::HttpRequest.new(url)
           http.post(body: payload, head: headers_for(payload))

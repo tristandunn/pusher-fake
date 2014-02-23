@@ -19,7 +19,7 @@ shared_examples_for "#process" do
   it "logs receiving the event" do
     subject.process(json)
 
-    expect(PusherFake).to have_received(:log).with("#{subject.id} - Recv: #{message}")
+    expect(PusherFake).to have_received(:log).with("RECV #{subject.id}: #{message}")
   end
 end
 
@@ -65,7 +65,7 @@ describe PusherFake::Connection, "#emit" do
   it "logs sending the event" do
     subject.emit(event, data)
 
-    expect(PusherFake).to have_received(:log).with("#{subject.id} - Send: #{message}")
+    expect(PusherFake).to have_received(:log).with("SEND #{subject.id}: #{message}")
   end
 end
 

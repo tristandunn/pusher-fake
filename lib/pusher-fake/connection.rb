@@ -29,7 +29,7 @@ module PusherFake
       message = { event: event, data: data }
       message[:channel] = channel if channel
 
-      PusherFake.log("#{id} - Send: #{message}")
+      PusherFake.log("SEND #{id}: #{message}")
 
       socket.send(MultiJson.dump(message))
     end
@@ -45,7 +45,7 @@ module PusherFake
     def process(data)
       message = MultiJson.load(data, symbolize_keys: true)
 
-      PusherFake.log("#{id} - Recv: #{message}")
+      PusherFake.log("RECV #{id}: #{message}")
 
       data    = message[:data]
       event   = message[:event]
