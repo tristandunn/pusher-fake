@@ -107,7 +107,7 @@ module PusherFake
 
         if channel
           users = channel.connections.map do |connection|
-            { id: connection.object_id }
+            { id: connection.id }
           end
         end
 

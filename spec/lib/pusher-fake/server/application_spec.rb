@@ -383,8 +383,8 @@ end
 
 describe PusherFake::Server::Application, ".users, for an occupied channel" do
   let(:name)     { "public-1" }
-  let(:user_1)   { mock }
-  let(:user_2)   { mock }
+  let(:user_1)   { stub(id: "1") }
+  let(:user_2)   { stub(id: "2") }
   let(:channel)  { stub(connections: [user_1, user_2]) }
   let(:channels) { { name => channel } }
 
@@ -398,8 +398,8 @@ describe PusherFake::Server::Application, ".users, for an occupied channel" do
     hash = subject.users(name)
 
     expect(hash).to eq({ users: [
-      { id: user_1.object_id },
-      { id: user_2.object_id }
+      { id: user_1.id },
+      { id: user_2.id }
     ] })
   end
 end

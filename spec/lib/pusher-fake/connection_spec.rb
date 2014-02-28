@@ -78,21 +78,22 @@ describe PusherFake::Connection, "#establish" do
     subject.stubs(:emit)
   end
 
-  it "emits the connection established event with the socket ID" do
+  it "emits the connection established event with the connection ID" do
     subject.establish
 
     expect(subject).to have_received(:emit)
-      .with("pusher:connection_established", socket_id: socket.object_id, activity_timeout: 120)
+      .with("pusher:connection_established", socket_id: subject.id, activity_timeout: 120)
   end
 end
 
 describe PusherFake::Connection, "#id" do
+  let(:id)     { socket.object_id.to_s }
   let(:socket) { stub }
 
   subject { PusherFake::Connection.new(socket) }
 
   it "returns the object ID of the socket" do
-    expect(subject.id).to eq(socket.object_id)
+    expect(subject.id).to eq(id)
   end
 end
 
@@ -202,7 +203,7 @@ describe PusherFake::Connection, "#process, with a client event" do
 
       subject.process(json)
 
-      expect(channel).to have_received(:emit).with(event, data, socket_id: subject.socket.object_id)
+      expect(channel).to have_received(:emit).with(event, data, socket_id: subject.id)
     end
 
     it "does not emit the event to the channel when the channel is not private" do

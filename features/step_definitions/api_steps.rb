@@ -32,9 +32,9 @@ Then /^I should receive JSON for (\d+) users?$/ do |count|
     expect(users).to have(count).items
 
     users.map do |user|
-      ObjectSpace._id2ref(user["id"])
+      ObjectSpace._id2ref(user["id"].to_i)
     end.each do |object|
-      expect(object).to be_a(PusherFake::Connection)
+      expect(object).to be_a(EventMachine::WebSocket::Connection)
     end
   end
 end

@@ -22,7 +22,7 @@ module PusherFake
       # @option options [String] :auth The authentication string.
       # @return [Boolean] +true+ if authorized, +false+ otherwise.
       def authorized?(connection, options)
-        authentication_for(connection.socket.object_id, options[:channel_data]) == options[:auth]
+        authentication_for(connection.id, options[:channel_data]) == options[:auth]
       end
 
       # Generate an authentication string from the channel based on the

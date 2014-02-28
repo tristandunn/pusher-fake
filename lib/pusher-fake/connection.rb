@@ -17,7 +17,7 @@ module PusherFake
     #
     # @return [Integer] The object ID of the socket.
     def id
-      socket.object_id
+      socket.object_id.to_s
     end
 
     # Emit an event to the connection.
@@ -61,7 +61,7 @@ module PusherFake
         emit("pusher:pong")
       when CLIENT_EVENT_MATCHER
         if channel.is_a?(Channel::Private) && channel.includes?(self)
-          channel.emit(event, data, socket_id: socket.object_id)
+          channel.emit(event, data, socket_id: id)
         end
       end
     end

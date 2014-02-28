@@ -2,6 +2,7 @@
 
 ## 1.0.0 — Unreleased
 
+* Treat socket_id as a string to match Pusher. (Tristan Dunn, Adrien Jarthon)
 * Add verbose logging. (Tristan Dunn)
 * Miscellaneous clean up. (Tristan Dunn)
 

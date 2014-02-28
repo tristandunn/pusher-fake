@@ -29,7 +29,7 @@ module PusherFake
       # @param [Hash] data The event data.
       def emit(event, data, options = {})
         connections.each do |connection|
-          unless connection.socket.object_id == options[:socket_id]
+          unless connection.id == options[:socket_id]
             connection.emit(event, data, name)
           end
         end
