@@ -22,15 +22,9 @@ Thread.new do
   EventMachine.run do
     Thin::Logging.silent = true
     Thin::Server.start("0.0.0.0", 8082, WebhookEndpoint)
-    Thread.current[:ready] = true
   end
 end.tap do |thread|
   at_exit { thread.exit }
-
-  # Wait for the webhook endpoint server to start.
-  Timeout::timeout(5) do
-    sleep(0.05) until thread[:ready]
-  end
 end
 
-PusherFake.configuration.webhooks = ["http://localhost:8082"]
+PusherFake.configuration.webhooks = ["http://127.0.0.1:8082"]

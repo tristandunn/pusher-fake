@@ -3,6 +3,7 @@
 ## 1.0.0 — Unreleased
 
 * Add verbose logging. (Tristan Dunn)
+* Miscellaneous clean up. (Tristan Dunn)
 
 ## 0.14.0 — February 19th, 2014
 
