@@ -26,7 +26,7 @@ module PusherFake
     # @param [Hash] data The event data.
     # @param [String] channel The channel name.
     def emit(event, data = {}, channel = nil)
-      message = { event: event, data: data }
+      message = { event: event, data: MultiJson.dump(data) }
       message[:channel] = channel if channel
 
       PusherFake.log("SEND #{id}: #{message}")

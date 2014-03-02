@@ -39,8 +39,15 @@ module PusherFake
       # @return [Hash] An empty hash.
       def self.events(request)
         event = MultiJson.load(request.body.read)
-        event["channels"].each do |channel|
-          Channel.factory(channel).emit(event["name"], event["data"], socket_id: event["socket_id"])
+        data  = begin
+                  MultiJson.load(event["data"])
+                rescue MultiJson::LoadError
+                  event["data"]
+                end
+
+        event["channels"].each do |channel_name|
+          channel = Channel.factory(channel_name)
+          channel.emit(event["name"], data, socket_id: event["socket_id"])
         end
 
         {}

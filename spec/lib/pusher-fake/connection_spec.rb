@@ -41,7 +41,7 @@ describe PusherFake::Connection, "#emit" do
   let(:event)        { "name" }
   let(:socket)       { stub(:send) }
   let(:channel)      { "channel" }
-  let(:message)      { { event: event, data: data } }
+  let(:message)      { { event: event, data: MultiJson.dump(data) } }
   let(:channel_json) { MultiJson.dump(message.merge(channel: channel)) }
 
   subject { PusherFake::Connection.new(socket) }

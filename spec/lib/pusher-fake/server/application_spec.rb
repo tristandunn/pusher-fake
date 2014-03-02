@@ -168,21 +168,23 @@ describe PusherFake::Server::Application, ".call, raising an error" do
 end
 
 describe PusherFake::Server::Application, ".events" do
-  let(:body)      { stub(read: json) }
-  let(:data)      { mock }
-  let(:json)      { mock }
-  let(:name)      { "event-name" }
-  let(:event)     { { "channels" => channels, "name" => name, "data" => data, "socket_id" => socket_id } }
-  let(:request)   { stub(body: body) }
-  let(:channels)  { ["channel-1", "channel-2"] }
-  let(:channel_1) { stub(emit: true) }
-  let(:channel_2) { stub(emit: true) }
-  let(:socket_id) { stub }
+  let(:body)       { stub(read: event_json) }
+  let(:data)       { { "example" => "data" } }
+  let(:name)       { "event-name" }
+  let(:event)      { { "channels" => channels, "name" => name, "data" => data_json, "socket_id" => socket_id } }
+  let(:request)    { stub(body: body) }
+  let(:channels)   { ["channel-1", "channel-2"] }
+  let(:channel_1)  { stub(emit: true) }
+  let(:channel_2)  { stub(emit: true) }
+  let(:data_json)  { data.to_json }
+  let(:socket_id)  { stub }
+  let(:event_json) { mock }
 
   subject { PusherFake::Server::Application }
 
   before do
-    MultiJson.stubs(load: event)
+    MultiJson.stubs(:load).with(event_json).returns(event)
+    MultiJson.stubs(:load).with(data_json).returns(data)
     PusherFake::Channel.stubs(:factory).with(channels[0]).returns(channel_1)
     PusherFake::Channel.stubs(:factory).with(channels[1]).returns(channel_2)
   end
@@ -190,7 +192,26 @@ describe PusherFake::Server::Application, ".events" do
   it "parses the request body as JSON" do
     subject.events(request)
 
-    expect(MultiJson).to have_received(:load).with(json)
+    expect(MultiJson).to have_received(:load).with(event_json)
+  end
+
+  it "parses the event data as JSON" do
+    subject.events(request)
+
+    expect(MultiJson).to have_received(:load).with(data_json)
+  end
+
+  it "handles invalid JSON for event data" do
+    event["data"] = data = "fake"
+
+    MultiJson.stubs(:load).with(data).raises(MultiJson::LoadError)
+
+    expect {
+      subject.events(request)
+    }.to_not raise_error
+
+    expect(channel_1).to have_received(:emit).with(name, data, socket_id: socket_id)
+    expect(channel_2).to have_received(:emit).with(name, data, socket_id: socket_id)
   end
 
   it "creates channels by name" do

@@ -2,6 +2,7 @@
 
 ## 1.0.0 — Unreleased
 
+* Double encode JSON data to match Pusher. (Tristan Dunn, Adrien Jarthon)
 * Treat socket_id as a string to match Pusher. (Tristan Dunn, Adrien Jarthon)
 * Add verbose logging. (Tristan Dunn)
 * Miscellaneous clean up. (Tristan Dunn)
