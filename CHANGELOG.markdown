@@ -6,6 +6,7 @@
 * Treat socket_id as a string to match Pusher. (Tristan Dunn, Adrien Jarthon)
 * Add verbose logging. (Tristan Dunn)
 * Miscellaneous clean up. (Tristan Dunn)
+* Update the Pusher JS client to version 2.2.1. (Tristan Dunn)
 * Update dependencies. (Tristan Dunn)
 
 ## 0.14.0 — February 19th, 2014
