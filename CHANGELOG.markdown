@@ -4,6 +4,7 @@
 
 * Double encode JSON data to match Pusher. (Tristan Dunn, Adrien Jarthon)
 * Treat socket_id as a string to match Pusher. (Tristan Dunn, Adrien Jarthon)
+* Trigger client_event webhooks. (Tristan Dunn).
 * Add verbose logging. (Tristan Dunn)
 * Miscellaneous clean up. (Tristan Dunn)
 * Update the Pusher JS client to version 2.2.1. (Tristan Dunn)

@@ -177,6 +177,7 @@ describe PusherFake::Connection, "#process, with a client event" do
     let(:message) { { event: event, data: data, channel: name } }
 
     before do
+      subject.stubs(:trigger)
       PusherFake::Channel.stubs(factory: channel)
     end
 
@@ -220,6 +221,56 @@ describe PusherFake::Connection, "#process, with a client event" do
       subject.process(json)
 
       expect(channel).to have_received(:emit).never
+    end
+  end
+end
+
+describe PusherFake::Connection, "#process, with a client event trigger a webhook" do
+  it_should_behave_like "#process" do
+    let(:data)    { { example: "data" } }
+    let(:name)    { "channel" }
+    let(:event)   { "client-hello-world" }
+    let(:user_id) { 1 }
+    let(:channel) { stub(name: name, emit: nil, includes?: nil) }
+    let(:message) { { event: event, channel: name } }
+    let(:options) { { channel: name, event: event, socket_id: subject.id } }
+
+    before do
+      channel.stubs(:trigger)
+      channel.stubs(:includes?).with(subject).returns(true)
+      channel.stubs(:is_a?).with(PusherFake::Channel::Private).returns(true)
+      channel.stubs(:is_a?).with(PusherFake::Channel::Presence).returns(false)
+
+      # NOTE: Hack to avoid race condition in unit tests.
+      Thread.stubs(:new).yields
+
+      PusherFake::Channel.stubs(factory: channel)
+    end
+
+    it "triggers the client event webhook" do
+      subject.process(json)
+
+      expect(channel).to have_received(:trigger)
+        .with("client_event", options).once
+    end
+
+    it "includes data in event when present" do
+      message[:data] = data
+
+      subject.process(json)
+
+      expect(channel).to have_received(:trigger).
+        with("client_event", options.merge(data: MultiJson.dump(data))).once
+    end
+
+    it "includes user ID in event when on a presence channel" do
+      channel.stubs(:is_a?).with(PusherFake::Channel::Presence).returns(true)
+      channel.stubs(members: { subject => { user_id: user_id } })
+
+      subject.process(json)
+
+      expect(channel).to have_received(:trigger).
+        with("client_event", options.merge(user_id: user_id)).once
     end
   end
 end

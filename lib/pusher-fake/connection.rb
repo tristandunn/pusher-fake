@@ -62,7 +62,25 @@ module PusherFake
       when CLIENT_EVENT_MATCHER
         if channel.is_a?(Channel::Private) && channel.includes?(self)
           channel.emit(event, data, socket_id: id)
+
+          trigger(channel, id, event, data)
         end
+      end
+    end
+
+    private
+
+    def trigger(channel, id, event, data)
+      Thread.new do
+        hook = {
+          event:     event,
+          channel:   channel.name,
+          socket_id: id
+        }
+        hook[:data]    = MultiJson.dump(data) if data
+        hook[:user_id] = channel.members[self][:user_id] if channel.is_a?(Channel::Presence)
+
+        channel.trigger("client_event", hook)
       end
     end
   end
