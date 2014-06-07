@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.0 — Unreleased
+## 1.0.0 — June 7th, 2014
 
 * Double encode JSON data to match Pusher. (Tristan Dunn, Adrien Jarthon)
 * Treat socket_id as a string to match Pusher. (Tristan Dunn, Adrien Jarthon)
