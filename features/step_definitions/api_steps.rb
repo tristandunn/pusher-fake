@@ -29,7 +29,7 @@ end
 
 Then /^I should receive JSON for (\d+) users?$/ do |count|
   @response[:users].tap do |users|
-    expect(users).to have(count).items
+    expect(users.length).to eq(count.to_i)
 
     users.map do |user|
       ObjectSpace._id2ref(user["id"].to_i)

@@ -38,7 +38,7 @@ Then /^([^ ]+) should receive a "([^"]+)" event on the "([^"]+)" channel$/ do |n
     wait do
       events = page.evaluate_script("Pusher.instance.events[#{MultiJson.dump([channel, event].join(":"))}]")
 
-      expect(events).to have(1).item
+      expect(events.length).to eq(1)
     end
   end
 end

@@ -9,7 +9,7 @@ RSpec::Matchers.define :have_configuration_option do |option|
     @default = default
   end
 
-  failure_message_for_should do |configuration|
+  failure_message do |configuration|
     description  = "expected configuration to have #{option.inspect} option"
     description << " with a default of #{@default.inspect}" unless @default.nil?
     description

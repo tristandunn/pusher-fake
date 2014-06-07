@@ -81,6 +81,6 @@ Then %{I should not be subscribed to the "$channel" channel} do |channel|
       channel && channel.subscribed;
     })
 
-    expect(subscribed).to be_false
+    expect(subscribed).to eq(false)
   end
 end
