@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1 — June 9th, 2014
+
+* Update the Pusher JS client to version 2.2.2. (Tristan Dunn)
+
 ## 1.0.0 — June 7th, 2014
 
 * Double encode JSON data to match Pusher. (Tristan Dunn, Adrien Jarthon)
