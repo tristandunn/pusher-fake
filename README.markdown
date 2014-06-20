@@ -20,13 +20,28 @@ A fake [Pusher](http://pusher.com) server for development and testing.
 </script>
 ```
 
-#### 2. Start PusherFake in the Cucumber environment.
+#### 2. Start PusherFake in your environment.
+
+##### RSpec
 
 ```ruby
-require "pusher-fake/cucumber"
+require "pusher-fake/support/rspec"
 ```
 
-Not using Cucumber? See [pusher-fake/cucumber.rb](https://github.com/tristandunn/pusher-fake/blob/master/lib/pusher-fake/cucumber.rb) for starting it manually.
+##### Cucumber
+
+```ruby
+require "pusher-fake/support/cucumber"
+```
+
+##### Other
+
+```ruby
+require "pusher-fake/support/base"
+
+# Reset the channels after each test:
+PusherFake::Channel.reset
+```
 
 ## Examples
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.0 — Unreleased
+
+* Add support for frameworks besides Cucumber. (Tristan Dunn)
+
 ## 1.0.1 — June 9th, 2014
 
 * Update the Pusher JS client to version 2.2.2. (Tristan Dunn)
