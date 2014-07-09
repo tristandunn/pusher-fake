@@ -3,6 +3,7 @@
 ## 1.1.0 — Unreleased
 
 * Add support for frameworks besides Cucumber. (Tristan Dunn)
+* Update development dependencies. (Tristan Dunn)
 
 ## 1.0.1 — June 9th, 2014
 
