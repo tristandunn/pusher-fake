@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.1.0 — Unreleased
+## 1.1.0 — July 22nd, 2014
 
 * Add support for frameworks besides Cucumber. (Tristan Dunn)
 * Update development dependencies. (Tristan Dunn)
