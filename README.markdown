@@ -2,7 +2,11 @@
 
 A fake [Pusher](http://pusher.com) server for development and testing.
 
+It's intended to fully replace the Pusher service with a local version for testing, but can also be used for development purposes. It is not intended to be a replacement for production usage.
+
 ## Usage
+
+### Test Environment
 
 #### 1. Use the PusherFake JS for the Pusher JS instance.
 
@@ -41,6 +45,27 @@ require "pusher-fake/support/base"
 
 # Reset the channels after each test:
 PusherFake::Channel.reset
+```
+
+### Development Environment
+
+In a Rails initializer, or any file executed during loading:
+
+```ruby
+require "pusher-fake/support/base"
+```
+
+If you're using Foreman or something similar you'll only want to run the fake for a single process:
+
+```ruby
+if ENV["PUSHER_FAKE"]
+  require "pusher-fake/support/base"
+end
+```
+
+```
+web: PUSHER_FAKE=1 bundle exec unicorn ...
+worker: bundle exec ...
 ```
 
 ## Examples
