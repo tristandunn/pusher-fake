@@ -37,8 +37,8 @@ module PusherFake
       self.verbose  = false
       self.webhooks = []
 
-      self.socket_options = { host: "127.0.0.1", port: 8080 }
-      self.web_options    = { host: "127.0.0.1", port: 8081 }
+      self.socket_options = { host: "127.0.0.1", port: available_port }
+      self.web_options    = { host: "127.0.0.1", port: available_port }
     end
 
     # Convert the configuration to a hash sutiable for Pusher JS options.
@@ -49,6 +49,16 @@ module PusherFake
         wsHost: socket_options[:host],
         wsPort: socket_options[:port]
       )
+    end
+
+    private
+
+    def available_port
+      socket = Socket.new(:INET, :STREAM, 0)
+      socket.bind(Addrinfo.tcp("127.0.0.1", 0))
+      socket.local_address.ip_port.tap do
+        socket.close
+      end
     end
   end
 end

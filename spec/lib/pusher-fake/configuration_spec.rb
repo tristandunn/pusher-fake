@@ -5,10 +5,24 @@ describe PusherFake::Configuration do
   it { should have_configuration_option(:key).with_default("PUSHER_API_KEY") }
   it { should have_configuration_option(:logger).with_default(STDOUT.to_io) }
   it { should have_configuration_option(:secret).with_default("PUSHER_API_SECRET") }
-  it { should have_configuration_option(:socket_options).with_default({ host: "127.0.0.1", port: 8080 }) }
   it { should have_configuration_option(:verbose).with_default(false) }
-  it { should have_configuration_option(:web_options).with_default({ host: "127.0.0.1", port: 8081 }) }
   it { should have_configuration_option(:webhooks).with_default([]) }
+
+  it "should have configuration option :socket_options" do
+    expect(subject.socket_options).to be_a(Hash)
+    expect(subject.socket_options[:host]).to eq("127.0.0.1")
+    expect(subject.socket_options[:port]).to be_a(Integer)
+  end
+
+  it "should have configuration option :web_options" do
+    expect(subject.web_options).to be_a(Hash)
+    expect(subject.web_options[:host]).to eq("127.0.0.1")
+    expect(subject.web_options[:port]).to be_a(Integer)
+  end
+
+  it "defaults socket and web ports to different values" do
+    expect(subject.socket_options[:port]).to_not eq(subject.web_options[:port])
+  end
 end
 
 describe PusherFake::Configuration, "#to_options" do
