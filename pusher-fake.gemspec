@@ -20,8 +20,8 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency "bourne",          "1.5.0"
   s.add_development_dependency "capybara-webkit", "1.2.0"
-  s.add_development_dependency "cucumber",        "1.3.15"
-  s.add_development_dependency "pusher",          "0.14.0"
+  s.add_development_dependency "cucumber",        "1.3.16"
+  s.add_development_dependency "pusher",          "0.14.1"
   s.add_development_dependency "rake",            "10.3.2"
   s.add_development_dependency "redcarpet",       "3.1.2"
   s.add_development_dependency "rspec",           "3.0.0"

@@ -3,6 +3,7 @@
 ## 1.2.0 — Unreleased
 
 * Default socket and web ports to available ports. (Tristan Dunn)
+* Update development dependencies. (Tristan Dunn)
 
 ## 1.1.0 — July 22nd, 2014
 
