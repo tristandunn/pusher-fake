@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.2.0 — Unreleased
+## 1.2.0 — August 9th, 2014
 
 * Default socket and web ports to available ports. (Tristan Dunn)
 * Update development dependencies. (Tristan Dunn)
