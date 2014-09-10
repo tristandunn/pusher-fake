@@ -2,6 +2,7 @@
 
 ## 1.3.0 — Unreleased
 
+* Update the Pusher JS client to version 2.2.3. (Tristan Dunn)
 * Update development and test dependencies. (Tristan Dunn)
 
 ## 1.2.0 — August 9th, 2014
