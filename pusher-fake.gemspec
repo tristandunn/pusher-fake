@@ -19,12 +19,12 @@ Gem::Specification.new do |s|
   s.add_dependency "multi_json",      "~> 1.6"
 
   s.add_development_dependency "bourne",          "1.5.0"
-  s.add_development_dependency "capybara-webkit", "1.3.0"
-  s.add_development_dependency "cucumber",        "1.3.16"
-  s.add_development_dependency "pusher",          "0.14.1"
+  s.add_development_dependency "capybara-webkit", "1.3.1"
+  s.add_development_dependency "cucumber",        "1.3.17"
+  s.add_development_dependency "pusher",          "0.14.2"
   s.add_development_dependency "rake",            "10.3.2"
-  s.add_development_dependency "redcarpet",       "3.1.2"
-  s.add_development_dependency "rspec",           "3.0.0"
+  s.add_development_dependency "redcarpet",       "3.2.0"
+  s.add_development_dependency "rspec",           "3.1.0"
   s.add_development_dependency "sinatra",         "1.4.5"
-  s.add_development_dependency "yard",            "0.8.7.4"
+  s.add_development_dependency "yard",            "0.8.7.6"
 end
