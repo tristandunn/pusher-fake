@@ -1,4 +1,8 @@
-$events = []
+RSpec.configure do |config|
+  config.before(:each) do
+    $events = []
+  end
+end
 
 Thread.new do
   # Not explicitly requiring Thin::Server occasionally results in

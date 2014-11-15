@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>PusherFake Test Application</title>
+</head>
+<body>
+
+<section>
+  <header>
+    <h1>Client disconnected.</h1>
+  </header>
+
+  <ul></ul>
+</section>
+
+<script src="/javascripts/vendor/pusher-2.2.4.js"></script>
+<script>
+  Pusher.instance = <%= PusherFake.javascript %>;
+  Pusher.instance.connection.bind("state_change", function(states) {
+    var header = document.querySelector("h1");
+
+    header.innerText = "Client " + states.current + ".";
+  });
+
+  var Helpers = {
+    log: function(text, attributes) {
+      var list    = document.querySelector("ul"),
+          element = document.createElement("li");
+
+      element.innerText = text;
+
+      for (var name in attributes) {
+        element.setAttribute(name, attributes[name]);
+      }
+
+      list.appendChild(element);
+    },
+
+    subscribe: function(name) {
+      Pusher.instance.subscribe(name)
+        .bind("pusher:subscription_succeeded", function(client) {
+          Helpers.log("Subscribed to " + name + ".");
+
+          for (var id in client.members) {
+            Helpers.log(client.members[id].name, {
+              "id"    : "client-" + id,
+              "class" : "channel-" + name
+            });
+          }
+        })
+        .bind("pusher:member_added", function(client) {
+          Helpers.log(client.info.name, {
+            "id"    : "client-" + client.id,
+            "class" : "channel-" + name
+          });
+        })
+        .bind("pusher:member_removed", function(client) {
+          var list = document.querySelector("ul"),
+              item = list.querySelector("#client-" + client.id);
+
+          list.removeChild(item);
+        })
+        .bind_all(function(event, message) {
+          Helpers.log("Channel " + name + " received " + event + " event.");
+        });
+    },
+
+    trigger: function(channel, event) {
+      var channel = Pusher.instance.channel(channel);
+
+      channel.trigger(event, {});
+    },
+
+    unsubscribe: function(name) {
+      Pusher.instance.unsubscribe(name)
+
+      Helpers.log("Unsubscribed from " + name + ".");
+    }
+  };
+</script>
+
+</body>
+</html>

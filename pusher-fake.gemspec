@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.license     = "MIT"
 
   s.files        = Dir["lib/**/*"].to_a
-  s.test_files   = Dir["{features,spec}/**/*"].to_a
+  s.test_files   = Dir["spec/**/*"].to_a
   s.require_path = "lib"
 
   s.add_dependency "em-http-request", "~> 1.1"
@@ -19,7 +19,6 @@ Gem::Specification.new do |s|
   s.add_dependency "multi_json",      "~> 1.6"
 
   s.add_development_dependency "capybara-webkit", "1.4.1"
-  s.add_development_dependency "cucumber",        "1.3.18"
   s.add_development_dependency "pusher",          "0.14.4"
   s.add_development_dependency "rake",            "10.4.2"
   s.add_development_dependency "rspec",           "3.1.0"
