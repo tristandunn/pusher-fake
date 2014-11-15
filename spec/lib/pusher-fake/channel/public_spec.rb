@@ -20,14 +20,14 @@ end
 
 describe PusherFake::Channel, "#add" do
   let(:name)        { "name" }
-  let(:connection)  { stub(emit: nil) }
-  let(:connections) { stub(push: nil, length: 0) }
+  let(:connection)  { double(:connection, emit: nil) }
+  let(:connections) { double(:connections, push: nil, length: 0) }
 
   subject { PusherFake::Channel::Public.new(name) }
 
   before do
-    PusherFake::Webhook.stubs(:trigger)
-    subject.stubs(connections: connections)
+    allow(PusherFake::Webhook).to receive(:trigger)
+    allow(subject).to receive(:connections).and_return(connections)
   end
 
   it "adds the connection" do
@@ -43,7 +43,7 @@ describe PusherFake::Channel, "#add" do
   end
 
   it "triggers channel occupied webhook for the first connection added" do
-    subject.unstub(:connections)
+    allow(subject).to receive(:connections).and_call_original
 
     2.times { subject.add(connection) }
 
@@ -52,17 +52,17 @@ describe PusherFake::Channel, "#add" do
 end
 
 describe PusherFake::Channel, "#emit" do
-  let(:data)         { stub }
+  let(:data)         { double }
   let(:name)         { "name" }
   let(:event)        { "event" }
   let(:connections)  { [connection_1, connection_2] }
-  let(:connection_1) { stub(emit: nil, id: "1") }
-  let(:connection_2) { stub(emit: nil, id: "2") }
+  let(:connection_1) { double(:connection, emit: nil, id: "1") }
+  let(:connection_2) { double(:connection, emit: nil, id: "2") }
 
   subject { PusherFake::Channel::Public.new(name) }
 
   before do
-    subject.stubs(connections: connections)
+    allow(subject).to receive(:connections).and_return(connections)
   end
 
   it "emits the event for each connection in the channel" do
@@ -76,23 +76,23 @@ describe PusherFake::Channel, "#emit" do
     subject.emit(event, data, socket_id: connection_2.id)
 
     expect(connection_1).to have_received(:emit).with(event, data, name)
-    expect(connection_2).to have_received(:emit).never
+    expect(connection_2).to_not have_received(:emit)
   end
 end
 
 describe PusherFake::Channel, "#includes?" do
-  let(:connection) { stub }
+  let(:connection) { double }
 
   subject { PusherFake::Channel::Public.new("name") }
 
   it "returns true if the connection is in the channel" do
-    subject.stubs(connections: [connection])
+    allow(subject).to receive(:connections).and_return([connection])
 
     expect(subject).to be_includes(connection)
   end
 
   it "returns false if the connection is not in the channel" do
-    subject.stubs(connections: [])
+    allow(subject).to receive(:connections).and_return([])
 
     expect(subject).to_not be_includes(connection)
   end
@@ -100,14 +100,14 @@ end
 
 describe PusherFake::Channel, "#remove" do
   let(:name)         { "name" }
-  let(:connection_1) { stub  }
-  let(:connection_2) { stub }
+  let(:connection_1) { double  }
+  let(:connection_2) { double }
 
   subject { PusherFake::Channel::Public.new(name) }
 
   before do
-    subject.stubs(connections: [connection_1, connection_2])
-    PusherFake::Webhook.stubs(:trigger)
+    allow(subject).to receive(:connections).and_return([connection_1, connection_2])
+    allow(PusherFake::Webhook).to receive(:trigger)
   end
 
   it "removes the connection from the channel" do
@@ -119,7 +119,7 @@ describe PusherFake::Channel, "#remove" do
   it "triggers channel vacated webhook when all connections are removed" do
     subject.remove(connection_1)
 
-    expect(PusherFake::Webhook).to have_received(:trigger).never
+    expect(PusherFake::Webhook).to_not have_received(:trigger)
 
     subject.remove(connection_2)
 

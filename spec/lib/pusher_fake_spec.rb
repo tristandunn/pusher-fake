@@ -11,13 +11,14 @@ describe PusherFake, ".configure" do
 end
 
 describe PusherFake, ".configuration" do
-  let(:configuration) { mock }
+  let(:configuration) { double }
 
   subject { PusherFake }
 
   before do
-    PusherFake::Configuration.stubs(new: configuration)
     PusherFake.instance_variable_set("@configuration", nil)
+
+    allow(PusherFake::Configuration).to receive(:new).and_return(configuration)
   end
 
   after do
@@ -63,7 +64,7 @@ describe PusherFake, ".javascript" do
 end
 
 describe PusherFake, ".log" do
-  let(:logger)        { stub(:<< => "") }
+  let(:logger)        { double(:logger, :<< => "") }
   let(:message)       { "Hello world." }
   let(:configuration) { subject.configuration }
 
@@ -86,6 +87,6 @@ describe PusherFake, ".log" do
 
     subject.log(message)
 
-    expect(logger).to have_received(:<<).never
+    expect(logger).to_not have_received(:<<)
   end
 end

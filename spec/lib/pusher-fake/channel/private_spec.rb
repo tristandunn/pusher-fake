@@ -11,19 +11,19 @@ end
 describe PusherFake::Channel::Private, "#add" do
   let(:data)           { { auth: authentication } }
   let(:name)           { "name" }
-  let(:connection)     { stub(emit: nil) }
-  let(:connections)    { stub(push: nil, length: 0) }
+  let(:connection)     { double(:connection, emit: nil) }
+  let(:connections)    { double(:connections, push: nil, length: 0) }
   let(:authentication) { "auth" }
 
   subject { PusherFake::Channel::Private.new(name) }
 
   before do
-    PusherFake::Webhook.stubs(:trigger)
-    subject.stubs(connections: connections)
+    allow(PusherFake::Webhook).to receive(:trigger)
+    allow(subject).to receive(:connections).and_return(connections)
   end
 
   it "authorizes the connection" do
-    subject.stubs(authorized?: nil)
+    allow(subject).to receive(:authorized?).and_return(nil)
 
     subject.add(connection, data)
 
@@ -31,7 +31,7 @@ describe PusherFake::Channel::Private, "#add" do
   end
 
   it "adds the connection to the channel when authorized" do
-    subject.stubs(authorized?: true)
+    allow(subject).to receive(:authorized?).and_return(true)
 
     subject.add(connection, data)
 
@@ -39,7 +39,7 @@ describe PusherFake::Channel::Private, "#add" do
   end
 
   it "successfully subscribes the connection when authorized" do
-    subject.stubs(authorized?: true)
+    allow(subject).to receive(:authorized?).and_return(true)
 
     subject.add(connection, data)
 
@@ -47,8 +47,8 @@ describe PusherFake::Channel::Private, "#add" do
   end
 
   it "triggers channel occupied webhook for the first connection added when authorized" do
-    subject.unstub(:connections)
-    subject.stubs(authorized?: true)
+    allow(subject).to receive(:authorized?).and_return(true)
+    allow(subject).to receive(:connections).and_call_original
 
     2.times { subject.add(connection, data) }
 
@@ -56,7 +56,7 @@ describe PusherFake::Channel::Private, "#add" do
   end
 
   it "unsuccessfully subscribes the connection when not authorized" do
-    subject.stubs(authorized?: false)
+    allow(subject).to receive(:authorized?).and_return(false)
 
     subject.add(connection, data)
 
@@ -64,34 +64,36 @@ describe PusherFake::Channel::Private, "#add" do
   end
 
   it "does not trigger channel occupied webhook when not authorized" do
-    subject.unstub(:connections)
-    subject.stubs(authorized?: false)
+    allow(subject).to receive(:authorized?).and_return(false)
+    allow(subject).to receive(:connections).and_call_original
 
     2.times { subject.add(connection, data) }
 
-    expect(PusherFake::Webhook).to have_received(:trigger).never
+    expect(PusherFake::Webhook).to_not have_received(:trigger)
   end
 end
 
 describe PusherFake::Channel::Private, "#authentication_for" do
   let(:id)            { "1234" }
   let(:name)          { "private-channel" }
+  let(:digest)        { double(:digest) }
   let(:string)        { [id, name].join(":") }
   let(:signature)     { "signature" }
-  let(:configuration) { stub(key: "key", secret: "secret") }
+  let(:configuration) { double(:configuration, key: "key", secret: "secret") }
 
   subject { PusherFake::Channel::Private.new(name) }
 
   before do
-    PusherFake.stubs(configuration: configuration)
-    OpenSSL::HMAC.stubs(hexdigest: signature)
+    allow(PusherFake).to receive(:configuration).and_return(configuration)
+    allow(OpenSSL::HMAC).to receive(:hexdigest).and_return(signature)
+    allow(OpenSSL::Digest::SHA256).to receive(:new).and_return(digest)
   end
 
   it "generates a signature" do
     subject.authentication_for(id)
 
     expect(OpenSSL::HMAC).to have_received(:hexdigest)
-      .with(kind_of(OpenSSL::Digest::SHA256), configuration.secret, string)
+      .with(digest, configuration.secret, string)
   end
 
   it "returns the authentication string" do
@@ -104,23 +106,25 @@ end
 describe PusherFake::Channel::Private, "#authentication_for, with channel data" do
   let(:id)            { "1234" }
   let(:name)          { "private-channel" }
+  let(:digest)        { double(:digest) }
   let(:string)        { [id, name, channel_data].join(":") }
   let(:signature)     { "signature" }
   let(:channel_data)  { "{}" }
-  let(:configuration) { stub(key: "key", secret: "secret") }
+  let(:configuration) { double(:configuration, key: "key", secret: "secret") }
 
   subject { PusherFake::Channel::Private.new(name) }
 
   before do
-    PusherFake.stubs(configuration: configuration)
-    OpenSSL::HMAC.stubs(hexdigest: signature)
+    allow(PusherFake).to receive(:configuration).and_return(configuration)
+    allow(OpenSSL::HMAC).to receive(:hexdigest).and_return(signature)
+    allow(OpenSSL::Digest::SHA256).to receive(:new).and_return(digest)
   end
 
   it "generates a signature" do
     subject.authentication_for(id, channel_data)
 
     expect(OpenSSL::HMAC).to have_received(:hexdigest)
-      .with(kind_of(OpenSSL::Digest::SHA256), configuration.secret, string)
+      .with(digest, configuration.secret, string)
   end
 
   it "returns the authentication string" do
@@ -133,14 +137,14 @@ end
 describe PusherFake::Channel::Private, "#authorized?" do
   let(:data)           { { auth: authentication, channel_data: channel_data } }
   let(:name)           { "private-channel" }
-  let(:connection)     { stub(id: "1") }
+  let(:connection)     { double(:connection, id: "1") }
   let(:channel_data)   { "{}" }
   let(:authentication) { "authentication" }
 
   subject { PusherFake::Channel::Private.new(name) }
 
   before do
-    subject.stubs(:authentication_for)
+    allow(subject).to receive(:authentication_for)
   end
 
   it "generates authentication for the connection ID" do
@@ -150,13 +154,13 @@ describe PusherFake::Channel::Private, "#authorized?" do
   end
 
   it "returns true if the authentication matches" do
-    subject.stubs(authentication_for: authentication)
+    allow(subject).to receive(:authentication_for).and_return(authentication)
 
     expect(subject).to be_authorized(connection, data)
   end
 
   it "returns false if the authentication matches" do
-    subject.stubs(authentication_for: "")
+    allow(subject).to receive(:authentication_for).and_return("")
 
     expect(subject).to_not be_authorized(connection, data)
   end

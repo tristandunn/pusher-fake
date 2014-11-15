@@ -1,20 +1,20 @@
 require "spec_helper"
 
 shared_examples_for "an API request" do
-  let(:hash)        { mock }
-  let(:string)      { mock }
-  let(:request)     { stub(path: path) }
-  let(:response)    { mock }
-  let(:environment) { mock }
+  let(:hash)        { double }
+  let(:string)      { double }
+  let(:request)     { double(:request, path: path) }
+  let(:response)    { double }
+  let(:environment) { double }
 
   subject { PusherFake::Server::Application }
 
   before do
-    response.stubs(finish: response)
+    allow(response).to receive(:finish).and_return(response)
 
-    MultiJson.stubs(dump: string)
-    Rack::Request.stubs(new: request)
-    Rack::Response.stubs(new: response)
+    allow(MultiJson).to receive(:dump).and_return(string)
+    allow(Rack::Request).to receive(:new).and_return(request)
+    allow(Rack::Response).to receive(:new).and_return(response)
   end
 
   it "creates a request" do
@@ -38,7 +38,7 @@ shared_examples_for "an API request" do
   it "finishes the response" do
     subject.call(environment)
 
-    expect(response).to have_received(:finish).with()
+    expect(response).to have_received(:finish).with(no_args)
   end
 
   it "returns the response" do
@@ -54,7 +54,7 @@ describe PusherFake::Server::Application, ".call, for triggering events" do
     let(:path) { "/apps/#{id}/events" }
 
     before do
-      subject.stubs(events: hash)
+      allow(subject).to receive(:events).and_return(hash)
     end
 
     it "emits events" do
@@ -71,7 +71,7 @@ describe PusherFake::Server::Application, ".call, for retrieving occupied channe
     let(:path) { "/apps/#{id}/channels" }
 
     before do
-      subject.stubs(channels: hash)
+      allow(subject).to receive(:channels).and_return(hash)
     end
 
     it "filters the occupied channels" do
@@ -84,16 +84,16 @@ end
 
 describe PusherFake::Server::Application, ".call, with unknown path" do
   let(:path)        { "/apps/fake/events" }
-  let(:request)     { stub(path: path) }
+  let(:request)     { double(:request, path: path) }
   let(:message)     { "Unknown path: #{path}" }
-  let(:response)    { mock }
-  let(:environment) { mock }
+  let(:response)    { double }
+  let(:environment) { double }
 
   before do
-    response.stubs(finish: response)
+    allow(response).to receive(:finish).and_return(response)
 
-    Rack::Request.stubs(new: request)
-    Rack::Response.stubs(new: response)
+    allow(Rack::Request).to receive(:new).and_return(request)
+    allow(Rack::Response).to receive(:new).and_return(response)
   end
 
   subject { PusherFake::Server::Application }
@@ -113,7 +113,7 @@ describe PusherFake::Server::Application, ".call, with unknown path" do
   it "finishes the response" do
     subject.call(environment)
 
-    expect(response).to have_received(:finish).with()
+    expect(response).to have_received(:finish).with(no_args)
   end
 
   it "returns the response" do
@@ -127,19 +127,19 @@ describe PusherFake::Server::Application, ".call, raising an error" do
   let(:id)          { PusherFake.configuration.app_id }
   let(:path)        { "/apps/#{id}/channels" }
   let(:message)     { "Example error message." }
-  let(:request)     { stub(path: path) }
-  let(:response)    { mock }
-  let(:environment) { mock }
+  let(:request)     { double(:request, path: path) }
+  let(:response)    { double }
+  let(:environment) { double }
 
   subject { PusherFake::Server::Application }
 
   before do
-    subject.stubs(:channels).raises(message)
+    allow(subject).to receive(:channels).and_raise(message)
 
-    response.stubs(finish: response)
+    allow(response).to receive(:finish).and_return(response)
 
-    Rack::Request.stubs(new: request)
-    Rack::Response.stubs(new: response)
+    allow(Rack::Request).to receive(:new).and_return(request)
+    allow(Rack::Response).to receive(:new).and_return(response)
   end
 
   it "creates a request" do
@@ -157,7 +157,7 @@ describe PusherFake::Server::Application, ".call, raising an error" do
   it "finishes the response" do
     subject.call(environment)
 
-    expect(response).to have_received(:finish).with()
+    expect(response).to have_received(:finish).with(no_args)
   end
 
   it "returns the response" do
@@ -168,25 +168,25 @@ describe PusherFake::Server::Application, ".call, raising an error" do
 end
 
 describe PusherFake::Server::Application, ".events" do
-  let(:body)       { stub(read: event_json) }
+  let(:body)       { double(:body, read: event_json) }
   let(:data)       { { "example" => "data" } }
   let(:name)       { "event-name" }
   let(:event)      { { "channels" => channels, "name" => name, "data" => data_json, "socket_id" => socket_id } }
-  let(:request)    { stub(body: body) }
+  let(:request)    { double(:request, body: body) }
   let(:channels)   { ["channel-1", "channel-2"] }
-  let(:channel_1)  { stub(emit: true) }
-  let(:channel_2)  { stub(emit: true) }
+  let(:channel_1)  { double(:channel, emit: true) }
+  let(:channel_2)  { double(:channel, emit: true) }
   let(:data_json)  { data.to_json }
-  let(:socket_id)  { stub }
-  let(:event_json) { mock }
+  let(:socket_id)  { double }
+  let(:event_json) { double }
 
   subject { PusherFake::Server::Application }
 
   before do
-    MultiJson.stubs(:load).with(event_json).returns(event)
-    MultiJson.stubs(:load).with(data_json).returns(data)
-    PusherFake::Channel.stubs(:factory).with(channels[0]).returns(channel_1)
-    PusherFake::Channel.stubs(:factory).with(channels[1]).returns(channel_2)
+    allow(MultiJson).to receive(:load).with(event_json).and_return(event)
+    allow(MultiJson).to receive(:load).with(data_json).and_return(data)
+    allow(PusherFake::Channel).to receive(:factory).with(channels[0]).and_return(channel_1)
+    allow(PusherFake::Channel).to receive(:factory).with(channels[1]).and_return(channel_2)
   end
 
   it "parses the request body as JSON" do
@@ -204,7 +204,7 @@ describe PusherFake::Server::Application, ".events" do
   it "handles invalid JSON for event data" do
     event["data"] = data = "fake"
 
-    MultiJson.stubs(:load).with(data).raises(MultiJson::LoadError)
+    allow(MultiJson).to receive(:load).with(data).and_raise(MultiJson::LoadError)
 
     expect {
       subject.events(request)
@@ -231,13 +231,13 @@ describe PusherFake::Server::Application, ".events" do
 end
 
 describe PusherFake::Server::Application, ".channels, requesting all channels" do
-  let(:request)  { stub(params: {}) }
-  let(:channels) { { "channel-1" => mock, "channel-2" => mock } }
+  let(:request)  { double(:request, params: {}) }
+  let(:channels) { { "channel-1" => double, "channel-2" => double } }
 
   subject { PusherFake::Server::Application }
 
   before do
-    PusherFake::Channel.stubs(channels: channels)
+    allow(PusherFake::Channel).to receive(:channels).and_return(channels)
   end
 
   it "returns a hash of all the channels" do
@@ -249,13 +249,13 @@ end
 
 describe PusherFake::Server::Application, ".channels, requesting channels with a filter" do
   let(:params)   { { "filter_by_prefix" => "public-" } }
-  let(:request)  { stub(params: params) }
-  let(:channels) { { "public-1" => mock, "presence-1" => mock } }
+  let(:request)  { double(:request, params: params) }
+  let(:channels) { { "public-1" => double, "presence-1" => double } }
 
   subject { PusherFake::Server::Application }
 
   before do
-    PusherFake::Channel.stubs(channels: channels)
+    allow(PusherFake::Channel).to receive(:channels).and_return(channels)
   end
 
   it "returns a hash of the channels matching the filter" do
@@ -267,14 +267,14 @@ end
 
 describe PusherFake::Server::Application, ".channels, requesting user count for channels with a filter" do
   let(:params)   { { "filter_by_prefix" => "presence-", "info" => "user_count" } }
-  let(:request)  { stub(params: params) }
-  let(:channel)  { stub(connections: [mock, mock]) }
-  let(:channels) { { "public-1" => mock, "presence-1" => channel } }
+  let(:request)  { double(:request, params: params) }
+  let(:channel)  { double(:channel, connections: [double, double]) }
+  let(:channels) { { "public-1" => double, "presence-1" => channel } }
 
   subject { PusherFake::Server::Application }
 
   before do
-    PusherFake::Channel.stubs(channels: channels)
+    allow(PusherFake::Channel).to receive(:channels).and_return(channels)
   end
 
   it "returns a hash of the channels matching the filter and include the user count" do
@@ -285,13 +285,13 @@ describe PusherFake::Server::Application, ".channels, requesting user count for 
 end
 
 describe PusherFake::Server::Application, ".channels, requesting all channels with no channels occupied" do
-  let(:request)  { stub(params: {}) }
+  let(:request)  { double(:request, params: {}) }
   let(:channels) { nil }
 
   subject { PusherFake::Server::Application }
 
   before do
-    PusherFake::Channel.stubs(channels: channels)
+    allow(PusherFake::Channel).to receive(:channels).and_return(channels)
   end
 
   it "returns a hash of no channels" do
@@ -303,7 +303,7 @@ end
 
 describe PusherFake::Server::Application, ".channels, requesting a user count on a non-presence channel" do
   let(:params)  { { "filter_by_prefix" => "public-", "info" => "user_count" } }
-  let(:request) { stub(params: params) }
+  let(:request) { double(:request, params: params) }
 
   subject { PusherFake::Server::Application }
 
@@ -316,14 +316,14 @@ end
 
 describe PusherFake::Server::Application, ".channel, for an occupied channel" do
   let(:name)     { "public-1" }
-  let(:request)  { stub(params: {}) }
-  let(:channel)  { stub(connections: [mock]) }
+  let(:request)  { double(:request, params: {}) }
+  let(:channel)  { double(:channel, connections: [double]) }
   let(:channels) { { name => channel } }
 
   subject { PusherFake::Server::Application }
 
   before do
-    PusherFake::Channel.stubs(channels: channels)
+    allow(PusherFake::Channel).to receive(:channels).and_return(channels)
   end
 
   it "returns a hash with the occupied status" do
@@ -335,14 +335,14 @@ end
 
 describe PusherFake::Server::Application, ".channel, for an unoccupied channel" do
   let(:name)     { "public-1" }
-  let(:request)  { stub(params: {}) }
-  let(:channel)  { stub(connections: []) }
+  let(:request)  { double(:request, params: {}) }
+  let(:channel)  { double(:channel, connections: []) }
   let(:channels) { { name => channel } }
 
   subject { PusherFake::Server::Application }
 
   before do
-    PusherFake::Channel.stubs(channels: channels)
+    allow(PusherFake::Channel).to receive(:channels).and_return(channels)
   end
 
   it "returns a hash with the occupied status" do
@@ -353,13 +353,13 @@ describe PusherFake::Server::Application, ".channel, for an unoccupied channel" 
 end
 
 describe PusherFake::Server::Application, ".channel, for an unknown channel" do
-  let(:request)  { stub(params: {}) }
+  let(:request)  { double(:request, params: {}) }
   let(:channels) { {} }
 
   subject { PusherFake::Server::Application }
 
   before do
-    PusherFake::Channel.stubs(channels: channels)
+    allow(PusherFake::Channel).to receive(:channels).and_return(channels)
   end
 
   it "returns a hash with the occupied status" do
@@ -372,14 +372,14 @@ end
 describe PusherFake::Server::Application, ".channel, request user count for a presence channel" do
   let(:name)     { "presence-1" }
   let(:params)   { { "info" => "user_count" } }
-  let(:request)  { stub(params: params) }
-  let(:channel)  { stub(connections: [mock, mock]) }
+  let(:request)  { double(:request, params: params) }
+  let(:channel)  { double(:channel, connections: [double, double]) }
   let(:channels) { { name => channel } }
 
   subject { PusherFake::Server::Application }
 
   before do
-    PusherFake::Channel.stubs(channels: channels)
+    allow(PusherFake::Channel).to receive(:channels).and_return(channels)
   end
 
   it "returns a hash with the occupied status" do
@@ -391,7 +391,7 @@ end
 
 describe PusherFake::Server::Application, ".channel, requesting a user count on a non-presence channel" do
   let(:params)  { { "info" => "user_count" } }
-  let(:request) { stub(params: params) }
+  let(:request) { double(:request, params: params) }
 
   subject { PusherFake::Server::Application }
 
@@ -404,15 +404,15 @@ end
 
 describe PusherFake::Server::Application, ".users, for an occupied channel" do
   let(:name)     { "public-1" }
-  let(:user_1)   { stub(id: "1") }
-  let(:user_2)   { stub(id: "2") }
-  let(:channel)  { stub(connections: [user_1, user_2]) }
+  let(:user_1)   { double(:user, id: "1") }
+  let(:user_2)   { double(:user, id: "2") }
+  let(:channel)  { double(:channel, connections: [user_1, user_2]) }
   let(:channels) { { name => channel } }
 
   subject { PusherFake::Server::Application }
 
   before do
-    PusherFake::Channel.stubs(channels: channels)
+    allow(PusherFake::Channel).to receive(:channels).and_return(channels)
   end
 
   it "returns a hash with the occupied status" do
@@ -427,13 +427,13 @@ end
 
 describe PusherFake::Server::Application, ".users, for an empty channel" do
   let(:name)     { "public-1" }
-  let(:channel)  { stub(connections: []) }
+  let(:channel)  { double(:channel, connections: []) }
   let(:channels) { { name => channel } }
 
   subject { PusherFake::Server::Application }
 
   before do
-    PusherFake::Channel.stubs(channels: channels)
+    allow(PusherFake::Channel).to receive(:channels).and_return(channels)
   end
 
   it "returns a hash with the occupied status" do
@@ -449,7 +449,7 @@ describe PusherFake::Server::Application, ".users, for an unknown channel" do
   subject { PusherFake::Server::Application }
 
   before do
-    PusherFake::Channel.stubs(channels: channels)
+    allow(PusherFake::Channel).to receive(:channels).and_return(channels)
   end
 
   it "returns a hash with the occupied status" do

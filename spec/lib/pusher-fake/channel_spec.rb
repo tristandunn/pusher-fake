@@ -2,12 +2,12 @@ require "spec_helper"
 
 describe PusherFake::Channel, ".factory" do
   let(:name)    { "channel" }
-  let(:channel) { stub }
+  let(:channel) { double }
 
   subject { PusherFake::Channel }
 
   before do
-    PusherFake::Channel::Public.stubs(new: channel)
+    allow(PusherFake::Channel::Public).to receive(:new).and_return(channel)
   end
 
   after do
@@ -15,7 +15,7 @@ describe PusherFake::Channel, ".factory" do
   end
 
   it "caches the channel" do
-    PusherFake::Channel::Public.unstub(:new)
+    allow(PusherFake::Channel::Public).to receive(:new).and_call_original
 
     factory_1 = subject.factory(name)
     factory_2 = subject.factory(name)
@@ -38,12 +38,12 @@ end
 
 describe PusherFake::Channel, ".factory, for a private channel" do
   let(:name)    { "private-channel" }
-  let(:channel) { stub }
+  let(:channel) { double }
 
   subject { PusherFake::Channel }
 
   before do
-    PusherFake::Channel::Private.stubs(new: channel)
+    allow(PusherFake::Channel::Private).to receive(:new).and_return(channel)
   end
 
   after do
@@ -51,7 +51,7 @@ describe PusherFake::Channel, ".factory, for a private channel" do
   end
 
   it "caches the channel" do
-    PusherFake::Channel::Private.unstub(:new)
+    allow(PusherFake::Channel::Private).to receive(:new).and_call_original
 
     factory_1 = subject.factory(name)
     factory_2 = subject.factory(name)
@@ -74,12 +74,12 @@ end
 
 describe PusherFake::Channel, ".factory, for a presence channel" do
   let(:name)    { "presence-channel" }
-  let(:channel) { stub }
+  let(:channel) { double }
 
   subject { PusherFake::Channel }
 
   before do
-    PusherFake::Channel::Presence.stubs(new: channel)
+    allow(PusherFake::Channel::Presence).to receive(:new).and_return(channel)
   end
 
   after do
@@ -87,7 +87,7 @@ describe PusherFake::Channel, ".factory, for a presence channel" do
   end
 
   it "caches the channel" do
-    PusherFake::Channel::Presence.unstub(:new)
+    allow(PusherFake::Channel::Presence).to receive(:new).and_call_original
 
     factory_1 = subject.factory(name)
     factory_2 = subject.factory(name)
@@ -110,14 +110,14 @@ end
 
 describe PusherFake::Channel, ".remove" do
   let(:channels)   { { channel_1: channel_1, channel_2: channel_2 } }
-  let(:channel_1)  { stub(connections: stub(empty?: true), remove: nil) }
-  let(:channel_2)  { stub(connections: stub(empty?: false), remove: nil) }
-  let(:connection) { mock }
+  let(:channel_1)  { double(:channel, connections: double(:array, empty?: true), remove: nil) }
+  let(:channel_2)  { double(:channel, connections: double(:array, empty?: false), remove: nil) }
+  let(:connection) { double }
 
   subject { PusherFake::Channel }
 
   before do
-    subject.stubs(channels: channels)
+    allow(subject).to receive(:channels).and_return(channels)
   end
 
   it "removes the connection from all channels" do
@@ -140,7 +140,7 @@ describe PusherFake::Channel, ".remove" do
   end
 
   it "handles channels not being defined" do
-    subject.stubs(channels: nil)
+    allow(subject).to receive(:channels).and_return(nil)
 
     expect {
       subject.remove(connection)
