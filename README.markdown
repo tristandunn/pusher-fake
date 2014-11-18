@@ -68,6 +68,36 @@ web: PUSHER_FAKE=1 bundle exec unicorn ...
 worker: bundle exec ...
 ```
 
+## Configuration
+
+Note that the application ID, API key, and token are automatically set to the `Pusher` values when using an included support file.
+
+### Settings
+
+Setting   | Description
+----------|------------
+app_id | The Pusher application ID.
+key | The Pusher API key.
+logger | An IO instance for verbose logging.
+secret | The Pusher API token.
+socket_options | Socket server options. See `EventMachine::WebSocket.start` for options.
+verbose | Enable verbose logging.
+web_options | Web server options. See `Thin::Server` for options.
+webhooks | Array of webhook URLs.
+
+### Usage
+
+```ruby
+# Single setting.
+PusherFake.configuration.verbose = true
+
+# Multiple settings.
+PusherFake.configure do |configuration|
+  configuration.logger  = Rails.logger
+  configuration.verbose = true
+end
+```
+
 ## Examples
 
 * [pusher-fake-example](https://github.com/tristandunn/pusher-fake-example) - An example of using pusher-fake with Cucumber to test a Rails application.
