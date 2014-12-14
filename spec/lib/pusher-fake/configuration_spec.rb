@@ -38,6 +38,12 @@ describe PusherFake::Configuration, "#to_options" do
     expect(options).to include(wsPort: subject.socket_options[:port])
   end
 
+  it "only enables the WebSocket transport" do
+    options = subject.to_options
+
+    expect(options).to include(enabledTransports: ["ws"])
+  end
+
   it "supports passing custom options" do
     options = subject.to_options(custom: "option")
 

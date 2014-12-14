@@ -2,6 +2,7 @@
 
 ## 1.3.0 — Unreleased
 
+* Only enable the WebSocket transport. (Tristan Dunn)
 * Update the Pusher JS client to version 2.2.3. (Tristan Dunn)
 * Update development and test dependencies. (Tristan Dunn)
 
