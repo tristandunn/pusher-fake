@@ -68,6 +68,18 @@ web: PUSHER_FAKE=1 bundle exec unicorn ...
 worker: bundle exec ...
 ```
 
+### Clients
+
+If you're creating a `Pusher::Client` instance and wish to use the fake, you need to provide the options.
+
+```ruby
+Pusher::Client.new({
+  key:    Pusher.key,
+  app_id: Pusher.app_id,
+  secret: Pusher.secret
+}.merge(PusherFake.configuration.web_options))
+```
+
 ## Configuration
 
 Note that the application ID, API key, and token are automatically set to the `Pusher` values when using an included support file.
