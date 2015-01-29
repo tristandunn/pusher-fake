@@ -59,7 +59,7 @@ module PusherFake
       # presence channels.
       #
       # @param [String] name The channel name.
-      # @params [Rack::Request] request The HTTP request.
+      # @param [Rack::Request] request The HTTP request.
       # @return [Hash] A hash of channel information.
       def self.channel(name, request)
         info = request.params["info"].to_s.split(",")
