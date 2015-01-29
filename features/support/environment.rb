@@ -11,3 +11,9 @@ RSpec.configure do |config|
     rspec.syntax = :expect
   end
 end
+
+Capybara.register_driver(:webkit) do |application|
+  Capybara::Webkit::Driver.new(application).tap do |driver|
+    driver.block_unknown_urls
+  end
+end
