@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.3.0 — Unreleased
+## 1.3.0 — February 16th, 2015
 
 * Only enable the WebSocket transport. (Tristan Dunn)
 * Update the Pusher JS client to version 2.2.4. (Tristan Dunn)
