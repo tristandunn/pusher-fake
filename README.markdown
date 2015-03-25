@@ -1,8 +1,8 @@
 # pusher-fake [![Build Status](http://img.shields.io/travis/tristandunn/pusher-fake.svg)](https://travis-ci.org/tristandunn/pusher-fake) [![Dependency Status](http://img.shields.io/gemnasium/tristandunn/pusher-fake.svg)](https://gemnasium.com/tristandunn/pusher-fake) [![Code Climate](http://img.shields.io/codeclimate/github/tristandunn/pusher-fake.svg)](https://codeclimate.com/github/tristandunn/pusher-fake) [![Coverage Status](http://img.shields.io/coveralls/tristandunn/pusher-fake.svg)](https://coveralls.io/r/tristandunn/pusher-fake?branch=master)
 
-A fake [Pusher](http://pusher.com) server for development and testing.
+A fake [Pusher](http://pusher.com) server for development and testing. When you run your code, we start up an entire fake service, on a random port that we find open. You can then connect to that service and run your development environment without needing an actual key. To find out where the service is running, check the logs for the startup messages.
 
-It's intended to fully replace the Pusher service with a local version for testing, but can also be used for development purposes. It is not intended to be a replacement for production usage.
+The project is intended to fully replace the Pusher service with a local version for testing, and can also be used for development purposes. It is not intended to be a replacement for production usage! If you try, bad things might happen to you.
 
 ## Usage
 
