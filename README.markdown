@@ -49,10 +49,15 @@ PusherFake::Channel.reset
 
 ### Development Environment
 
-In a Rails initializer, or any file executed during loading:
+In a Rails initializer, or any file executed during loading do the following. Please note that requiring that file immediately starts up the websocket server.
 
 ```ruby
-require "pusher-fake/support/base"
+if Rails.env == "development"
+  Pusher.app_id = "testapp"
+  Pusher.key = "testkey"
+  Pusher.secret = "super secret"
+  require "pusher-fake/support/base"
+end
 ```
 
 If you're using Foreman or something similar you'll only want to run the fake for a single process:
