@@ -36,6 +36,10 @@
       list.appendChild(element);
     },
 
+    safeID: function(id) {
+      return id.replace(".", "");
+    },
+
     subscribe: function(name) {
       Pusher.instance.subscribe(name)
         .bind("pusher:subscription_succeeded", function(client) {
@@ -43,20 +47,20 @@
 
           for (var id in client.members) {
             Helpers.log(client.members[id].name, {
-              "id"    : "client-" + id,
+              "id"    : "client-" + Helpers.safeID(id),
               "class" : "channel-" + name
             });
           }
         })
         .bind("pusher:member_added", function(client) {
           Helpers.log(client.info.name, {
-            "id"    : "client-" + client.id,
+            "id"    : "client-" + Helpers.safeID(client.id),
             "class" : "channel-" + name
           });
         })
         .bind("pusher:member_removed", function(client) {
           var list = document.querySelector("ul"),
-              item = list.querySelector("#client-" + client.id);
+              item = list.querySelector("#client-" + Helpers.safeID(client.id));
 
           list.removeChild(item);
         })

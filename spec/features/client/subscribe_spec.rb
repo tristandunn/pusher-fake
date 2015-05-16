@@ -34,7 +34,7 @@ feature "Client subscribing to a channel" do
   end
 
   scenario "unsuccessfully subscribes to a private channel" do
-    set_socket_id(-1)
+    set_socket_id("13.37")
 
     attempt_to_subscribe_to("private-message-bob")
 
@@ -42,7 +42,7 @@ feature "Client subscribing to a channel" do
   end
 
   scenario "unsuccessfully subscribes to a presence channel" do
-    set_socket_id(-1)
+    set_socket_id("13.37")
 
     attempt_to_subscribe_to("presence-game-1")
 

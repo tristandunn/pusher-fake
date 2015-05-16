@@ -17,7 +17,10 @@ module PusherFake
     #
     # @return [Integer] The object ID of the socket.
     def id
-      socket.object_id.to_s
+      parts = socket.object_id.to_s.split("")
+      parts = parts.each_slice(parts.length / 2).to_a
+
+      [parts.first.join(""), parts.last.join("")].join(".")
     end
 
     # Emit an event to the connection.

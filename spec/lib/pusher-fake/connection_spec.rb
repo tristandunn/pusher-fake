@@ -87,8 +87,8 @@ describe PusherFake::Connection, "#establish" do
 end
 
 describe PusherFake::Connection, "#id" do
-  let(:id)     { socket.object_id.to_s }
-  let(:socket) { double }
+  let(:id)     { "123.456" }
+  let(:socket) { double(object_id: 123456) }
 
   subject { PusherFake::Connection.new(socket) }
 

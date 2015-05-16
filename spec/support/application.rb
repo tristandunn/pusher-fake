@@ -1,4 +1,5 @@
 require "sinatra"
+require "tilt/erb"
 
 class Sinatra::Application
   set :root,          Proc.new { File.join(File.dirname(__FILE__), "application") }

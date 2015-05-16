@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.0 — Unreleased
+
+* Update development and test dependencies. (Tristan Dunn)
+
 ## 1.3.0 — February 16th, 2015
 
 * Only enable the WebSocket transport. (Tristan Dunn)
