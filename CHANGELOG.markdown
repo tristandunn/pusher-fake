@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.4.0 — Unreleased
+## 1.4.0 — May 20th, 2015
 
 * Update development and test dependencies. (Tristan Dunn)
 
