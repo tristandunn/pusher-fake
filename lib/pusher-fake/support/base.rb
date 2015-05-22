@@ -1,3 +1,15 @@
+if Pusher.app_id.nil?
+  warn("Warning: `Pusher.app_id` is not set. Should be set before including PusherFake.")
+end
+
+if Pusher.key.nil?
+  warn("Warning: `Pusher.key` is not set. Should be set before including PusherFake.")
+end
+
+if Pusher.secret.nil?
+  warn("Warning: `Pusher.secret` is not set. Should be set before including PusherFake.")
+end
+
 # Use the same API key and secret as the live version.
 PusherFake.configure do |configuration|
   configuration.app_id = Pusher.app_id
