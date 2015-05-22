@@ -1,8 +1,10 @@
 # pusher-fake [![Build Status](http://img.shields.io/travis/tristandunn/pusher-fake.svg)](https://travis-ci.org/tristandunn/pusher-fake) [![Dependency Status](http://img.shields.io/gemnasium/tristandunn/pusher-fake.svg)](https://gemnasium.com/tristandunn/pusher-fake) [![Code Climate](http://img.shields.io/codeclimate/github/tristandunn/pusher-fake.svg)](https://codeclimate.com/github/tristandunn/pusher-fake) [![Coverage Status](http://img.shields.io/coveralls/tristandunn/pusher-fake.svg)](https://coveralls.io/r/tristandunn/pusher-fake?branch=master)
 
-A fake [Pusher](http://pusher.com) server for development and testing. When you run your code, we start up an entire fake service, on a random port that we find open. You can then connect to that service and run your development environment without needing an actual key. To find out where the service is running, check the logs for the startup messages.
+A fake [Pusher](https://pusher.com) server for development and testing.
 
-The project is intended to fully replace the Pusher service with a local version for testing, and can also be used for development purposes. It is not intended to be a replacement for production usage! If you try, bad things might happen to you.
+When run an entire fake service is started on two random open ports. Connections can then be made to the service without needing a Pusher account. The host and port for the socket and web servers can be found by checking the configuration.
+
+The project is intended to fully replace the Pusher service with a local version for testing and development purposes. It is not intended to be a replacement for production usage!
 
 ## Usage
 
@@ -49,13 +51,17 @@ PusherFake::Channel.reset
 
 ### Development Environment
 
-In a Rails initializer, or any file executed during loading do the following. Please note that requiring that file immediately starts up the websocket server.
+In a Rails initializer, or any file executed during loading:
 
 ```ruby
-if Rails.env == "development"
-  Pusher.app_id = "testapp"
-  Pusher.key = "testkey"
-  Pusher.secret = "super secret"
+# Ensure it's only run in a development environment if it's a global file.
+if Rails.env.development?
+  # Ensure Pusher configuration is set if you're not doing so elsewhere.
+  Pusher.app_id = "MY_TEST_ID"
+  Pusher.key    = "MY_TEST_KEY"
+  Pusher.secret = "MY_TEST_SECRET"
+
+  # Require the base file, which immediately starts the socket and web servers.
   require "pusher-fake/support/base"
 end
 ```
