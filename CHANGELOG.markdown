@@ -3,6 +3,7 @@
 ## Unreleased
 
 * Warn when Pusher configuration is not set. (Tristan Dunn)
+* Update the Pusher JS client to version 3.0.0. (Tristan Dunn)
 
 ## 1.4.0 — May 20th, 2015
 
