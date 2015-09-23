@@ -2,7 +2,7 @@
 
 A fake [Pusher](https://pusher.com) server for development and testing.
 
-When run an entire fake service is started on two random open ports. Connections can then be made to the service without needing a Pusher account. The host and port for the socket and web servers can be found by checking the configuration.
+When run, an entire fake service is started on two random open ports. Connections can then be made to the service without needing a Pusher account. The host and port for the socket and web servers can be found by checking the configuration.
 
 The project is intended to fully replace the Pusher service with a local version for testing and development purposes. It is not intended to be a replacement for production usage!
 
