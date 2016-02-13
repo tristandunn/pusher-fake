@@ -1,9 +1,3 @@
-RSpec.configure do |config|
-  config.before(:each) do
-    $events = []
-  end
-end
-
 Thread.new do
   # Not explicitly requiring Thin::Server occasionally results in
   # Thin::Server.start not being defined.
@@ -31,4 +25,10 @@ end.tap do |thread|
   at_exit { thread.exit }
 end
 
-PusherFake.configuration.webhooks = ["http://127.0.0.1:8082"]
+RSpec.configure do |config|
+  config.before(:each) do
+    $events = []
+
+    PusherFake.configuration.webhooks = ["http://127.0.0.1:8082"]
+  end
+end
