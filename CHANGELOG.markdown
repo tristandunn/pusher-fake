@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.5.0 — February 12th, 2016
 
 * Warn when Pusher configuration is not set. (Tristan Dunn)
 * Update the Pusher JS client to version 3.0.0. (Tristan Dunn)
