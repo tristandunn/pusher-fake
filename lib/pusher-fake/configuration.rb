@@ -30,6 +30,10 @@ module PusherFake
 
     # Instantiated from {PusherFake.configuration}. Sets the defaults.
     def initialize
+      reset!
+    end
+
+    def reset!
       self.app_id   = "PUSHER_APP_ID"
       self.key      = "PUSHER_API_KEY"
       self.logger   = STDOUT.to_io
