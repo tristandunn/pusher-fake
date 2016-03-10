@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.6.0 — Unreleased
+
+* Update development and test dependencies. (Tristan Dunn)
+
 ## 1.5.0 — February 12th, 2016
 
 * Warn when Pusher configuration is not set. (Tristan Dunn)
