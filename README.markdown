@@ -62,11 +62,14 @@ if Rails.env.development?
   Pusher.secret = "MY_TEST_SECRET"
 
   # Require the base file, which immediately starts the socket and web servers.
+  #
+  # If you're including this file in multiple processes, you may want to add an
+  # additional check or even possibly hard code the socket and web ports.
   require "pusher-fake/support/base"
 end
 ```
 
-If you're using Foreman or something similar you'll only want to run the fake for a single process:
+If you're using Foreman, or something similar, you'll only want to run the fake for a single process:
 
 ```ruby
 if ENV["PUSHER_FAKE"]
