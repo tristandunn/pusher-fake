@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.6.0 — Unreleased
+## 1.6.0 — July 31, 2016
 
 * Update development and test dependencies. (Tristan Dunn)
 * Update the Pusher JS client to version 3.1.0. (Tristan Dunn)
