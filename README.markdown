@@ -6,6 +6,13 @@ When run, an entire fake service is started on two random open ports. Connection
 
 The project is intended to fully replace the Pusher service with a local version for testing and development purposes. It is not intended to be a replacement for production usage!
 
+#### Why?
+
+1. Using a remote API for testing is slow.
+2. Working offline is currently impossible.
+3. Wasting connections and messages in development is unreasonable.
+4. Stubbing the JavaScript, such as with [pusher-test-stub](https://github.com/leggetter/pusher-test-stub), is suboptimal and tedious for integration tests.
+
 ## Usage
 
 ### Test Environment
@@ -133,17 +140,6 @@ The web server passes all `web_options`, besides `host` and `port`, to the Thin 
 ## Examples
 
 * [pusher-fake-example](https://github.com/tristandunn/pusher-fake-example) - An example of using pusher-fake with RSpec to test a Rails application.
-
-## Goal
-
-Fully recreate the Pusher API service for development and testing.
-
-#### Why?
-
-* Using a remote API for testing is slow.
-* Working offline is currently impossible.
-* Wasting connections and messages in development is unreasonable.
-* Stubbing the JavaScript, such as with [pusher-test-stub](https://github.com/leggetter/pusher-test-stub), is suboptimal and tedious for integration tests.
 
 ## License
 
