@@ -31,7 +31,7 @@ feature "Server triggers event" do
 
     trigger(public_channel, event)
 
-    expect(page).to_not have_event(event, on: public_channel)
+    expect(page).not_to have_event(event, on: public_channel)
 
     using_session(other_user) do
       expect(page).to have_event(event, on: public_channel)
@@ -41,10 +41,10 @@ feature "Server triggers event" do
   scenario "on an unsubscribed public channel" do
     trigger(public_channel, event)
 
-    expect(page).to_not have_event(event, on: public_channel)
+    expect(page).not_to have_event(event, on: public_channel)
 
     using_session(other_user) do
-      expect(page).to_not have_event(event, on: public_channel)
+      expect(page).not_to have_event(event, on: public_channel)
     end
   end
 
@@ -68,7 +68,7 @@ feature "Server triggers event" do
 
     trigger(private_channel, event)
 
-    expect(page).to_not have_event(event, on: private_channel)
+    expect(page).not_to have_event(event, on: private_channel)
 
     using_session(other_user) do
       expect(page).to have_event(event, on: private_channel)
@@ -78,10 +78,10 @@ feature "Server triggers event" do
   scenario "on an unsubscribed private channel" do
     trigger(private_channel, event)
 
-    expect(page).to_not have_event(event, on: private_channel)
+    expect(page).not_to have_event(event, on: private_channel)
 
     using_session(other_user) do
-      expect(page).to_not have_event(event, on: private_channel)
+      expect(page).not_to have_event(event, on: private_channel)
     end
   end
 
@@ -108,7 +108,7 @@ feature "Server triggers event" do
     expect(page).to have_event(event, on: public_channel)
 
     using_session(other_user) do
-      expect(page).to_not have_event(event, on: public_channel)
+      expect(page).not_to have_event(event, on: public_channel)
     end
   end
 

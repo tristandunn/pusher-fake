@@ -34,19 +34,19 @@ feature "Client subscribing to a channel" do
   end
 
   scenario "unsuccessfully subscribes to a private channel" do
-    set_socket_id("13.37")
+    override_socket_id("13.37")
 
     attempt_to_subscribe_to("private-message-bob")
 
-    expect(page).to_not have_content("Subscribed to private-message-bob.")
+    expect(page).not_to have_content("Subscribed to private-message-bob.")
   end
 
   scenario "unsuccessfully subscribes to a presence channel" do
-    set_socket_id("13.37")
+    override_socket_id("13.37")
 
     attempt_to_subscribe_to("presence-game-1")
 
-    expect(page).to_not have_content("Subscribed to presence-game-1.")
+    expect(page).not_to have_content("Subscribed to presence-game-1.")
   end
 
   protected
@@ -55,7 +55,9 @@ feature "Client subscribing to a channel" do
     page.execute_script("Helpers.subscribe(#{MultiJson.dump(channel)})")
   end
 
-  def set_socket_id(value)
-    page.execute_script("Pusher.instance.connection.socket_id = #{MultiJson.dump(value)};")
+  def override_socket_id(value)
+    page.execute_script(
+      "Pusher.instance.connection.socket_id = #{MultiJson.dump(value)};"
+    )
   end
 end

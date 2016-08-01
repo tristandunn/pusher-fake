@@ -1,7 +1,7 @@
 require "spec_helper"
 
 feature "Requesting user API endpoint" do
-  let(:users)   { Pusher.get("/channels/#{channel_name}/users")[:users] }
+  let(:users)        { Pusher.get("/channels/#{channel_name}/users")[:users] }
   let(:channel_name) { "public-1" }
 
   before do

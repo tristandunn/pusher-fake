@@ -1,4 +1,6 @@
-Thread.new do
+# rubocop:disable Style/GlobalVars
+
+thread = Thread.new do
   # Not explicitly requiring Thin::Server occasionally results in
   # Thin::Server.start not being defined.
   require "thin"
@@ -21,9 +23,9 @@ Thread.new do
     Thin::Logging.silent = true
     Thin::Server.start("0.0.0.0", 8082, WebhookEndpoint)
   end
-end.tap do |thread|
-  at_exit { thread.exit }
 end
+
+at_exit { thread.exit }
 
 RSpec.configure do |config|
   config.before(:each) do

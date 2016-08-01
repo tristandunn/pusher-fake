@@ -4,14 +4,14 @@ describe PusherFake::Channel, ".factory" do
   let(:name)    { "channel" }
   let(:channel) { double }
 
-  subject { PusherFake::Channel }
+  subject { described_class }
 
   before do
     allow(PusherFake::Channel::Public).to receive(:new).and_return(channel)
   end
 
   after do
-    PusherFake::Channel.reset
+    described_class.reset
   end
 
   it "caches the channel" do
@@ -40,14 +40,14 @@ describe PusherFake::Channel, ".factory, for a private channel" do
   let(:name)    { "private-channel" }
   let(:channel) { double }
 
-  subject { PusherFake::Channel }
+  subject { described_class }
 
   before do
     allow(PusherFake::Channel::Private).to receive(:new).and_return(channel)
   end
 
   after do
-    PusherFake::Channel.reset
+    described_class.reset
   end
 
   it "caches the channel" do
@@ -76,14 +76,14 @@ describe PusherFake::Channel, ".factory, for a presence channel" do
   let(:name)    { "presence-channel" }
   let(:channel) { double }
 
-  subject { PusherFake::Channel }
+  subject { described_class }
 
   before do
     allow(PusherFake::Channel::Presence).to receive(:new).and_return(channel)
   end
 
   after do
-    PusherFake::Channel.reset
+    described_class.reset
   end
 
   it "caches the channel" do
@@ -110,11 +110,21 @@ end
 
 describe PusherFake::Channel, ".remove" do
   let(:channels)   { { channel_1: channel_1, channel_2: channel_2 } }
-  let(:channel_1)  { double(:channel, connections: double(:array, empty?: true), remove: nil) }
-  let(:channel_2)  { double(:channel, connections: double(:array, empty?: false), remove: nil) }
   let(:connection) { double }
 
-  subject { PusherFake::Channel }
+  let(:channel_1) do
+    instance_double(PusherFake::Channel::Public,
+                    remove:      nil,
+                    connections: instance_double(Array, empty?: true))
+  end
+
+  let(:channel_2) do
+    instance_double(PusherFake::Channel::Public,
+                    remove:      nil,
+                    connections: instance_double(Array, empty?: false))
+  end
+
+  subject { described_class }
 
   before do
     allow(subject).to receive(:channels).and_return(channels)
@@ -130,7 +140,7 @@ describe PusherFake::Channel, ".remove" do
   it "deletes a channel with no connections remaining" do
     subject.remove(connection)
 
-    expect(channels).to_not have_key(:channel_1)
+    expect(channels).not_to have_key(:channel_1)
   end
 
   it "does not delete a channel with connections remaining" do
@@ -142,14 +152,14 @@ describe PusherFake::Channel, ".remove" do
   it "handles channels not being defined" do
     allow(subject).to receive(:channels).and_return(nil)
 
-    expect {
+    expect do
       subject.remove(connection)
-    }.to_not raise_error
+    end.not_to raise_error
   end
 end
 
 describe PusherFake::Channel, ".reset" do
-  subject { PusherFake::Channel }
+  subject { described_class }
 
   it "empties the channel cache" do
     subject.factory("example")

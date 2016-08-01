@@ -39,10 +39,10 @@ feature "Requesting channel API endpoint" do
     expect(result[presence_name]["user_count"]).to eq(1)
   end
 
- scenario "all channels, with invalid info attributes" do
-    expect {
+  scenario "all channels, with invalid info attributes" do
+    expect do
       channels(info: "user_count")
-    }.to raise_error(/user_count may only be requested for presence channels/)
+    end.to raise_error(/user_count may only be requested for presence channels/)
   end
 
   scenario "channel, with no occupants" do
@@ -65,9 +65,11 @@ feature "Requesting channel API endpoint" do
   end
 
   scenario "channel, with invalid info attributes" do
-    expect {
+    expect do
       channel(info: "user_count")
-    }.to raise_error(/Cannot retrieve the user count unless the channel is a presence channel/)
+    end.to raise_error(
+      /Cannot retrieve the user count unless the channel is a presence channel/
+    )
   end
 
   protected

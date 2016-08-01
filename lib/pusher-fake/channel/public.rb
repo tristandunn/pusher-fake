@@ -64,6 +64,10 @@ module PusherFake
         {}
       end
 
+      def trigger(name, data = {})
+        PusherFake::Webhook.trigger(name, data)
+      end
+
       private
 
       # Notify the +connection+ of the successful subscription and add the
@@ -80,10 +84,6 @@ module PusherFake
         if connections.length == 1
           trigger("channel_occupied", channel: name)
         end
-      end
-
-      def trigger(name, data = {})
-        PusherFake::Webhook.trigger(name, data)
       end
     end
   end

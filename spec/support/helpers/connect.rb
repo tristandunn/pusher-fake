@@ -4,9 +4,7 @@ module ConnectHelpers
 
     expect(page).to have_content("Client connected.")
 
-    if options[:channel]
-      subscribe_to(options[:channel])
-    end
+    subscribe_to(options[:channel]) if options[:channel]
   end
 
   def connect_as(name, options = {})

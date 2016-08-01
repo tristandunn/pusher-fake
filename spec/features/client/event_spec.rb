@@ -17,7 +17,7 @@ feature "Client triggers a client event" do
 
     trigger(private_channel, event)
 
-    expect(page).to_not have_event(event, on: private_channel)
+    expect(page).not_to have_event(event, on: private_channel)
 
     using_session(other_user) do
       expect(page).to have_event(event, on: private_channel)
@@ -30,16 +30,18 @@ feature "Client triggers a client event" do
 
     trigger(public_channel, event)
 
-    expect(page).to_not have_event(event, on: public_channel)
+    expect(page).not_to have_event(event, on: public_channel)
 
     using_session(other_user) do
-      expect(page).to_not have_event(event, on: public_channel)
+      expect(page).not_to have_event(event, on: public_channel)
     end
   end
 
   protected
 
   def trigger(channel, event)
-    page.execute_script("Helpers.trigger(#{MultiJson.dump(channel)}, #{MultiJson.dump(event)})")
+    page.execute_script(
+      "Helpers.trigger(#{MultiJson.dump(channel)}, #{MultiJson.dump(event)})"
+    )
   end
 end

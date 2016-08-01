@@ -1,16 +1,33 @@
 require "spec_helper"
 
 describe PusherFake::Webhook, ".trigger" do
-  subject { PusherFake::Webhook }
+  subject { described_class }
 
-  let(:data)          { { channel: "name" } }
-  let(:http)          { double(:http, post: true) }
-  let(:name)          { "channel_occupied" }
-  let(:digest)        { double(:digest) }
-  let(:payload)       { MultiJson.dump({ events: [data.merge(name: name)], time_ms: Time.now.to_i }) }
-  let(:webhooks)      { ["url"] }
-  let(:signature)     { "signature" }
-  let(:configuration) { double(:configuration, key: "key", secret: "secret", webhooks: webhooks) }
+  let(:data)      { { channel: "name" } }
+  let(:http)      { instance_double(EventMachine::HttpConnection, post: true) }
+  let(:name)      { "channel_occupied" }
+  let(:digest)    { instance_double(OpenSSL::Digest::SHA256) }
+  let(:webhooks)  { ["url"] }
+  let(:signature) { "signature" }
+
+  let(:configuration) do
+    instance_double(PusherFake::Configuration,
+                    key:      "key",
+                    secret:   "secret",
+                    webhooks: webhooks)
+  end
+
+  let(:headers) do
+    {
+      "Content-Type"       => "application/json",
+      "X-Pusher-Key"       => configuration.key,
+      "X-Pusher-Signature" => signature
+    }
+  end
+
+  let(:payload) do
+    MultiJson.dump(events: [data.merge(name: name)], time_ms: Time.now.to_i)
+  end
 
   before do
     allow(OpenSSL::HMAC).to receive(:hexdigest).and_return(signature)
@@ -30,20 +47,14 @@ describe PusherFake::Webhook, ".trigger" do
   it "creates a HTTP request for each webhook URL" do
     subject.trigger(name, data)
 
-    expect(EventMachine::HttpRequest).to have_received(:new).with(webhooks.first)
+    expect(EventMachine::HttpRequest).to have_received(:new)
+      .with(webhooks.first)
   end
 
   it "posts the payload to the webhook URL" do
     subject.trigger(name, data)
 
-    expect(http).to have_received(:post).with(
-      body: payload,
-      head: {
-        "Content-Type"       => "application/json",
-        "X-Pusher-Key"       => configuration.key,
-        "X-Pusher-Signature" => signature
-      }
-    )
+    expect(http).to have_received(:post).with(body: payload, head: headers)
   end
 
   it "logs sending the hook" do

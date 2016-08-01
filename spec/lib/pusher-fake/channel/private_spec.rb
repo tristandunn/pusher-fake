@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe PusherFake::Channel::Private do
-  subject { PusherFake::Channel::Private }
+  subject { described_class }
 
   it "inherits from public channel" do
     expect(subject.ancestors).to include(PusherFake::Channel::Public)
@@ -11,11 +11,11 @@ end
 describe PusherFake::Channel::Private, "#add" do
   let(:data)           { { auth: authentication } }
   let(:name)           { "name" }
-  let(:connection)     { double(:connection, emit: nil) }
-  let(:connections)    { double(:connections, push: nil, length: 0) }
+  let(:connection)     { instance_double(PusherFake::Connection, emit: nil) }
+  let(:connections)    { instance_double(Array, push: nil, length: 0) }
   let(:authentication) { "auth" }
 
-  subject { PusherFake::Channel::Private.new(name) }
+  subject { described_class.new(name) }
 
   before do
     allow(PusherFake::Webhook).to receive(:trigger)
@@ -43,16 +43,18 @@ describe PusherFake::Channel::Private, "#add" do
 
     subject.add(connection, data)
 
-    expect(connection).to have_received(:emit).with("pusher_internal:subscription_succeeded", {}, subject.name)
+    expect(connection).to have_received(:emit)
+      .with("pusher_internal:subscription_succeeded", {}, subject.name)
   end
 
-  it "triggers channel occupied webhook for the first connection added when authorized" do
+  it "triggers occupied webhook for first connection added when authorized" do
     allow(subject).to receive(:authorized?).and_return(true)
     allow(subject).to receive(:connections).and_call_original
 
     2.times { subject.add(connection, data) }
 
-    expect(PusherFake::Webhook).to have_received(:trigger).with("channel_occupied", channel: name).once
+    expect(PusherFake::Webhook).to have_received(:trigger)
+      .with("channel_occupied", channel: name).once
   end
 
   it "unsuccessfully subscribes the connection when not authorized" do
@@ -60,7 +62,8 @@ describe PusherFake::Channel::Private, "#add" do
 
     subject.add(connection, data)
 
-    expect(connection).to have_received(:emit).with("pusher_internal:subscription_error", {}, subject.name)
+    expect(connection).to have_received(:emit)
+      .with("pusher_internal:subscription_error", {}, subject.name)
   end
 
   it "does not trigger channel occupied webhook when not authorized" do
@@ -69,19 +72,22 @@ describe PusherFake::Channel::Private, "#add" do
 
     2.times { subject.add(connection, data) }
 
-    expect(PusherFake::Webhook).to_not have_received(:trigger)
+    expect(PusherFake::Webhook).not_to have_received(:trigger)
   end
 end
 
 describe PusherFake::Channel::Private, "#authentication_for" do
-  let(:id)            { "1234" }
-  let(:name)          { "private-channel" }
-  let(:digest)        { double(:digest) }
-  let(:string)        { [id, name].join(":") }
-  let(:signature)     { "signature" }
-  let(:configuration) { double(:configuration, key: "key", secret: "secret") }
+  let(:id)        { "1234" }
+  let(:name)      { "private-channel" }
+  let(:digest)    { instance_double(OpenSSL::Digest::SHA256) }
+  let(:string)    { [id, name].join(":") }
+  let(:signature) { "signature" }
 
-  subject { PusherFake::Channel::Private.new(name) }
+  let(:configuration) do
+    instance_double(PusherFake::Configuration, key: "key", secret: "secret")
+  end
+
+  subject { described_class.new(name) }
 
   before do
     allow(PusherFake).to receive(:configuration).and_return(configuration)
@@ -103,16 +109,20 @@ describe PusherFake::Channel::Private, "#authentication_for" do
   end
 end
 
-describe PusherFake::Channel::Private, "#authentication_for, with channel data" do
-  let(:id)            { "1234" }
-  let(:name)          { "private-channel" }
-  let(:digest)        { double(:digest) }
-  let(:string)        { [id, name, channel_data].join(":") }
-  let(:signature)     { "signature" }
-  let(:channel_data)  { "{}" }
-  let(:configuration) { double(:configuration, key: "key", secret: "secret") }
+describe PusherFake::Channel::Private,
+         "#authentication_for, with channel data" do
+  let(:id)           { "1234" }
+  let(:name)         { "private-channel" }
+  let(:digest)       { instance_double(OpenSSL::Digest::SHA256) }
+  let(:string)       { [id, name, channel_data].join(":") }
+  let(:signature)    { "signature" }
+  let(:channel_data) { "{}" }
 
-  subject { PusherFake::Channel::Private.new(name) }
+  let(:configuration) do
+    instance_double(PusherFake::Configuration, key: "key", secret: "secret")
+  end
+
+  subject { described_class.new(name) }
 
   before do
     allow(PusherFake).to receive(:configuration).and_return(configuration)
@@ -137,11 +147,11 @@ end
 describe PusherFake::Channel::Private, "#authorized?" do
   let(:data)           { { auth: authentication, channel_data: channel_data } }
   let(:name)           { "private-channel" }
-  let(:connection)     { double(:connection, id: "1") }
+  let(:connection)     { instance_double(PusherFake::Connection, id: "1") }
   let(:channel_data)   { "{}" }
   let(:authentication) { "authentication" }
 
-  subject { PusherFake::Channel::Private.new(name) }
+  subject { described_class.new(name) }
 
   before do
     allow(subject).to receive(:authentication_for)
@@ -150,7 +160,8 @@ describe PusherFake::Channel::Private, "#authorized?" do
   it "generates authentication for the connection ID" do
     subject.authorized?(connection, data)
 
-    expect(subject).to have_received(:authentication_for).with(connection.id, channel_data)
+    expect(subject).to have_received(:authentication_for)
+      .with(connection.id, channel_data)
   end
 
   it "returns true if the authentication matches" do
@@ -162,6 +173,6 @@ describe PusherFake::Channel::Private, "#authorized?" do
   it "returns false if the authentication matches" do
     allow(subject).to receive(:authentication_for).and_return("")
 
-    expect(subject).to_not be_authorized(connection, data)
+    expect(subject).not_to be_authorized(connection, data)
   end
 end

@@ -1,28 +1,28 @@
 require "spec_helper"
 
 describe PusherFake, ".configure" do
-  subject { PusherFake }
+  subject { described_class }
 
   it "yields the configuration" do
-    expect { |block|
+    expect do |block|
       subject.configure(&block)
-    }.to yield_with_args(subject.configuration)
+    end.to yield_with_args(subject.configuration)
   end
 end
 
 describe PusherFake, ".configuration" do
   let(:configuration) { double }
 
-  subject { PusherFake }
+  subject { described_class }
 
   before do
-    PusherFake.instance_variable_set("@configuration", nil)
+    described_class.instance_variable_set("@configuration", nil)
 
     allow(PusherFake::Configuration).to receive(:new).and_return(configuration)
   end
 
   after do
-    PusherFake.instance_variable_set("@configuration", nil)
+    described_class.instance_variable_set("@configuration", nil)
   end
 
   it "initializes a configuration object" do
@@ -45,30 +45,32 @@ end
 describe PusherFake, ".javascript" do
   let(:configuration) { subject.configuration }
 
-  subject { PusherFake }
+  subject { described_class }
 
   it "returns JavaScript setting the host and port to the configured options" do
-    arguments  = [configuration.key, configuration.to_options].map(&:to_json).join(",")
     javascript = subject.javascript
+    arguments  = [configuration.key, configuration.to_options]
+                 .map(&:to_json).join(",")
 
     expect(javascript).to eq("new Pusher(#{arguments})")
   end
 
   it "supports passing custom options" do
     options    = { custom: "option" }
-    arguments  = [configuration.key, configuration.to_options(options)].map(&:to_json).join(",")
     javascript = subject.javascript(options)
+    arguments  = [configuration.key, configuration.to_options(options)]
+                 .map(&:to_json).join(",")
 
     expect(javascript).to eq("new Pusher(#{arguments})")
   end
 end
 
 describe PusherFake, ".log" do
-  let(:logger)        { double(:logger, :<< => "") }
+  let(:logger)        { instance_double(Logger, :<< => "") }
   let(:message)       { "Hello world." }
   let(:configuration) { subject.configuration }
 
-  subject { PusherFake }
+  subject { described_class }
 
   before do
     configuration.logger = logger
@@ -87,6 +89,6 @@ describe PusherFake, ".log" do
 
     subject.log(message)
 
-    expect(logger).to_not have_received(:<<)
+    expect(logger).not_to have_received(:<<)
   end
 end

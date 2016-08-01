@@ -1,3 +1,5 @@
+# rubocop:disable Style/GlobalVars
+
 require "spec_helper"
 
 feature "Receiving event webhooks" do
@@ -36,11 +38,17 @@ feature "Receiving event webhooks" do
   scenario "subscribing to a presence channel" do
     subscribe_to(presence_channel)
 
-    expect($events).to include_event("member_added", "channel" => presence_channel, "user_id" => user_id)
+    expect($events).to include_event(
+      "member_added",
+      "channel" => presence_channel, "user_id" => user_id
+    )
 
     subscribe_to_as(presence_channel, other_user)
 
-    expect($events).to include_event("member_added", "channel" => presence_channel, "user_id" => user_id(other_user))
+    expect($events).to include_event(
+      "member_added",
+      "channel" => presence_channel, "user_id" => user_id(other_user)
+    )
   end
 
   scenario "unsubscribing from a presence channel" do
@@ -49,11 +57,17 @@ feature "Receiving event webhooks" do
 
     unsubscribe_from(presence_channel)
 
-    expect($events).to include_event("member_added", "channel" => presence_channel, "user_id" => user_id)
+    expect($events).to include_event(
+      "member_added",
+      "channel" => presence_channel, "user_id" => user_id
+    )
 
     unsubscribe_from_as(presence_channel, other_user)
 
-    expect($events).to include_event("member_added", "channel" => presence_channel, "user_id" => user_id(other_user))
+    expect($events).to include_event(
+      "member_added",
+      "channel" => presence_channel, "user_id" => user_id(other_user)
+    )
   end
 
   protected

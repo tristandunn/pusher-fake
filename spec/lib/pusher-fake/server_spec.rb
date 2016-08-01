@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe PusherFake::Server, ".start" do
-  subject { PusherFake::Server }
+  subject { described_class }
 
   before do
     allow(subject).to receive(:start_web_server).and_return(nil)
@@ -18,7 +18,7 @@ describe PusherFake::Server, ".start" do
   it "starts the socket web server when run yields" do
     subject.start
 
-    expect(subject).to_not have_received(:start_web_server)
+    expect(subject).not_to have_received(:start_web_server)
 
     allow(EventMachine).to receive(:run).and_yield
 
@@ -30,7 +30,7 @@ describe PusherFake::Server, ".start" do
   it "starts the socket server when run yields" do
     subject.start
 
-    expect(subject).to_not have_received(:start_socket_server)
+    expect(subject).not_to have_received(:start_socket_server)
 
     allow(EventMachine).to receive(:run).and_yield
 
@@ -41,13 +41,24 @@ describe PusherFake::Server, ".start" do
 end
 
 describe PusherFake::Server, ".start_socket_server" do
-  let(:data)          { double }
-  let(:socket)        { double(:socket, onopen: nil, onmessage: nil, onclose: nil) }
-  let(:options)       { configuration.socket_options }
-  let(:connection)    { double(:connection, establish: nil, process: nil) }
-  let(:configuration) { double(:configuration, socket_options: { host: "192.168.0.1", port: 8080 }) }
+  let(:data)    { double }
+  let(:options) { configuration.socket_options }
 
-  subject { PusherFake::Server }
+  let(:configuration) do
+    instance_double(PusherFake::Configuration,
+                    socket_options: { host: "192.168.0.1", port: 8080 })
+  end
+
+  let(:connection) do
+    instance_double(PusherFake::Connection, establish: nil, process: nil)
+  end
+
+  let(:socket) do
+    instance_double(EventMachine::WebSocket::Connection,
+                    onopen: nil, onmessage: nil, onclose: nil)
+  end
+
+  subject { described_class }
 
   before do
     allow(PusherFake).to receive(:configuration).and_return(configuration)
@@ -69,10 +80,6 @@ describe PusherFake::Server, ".start_socket_server" do
   end
 
   it "creates a connection with the provided socket when onopen yields" do
-    subject.start_socket_server
-
-    expect(PusherFake::Connection).to_not have_received(:new)
-
     allow(socket).to receive(:onopen).and_yield
 
     subject.start_socket_server
@@ -81,10 +88,6 @@ describe PusherFake::Server, ".start_socket_server" do
   end
 
   it "establishes the connection when onopen yields" do
-    subject.start_socket_server
-
-    expect(connection).to_not have_received(:establish)
-
     allow(socket).to receive(:onopen).and_yield
 
     subject.start_socket_server
@@ -93,10 +96,6 @@ describe PusherFake::Server, ".start_socket_server" do
   end
 
   it "defines a message callback on the socket when onopen yields" do
-    subject.start_socket_server
-
-    expect(socket).to_not have_received(:onmessage)
-
     allow(socket).to receive(:onopen).and_yield
 
     subject.start_socket_server
@@ -106,11 +105,6 @@ describe PusherFake::Server, ".start_socket_server" do
 
   it "triggers process on the connection when onmessage yields" do
     allow(socket).to receive(:onopen).and_yield
-
-    subject.start_socket_server
-
-    expect(connection).to_not have_received(:process)
-
     allow(socket).to receive(:onmessage).and_yield(data)
 
     subject.start_socket_server
@@ -119,10 +113,6 @@ describe PusherFake::Server, ".start_socket_server" do
   end
 
   it "defines a close callback on the socket when onopen yields" do
-    subject.start_socket_server
-
-    expect(socket).to_not have_received(:onclose)
-
     allow(socket).to receive(:onopen).and_yield
 
     subject.start_socket_server
@@ -132,11 +122,6 @@ describe PusherFake::Server, ".start_socket_server" do
 
   it "removes the connection from all channels when onclose yields" do
     allow(socket).to receive(:onopen).and_yield
-
-    subject.start_socket_server
-
-    expect(PusherFake::Channel).to_not have_received(:remove)
-
     allow(socket).to receive(:onclose).and_yield
 
     subject.start_socket_server
@@ -146,12 +131,16 @@ describe PusherFake::Server, ".start_socket_server" do
 end
 
 describe PusherFake::Server, ".start_web_server" do
-  let(:host)          { "192.168.0.1" }
-  let(:port)          { 8081 }
-  let(:server)        { double(:server, :start! => true, :ssl= => true) }
-  let(:configuration) { double(:configuration, web_options: { host: host, port: port, ssl: true }) }
+  let(:host)   { "192.168.0.1" }
+  let(:port)   { 8081 }
+  let(:server) { instance_double(Thin::Server, :start! => true, :ssl= => true) }
 
-  subject { PusherFake::Server }
+  let(:configuration) do
+    instance_double(PusherFake::Configuration,
+                    web_options: { host: host, port: port, ssl: true })
+  end
+
+  subject { described_class }
 
   before do
     allow(Thin::Server).to receive(:new).and_return(server)
@@ -168,7 +157,8 @@ describe PusherFake::Server, ".start_web_server" do
   it "creates the web server" do
     subject.start_web_server
 
-    expect(Thin::Server).to have_received(:new).with(host, port, PusherFake::Server::Application)
+    expect(Thin::Server).to have_received(:new)
+      .with(host, port, PusherFake::Server::Application)
   end
 
   it "assigns custom options to the server" do

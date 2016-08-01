@@ -3,7 +3,7 @@ require "spec_helper"
 describe PusherFake::Channel::Public do
   let(:name) { "channel" }
 
-  subject { PusherFake::Channel::Public }
+  subject { described_class }
 
   it "assigns the provided name" do
     channel = subject.new(name)
@@ -20,8 +20,8 @@ end
 
 describe PusherFake::Channel, "#add" do
   let(:name)        { "name" }
-  let(:connection)  { double(:connection, emit: nil) }
-  let(:connections) { double(:connections, push: nil, length: 0) }
+  let(:connection)  { instance_double(PusherFake::Connection, emit: nil) }
+  let(:connections) { instance_double(Array, push: nil, length: 0) }
 
   subject { PusherFake::Channel::Public.new(name) }
 
@@ -39,7 +39,8 @@ describe PusherFake::Channel, "#add" do
   it "successfully subscribes the connection" do
     subject.add(connection)
 
-    expect(connection).to have_received(:emit).with("pusher_internal:subscription_succeeded", {}, subject.name)
+    expect(connection).to have_received(:emit)
+      .with("pusher_internal:subscription_succeeded", {}, subject.name)
   end
 
   it "triggers channel occupied webhook for the first connection added" do
@@ -47,17 +48,24 @@ describe PusherFake::Channel, "#add" do
 
     2.times { subject.add(connection) }
 
-    expect(PusherFake::Webhook).to have_received(:trigger).with("channel_occupied", channel: name).once
+    expect(PusherFake::Webhook).to have_received(:trigger)
+      .with("channel_occupied", channel: name).once
   end
 end
 
 describe PusherFake::Channel, "#emit" do
-  let(:data)         { double }
-  let(:name)         { "name" }
-  let(:event)        { "event" }
-  let(:connections)  { [connection_1, connection_2] }
-  let(:connection_1) { double(:connection, emit: nil, id: "1") }
-  let(:connection_2) { double(:connection, emit: nil, id: "2") }
+  let(:data)        { double }
+  let(:name)        { "name" }
+  let(:event)       { "event" }
+  let(:connections) { [connection_1, connection_2] }
+
+  let(:connection_1) do
+    instance_double(PusherFake::Connection, emit: nil, id: "1")
+  end
+
+  let(:connection_2) do
+    instance_double(PusherFake::Connection, emit: nil, id: "2")
+  end
 
   subject { PusherFake::Channel::Public.new(name) }
 
@@ -76,7 +84,7 @@ describe PusherFake::Channel, "#emit" do
     subject.emit(event, data, socket_id: connection_2.id)
 
     expect(connection_1).to have_received(:emit).with(event, data, name)
-    expect(connection_2).to_not have_received(:emit)
+    expect(connection_2).not_to have_received(:emit)
   end
 end
 
@@ -94,41 +102,43 @@ describe PusherFake::Channel, "#includes?" do
   it "returns false if the connection is not in the channel" do
     allow(subject).to receive(:connections).and_return([])
 
-    expect(subject).to_not be_includes(connection)
+    expect(subject).not_to be_includes(connection)
   end
 end
 
 describe PusherFake::Channel, "#remove" do
   let(:name)         { "name" }
-  let(:connection_1) { double  }
+  let(:connection_1) { double }
   let(:connection_2) { double }
 
   subject { PusherFake::Channel::Public.new(name) }
 
   before do
-    allow(subject).to receive(:connections).and_return([connection_1, connection_2])
     allow(PusherFake::Webhook).to receive(:trigger)
+    allow(subject).to receive(:connections)
+      .and_return([connection_1, connection_2])
   end
 
   it "removes the connection from the channel" do
     subject.remove(connection_1)
 
-    expect(subject.connections).to_not include(connection_1)
+    expect(subject.connections).not_to include(connection_1)
   end
 
   it "triggers channel vacated webhook when all connections are removed" do
     subject.remove(connection_1)
 
-    expect(PusherFake::Webhook).to_not have_received(:trigger)
+    expect(PusherFake::Webhook).not_to have_received(:trigger)
 
     subject.remove(connection_2)
 
-    expect(PusherFake::Webhook).to have_received(:trigger).with("channel_vacated", channel: name).once
+    expect(PusherFake::Webhook).to have_received(:trigger)
+      .with("channel_vacated", channel: name).once
   end
 end
 
 describe PusherFake::Channel::Public, "#subscription_data" do
-  subject { PusherFake::Channel::Public.new("name") }
+  subject { described_class.new("name") }
 
   it "returns an empty hash" do
     expect(subject.subscription_data).to eq({})
