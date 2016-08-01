@@ -1,4 +1,5 @@
 module PusherFake
+  # Configuration class.
   class Configuration
     # @return [String] The Pusher Applicaiton ID. (Defaults to +PUSHER_APP_ID+.)
     attr_accessor :app_id
@@ -12,7 +13,7 @@ module PusherFake
     # @return [String] The Pusher API token. (Defaults to +PUSHER_API_SECRET+.)
     attr_accessor :secret
 
-    # Options for the socket server. See +EventMachine::WebSocket.start+ for options.
+    # Options for the socket server. See +EventMachine::WebSocket.start+.
     #
     # @return [Hash] Options for the socket server.
     attr_accessor :socket_options

@@ -304,13 +304,12 @@ end
 
 describe PusherFake::Server::Application,
          ".channels, requesting all channels with no channels occupied" do
-  let(:request)  { instance_double(Rack::Request, params: {}) }
-  let(:channels) { nil }
+  let(:request) { instance_double(Rack::Request, params: {}) }
 
   subject { described_class }
 
   before do
-    allow(PusherFake::Channel).to receive(:channels).and_return(channels)
+    allow(PusherFake::Channel).to receive(:channels).and_return({})
   end
 
   it "returns a hash of no channels" do

@@ -1,12 +1,15 @@
+# rubocop:disable Style/FileName
+
 require "em-http-request"
 require "em-websocket"
 require "multi_json"
 require "openssl"
 require "thin"
 
+# A Pusher fake.
 module PusherFake
   # The current version string.
-  VERSION = "1.6.0"
+  VERSION = "1.6.0".freeze
 
   autoload :Channel,       "pusher-fake/channel"
   autoload :Configuration, "pusher-fake/configuration"

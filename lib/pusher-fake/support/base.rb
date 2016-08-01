@@ -1,13 +1,8 @@
-if Pusher.app_id.nil?
-  warn("Warning: `Pusher.app_id` is not set. Should be set before including PusherFake.")
-end
+%w(app_id key secret).each do |setting|
+  next unless Pusher.public_send(setting).nil?
 
-if Pusher.key.nil?
-  warn("Warning: `Pusher.key` is not set. Should be set before including PusherFake.")
-end
-
-if Pusher.secret.nil?
-  warn("Warning: `Pusher.secret` is not set. Should be set before including PusherFake.")
+  warn("Warning: Pusher.#{setting} is not set." \
+       "Should be set before including PusherFake")
 end
 
 # Use the same API key and secret as the live version.

@@ -315,10 +315,10 @@ describe PusherFake::Connection, "#process, with an unknown event" do
       allow(PusherFake::Channel).to receive(:factory).and_return(channel)
     end
 
-    it "creates a channel from the event data" do
+    it "does not create a channel" do
       subject.process(json)
 
-      expect(PusherFake::Channel).to have_received(:factory).with(name)
+      expect(PusherFake::Channel).not_to have_received(:factory)
     end
 
     it "does not emit the event" do

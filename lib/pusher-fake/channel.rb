@@ -1,4 +1,5 @@
 module PusherFake
+  # Channel creation and management.
   module Channel
     autoload :Public,   "pusher-fake/channel/public"
     autoload :Private,  "pusher-fake/channel/private"
@@ -6,13 +7,18 @@ module PusherFake
 
     class << self
       # Name matcher for private channels.
-      PRIVATE_CHANNEL_MATCHER  = /\Aprivate-/.freeze
+      PRIVATE_CHANNEL_MATCHER  = /\Aprivate-/
 
       # Name matcher for presence channels.
-      PRESENCE_CHANNEL_MATCHER = /\Apresence-/.freeze
+      PRESENCE_CHANNEL_MATCHER = /\Apresence-/
 
       # @return [Hash] Cache of existing channels.
-      attr_accessor :channels
+      attr_writer :channels
+
+      # @return [Hash] Cache of existing channels.
+      def channels
+        @channels ||= {}
+      end
 
       # Create a channel, determining the type by the name.
       #

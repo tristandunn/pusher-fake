@@ -1,32 +1,30 @@
 module PusherFake
   module Server
+    # The fake web application.
     class Application
-      CHANNEL_FILTER_ERROR = "user_count may only be requested for presence channels - " +
-                               "please supply filter_by_prefix begining with presence-".freeze
+      CHANNEL_FILTER_ERROR = "user_count may only be requested for presence " \
+                             "channels - please supply filter_by_prefix " \
+                             "begining with presence-".freeze
 
-      CHANNEL_USER_COUNT_ERROR = "Cannot retrieve the user count unless the channel is a presence channel".freeze
+      CHANNEL_USER_COUNT_ERROR = "Cannot retrieve the user count unless the " \
+                                 "channel is a presence channel".freeze
 
-      PRESENCE_PREFIX_MATCHER = /\Apresence-/.freeze
+      PRESENCE_PREFIX_MATCHER = /\Apresence-/
+
+      REQUEST_PATHS = {
+        %r{\A/apps/:id/events\z}                 => :events,
+        %r{\A/apps/:id/channels\z}               => :channels,
+        %r{\A/apps/:id/channels/([^/]+)\z}       => :channel,
+        %r{\A/apps/:id/channels/([^/]+)/users\z} => :users
+      }.freeze
 
       # Process an API request.
       #
       # @param [Hash] environment The request environment.
       # @return [Rack::Response] A successful response.
       def self.call(environment)
-        id       = PusherFake.configuration.app_id
         request  = Rack::Request.new(environment)
-        response = case request.path
-                   when %r{\A/apps/#{id}/events\Z}
-                     events(request)
-                   when %r{\A/apps/#{id}/channels\Z}
-                     channels(request)
-                   when %r{\A/apps/#{id}/channels/([^/]+)\Z}
-                     channel($1, request)
-                   when %r{\A/apps/#{id}/channels/([^/]+)/users\Z}
-                     users($1)
-                   else
-                     raise "Unknown path: #{request.path}"
-                   end
+        response = response_for(request)
 
         Rack::Response.new(MultiJson.dump(response)).finish
       rescue => error
@@ -37,13 +35,11 @@ module PusherFake
       #
       # @param [Rack::Request] request The HTTP request.
       # @return [Hash] An empty hash.
+      #
+      # rubocop:disable Style/RescueModifier
       def self.events(request)
         event = MultiJson.load(request.body.read)
-        data  = begin
-                  MultiJson.load(event["data"])
-                rescue MultiJson::LoadError
-                  event["data"]
-                end
+        data  = MultiJson.load(event["data"]) rescue event["data"]
 
         event["channels"].each do |channel_name|
           channel = Channel.factory(channel_name)
@@ -52,6 +48,7 @@ module PusherFake
 
         {}
       end
+      # rubocop:enable Style/RescueModifier
 
       # Return a hash of channel information.
       #
@@ -62,53 +59,71 @@ module PusherFake
       # @param [Rack::Request] request The HTTP request.
       # @return [Hash] A hash of channel information.
       def self.channel(name, request)
-        info = request.params["info"].to_s.split(",")
+        count = request.params["info"].to_s.split(",").include?("user_count")
 
-        if info.include?("user_count") && name !~ PRESENCE_PREFIX_MATCHER
+        if count && name !~ PRESENCE_PREFIX_MATCHER
           raise CHANNEL_USER_COUNT_ERROR
         end
 
-        channels = PusherFake::Channel.channels || {}
-        channel  = channels[name]
+        channel     = PusherFake::Channel.channels[name]
+        connections = channel ? channel.connections : []
 
-        {}.tap do |result|
-          result[:occupied]   = !channel.nil? && channel.connections.length > 0
-          result[:user_count] = channel.connections.length if channel && info.include?("user_count")
-        end
+        result = { occupied: connections.any? }
+        result[:user_count] = connections.size if count
+        result
       end
 
-      # Returns a hash of occupied channels, optionally filtering with a prefix.
-      #
-      # When filtering to presence chanenls, the user count maybe also be requested.
+      # Returns a hash of occupied channels, optionally filtering with a
+      # prefix. When filtering to presence chanenls, the user count maybe also
+      # be requested.
       #
       # @param [Rack::Request] request The HTTP request.
       # @return [Hash] A hash of occupied channels.
+      #
+      # rubocop:disable Metrics/AbcSize
       def self.channels(request)
-        info   = request.params["info"].to_s.split(",")
+        count  = request.params["info"].to_s.split(",").include?("user_count")
         prefix = request.params["filter_by_prefix"].to_s
 
-        if info.include?("user_count") && prefix !~ PRESENCE_PREFIX_MATCHER
-          raise CHANNEL_FILTER_ERROR
-        end
+        raise CHANNEL_FILTER_ERROR if count && prefix !~ PRESENCE_PREFIX_MATCHER
 
-        filter   = Regexp.new(%r{\A#{prefix}})
-        channels = PusherFake::Channel.channels || {}
-        channels.inject(channels: {}) do |result, (name, channel)|
-          unless filter && name !~ filter
-            channels = result[:channels]
-            channels[name] = {}
-            channels[name][:user_count] = channel.connections.length if info.include?("user_count")
+        PusherFake::Channel
+          .channels
+          .each_with_object(channels: {}) do |(name, channel), result|
+            next unless name.start_with?(prefix)
+
+            channels = result[:channels].merge!(name => {})
+            channels[name][:user_count] = channel.connections.size if count
           end
+      end
+      # rubocop:enable Metrics/AbcSize
 
-          result
+      # Attempt to provide a response for the provided request.
+      #
+      # @param [Rack::Request] request The HTTP request.
+      # @return [Hash] A response hash.
+      def self.response_for(request)
+        id = PusherFake.configuration.app_id
+
+        REQUEST_PATHS.each do |path, method|
+          matcher = Regexp.new(path.to_s.sub(":id", id))
+          matches = matcher.match(request.path)
+
+          next if matches.nil?
+
+          arguments = [matches[1], request].compact
+
+          return public_send(method, *arguments)
         end
+
+        raise "Unknown path: #{request.path}"
       end
 
       # Returns a hash of the IDs for the users in the channel.
       #
       # @param [String] name The channel name.
       # @return [Hash] A hash of user IDs.
-      def self.users(name)
+      def self.users(name, _request = nil)
         channels = PusherFake::Channel.channels || {}
         channel  = channels[name]
 

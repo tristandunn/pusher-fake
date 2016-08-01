@@ -1,4 +1,5 @@
 module PusherFake
+  # Webhook triggering.
   class Webhook
     class << self
       def trigger(name, data = {})
@@ -17,7 +18,8 @@ module PusherFake
       private
 
       def headers_for(payload)
-        { "Content-Type"       => "application/json",
+        {
+          "Content-Type"       => "application/json",
           "X-Pusher-Key"       => PusherFake.configuration.key,
           "X-Pusher-Signature" => signature_for(payload)
         }

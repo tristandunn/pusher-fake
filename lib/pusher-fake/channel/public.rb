@@ -1,5 +1,6 @@
 module PusherFake
   module Channel
+    # A public channel.
     class Public
       # @return [Array] Connections in this channel.
       attr_reader :connections
@@ -38,7 +39,7 @@ module PusherFake
       # Determine if the +connection+ is in the channel.
       #
       # @param [Connection] connection The connection.
-      # @return [Boolean] +true+ if the connection is in the channel, +false+ otherwise.
+      # @return [Boolean] If the connection is in the channel or not.
       def includes?(connection)
         connections.index(connection)
       end
@@ -51,9 +52,7 @@ module PusherFake
       def remove(connection)
         connections.delete(connection)
 
-        if connections.empty?
-          trigger("channel_vacated", channel: name)
-        end
+        trigger("channel_vacated", channel: name) if connections.empty?
       end
 
       # Return subscription data for the channel.
@@ -75,15 +74,15 @@ module PusherFake
       #
       # If it is the first connection, trigger the channel_occupied webhook.
       #
-      # @param [Connection] connection The connection a subscription succeeded for.
+      # @param [Connection] connection Connection a subscription succeeded for.
       # @param [Hash] options The options for the channel.
-      def subscription_succeeded(connection, options = {})
-        connection.emit("pusher_internal:subscription_succeeded", subscription_data, name)
+      def subscription_succeeded(connection, _options = {})
+        connection.emit("pusher_internal:subscription_succeeded",
+                        subscription_data, name)
+
         connections.push(connection)
 
-        if connections.length == 1
-          trigger("channel_occupied", channel: name)
-        end
+        trigger("channel_occupied", channel: name) if connections.length == 1
       end
     end
   end
