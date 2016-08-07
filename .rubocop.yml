@@ -7,6 +7,9 @@ RSpec/FilePath:
 RSpec/MultipleDescribes:
   Enabled: false
 
+RSpec/NamedSubject:
+  Enabled: false
+
 Style/AlignHash:
   EnforcedColonStyle: table
   EnforcedHashRocketStyle: table
