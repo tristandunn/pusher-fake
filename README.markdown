@@ -47,6 +47,10 @@ require "pusher-fake/support/rspec"
 require "pusher-fake/support/cucumber"
 ```
 
+##### Zeus
+
+A custom plan is required. See [an example plan](https://github.com/tristandunn/pusher-fake-example/commit/add6dedad3b6da12cdac818d2fff3696a5d44738) for the configuration necessary.
+
 ##### Other
 
 ```ruby
