@@ -11,9 +11,9 @@ describe PusherFake, ".configure" do
 end
 
 describe PusherFake, ".configuration" do
-  let(:configuration) { double }
-
   subject { described_class }
+
+  let(:configuration) { double }
 
   before do
     described_class.instance_variable_set("@configuration", nil)
@@ -43,9 +43,9 @@ describe PusherFake, ".configuration" do
 end
 
 describe PusherFake, ".javascript" do
-  let(:configuration) { subject.configuration }
-
   subject { described_class }
+
+  let(:configuration) { subject.configuration }
 
   it "returns JavaScript setting the host and port to the configured options" do
     javascript = subject.javascript
@@ -66,11 +66,11 @@ describe PusherFake, ".javascript" do
 end
 
 describe PusherFake, ".log" do
+  subject { described_class }
+
   let(:logger)        { instance_double(Logger, :<< => "") }
   let(:message)       { "Hello world." }
   let(:configuration) { subject.configuration }
-
-  subject { described_class }
 
   before do
     configuration.logger = logger

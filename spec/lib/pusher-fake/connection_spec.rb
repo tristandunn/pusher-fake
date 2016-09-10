@@ -1,9 +1,9 @@
 require "spec_helper"
 
 shared_examples_for "#process" do
-  let(:json) { double }
-
   subject { PusherFake::Connection.new(double) }
+
+  let(:json) { double }
 
   before do
     allow(PusherFake).to receive(:log)
@@ -25,9 +25,9 @@ shared_examples_for "#process" do
 end
 
 describe PusherFake::Connection do
-  let(:socket) { double }
-
   subject { described_class }
+
+  let(:socket) { double }
 
   it "assigns the provided socket" do
     connection = subject.new(socket)
@@ -37,6 +37,8 @@ describe PusherFake::Connection do
 end
 
 describe PusherFake::Connection, "#emit" do
+  subject { described_class.new(socket) }
+
   let(:data)         { { some: "data", good: true } }
   let(:json)         { MultiJson.dump(message) }
   let(:event)        { "name" }
@@ -47,8 +49,6 @@ describe PusherFake::Connection, "#emit" do
   let(:socket) do
     instance_double(EventMachine::WebSocket::Connection, send: nil)
   end
-
-  subject { described_class.new(socket) }
 
   before do
     allow(PusherFake).to receive(:log)
@@ -75,9 +75,9 @@ describe PusherFake::Connection, "#emit" do
 end
 
 describe PusherFake::Connection, "#establish" do
-  let(:socket) { double }
-
   subject { described_class.new(socket) }
+
+  let(:socket) { double }
 
   before do
     allow(subject).to receive(:emit)
@@ -93,10 +93,10 @@ describe PusherFake::Connection, "#establish" do
 end
 
 describe PusherFake::Connection, "#id" do
+  subject { described_class.new(socket) }
+
   let(:id)     { "123.456" }
   let(:socket) { instance_double(Object, object_id: 123_456) }
-
-  subject { described_class.new(socket) }
 
   it "returns the object ID of the socket" do
     expect(subject.id).to eq(id)

@@ -1,9 +1,9 @@
 require "spec_helper"
 
 describe PusherFake::Channel::Public do
-  let(:name) { "channel" }
-
   subject { described_class }
+
+  let(:name) { "channel" }
 
   it "assigns the provided name" do
     channel = subject.new(name)
@@ -19,11 +19,11 @@ describe PusherFake::Channel::Public do
 end
 
 describe PusherFake::Channel, "#add" do
+  subject { PusherFake::Channel::Public.new(name) }
+
   let(:name)        { "name" }
   let(:connection)  { instance_double(PusherFake::Connection, emit: nil) }
   let(:connections) { instance_double(Array, push: nil, length: 0) }
-
-  subject { PusherFake::Channel::Public.new(name) }
 
   before do
     allow(PusherFake::Webhook).to receive(:trigger)
@@ -54,6 +54,8 @@ describe PusherFake::Channel, "#add" do
 end
 
 describe PusherFake::Channel, "#emit" do
+  subject { PusherFake::Channel::Public.new(name) }
+
   let(:data)        { double }
   let(:name)        { "name" }
   let(:event)       { "event" }
@@ -66,8 +68,6 @@ describe PusherFake::Channel, "#emit" do
   let(:connection_2) do
     instance_double(PusherFake::Connection, emit: nil, id: "2")
   end
-
-  subject { PusherFake::Channel::Public.new(name) }
 
   before do
     allow(subject).to receive(:connections).and_return(connections)
@@ -89,9 +89,9 @@ describe PusherFake::Channel, "#emit" do
 end
 
 describe PusherFake::Channel, "#includes?" do
-  let(:connection) { double }
-
   subject { PusherFake::Channel::Public.new("name") }
+
+  let(:connection) { double }
 
   it "returns true if the connection is in the channel" do
     allow(subject).to receive(:connections).and_return([connection])
@@ -107,11 +107,11 @@ describe PusherFake::Channel, "#includes?" do
 end
 
 describe PusherFake::Channel, "#remove" do
+  subject { PusherFake::Channel::Public.new(name) }
+
   let(:name)         { "name" }
   let(:connection_1) { double }
   let(:connection_2) { double }
-
-  subject { PusherFake::Channel::Public.new(name) }
 
   before do
     allow(PusherFake::Webhook).to receive(:trigger)

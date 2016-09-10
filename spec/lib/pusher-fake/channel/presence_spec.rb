@@ -1,9 +1,9 @@
 require "spec_helper"
 
 describe PusherFake::Channel::Presence do
-  let(:name) { "channel" }
-
   subject { described_class }
+
+  let(:name) { "channel" }
 
   it "inherits from private channel" do
     expect(subject.ancestors).to include(PusherFake::Channel::Private)
@@ -17,6 +17,8 @@ describe PusherFake::Channel::Presence do
 end
 
 describe PusherFake::Channel::Presence, "#add" do
+  subject { described_class.new(name) }
+
   let(:name)              { "name" }
   let(:user_id)           { "1234" }
   let(:connection)        { instance_double(PusherFake::Connection, emit: nil) }
@@ -29,8 +31,6 @@ describe PusherFake::Channel::Presence, "#add" do
     { auth:         authentication,
       channel_data: MultiJson.dump(channel_data) }
   end
-
-  subject { described_class.new(name) }
 
   before do
     allow(PusherFake::Webhook).to receive(:trigger)
@@ -139,12 +139,12 @@ describe PusherFake::Channel::Presence, "#add" do
 end
 
 describe PusherFake::Channel::Presence, "#remove" do
+  subject { described_class.new(name) }
+
   let(:name)         { "name" }
   let(:user_id)      { "1234" }
   let(:connection)   { double }
   let(:channel_data) { { user_id: user_id } }
-
-  subject { described_class.new(name) }
 
   before do
     allow(PusherFake::Webhook).to receive(:trigger)
@@ -183,12 +183,12 @@ end
 
 describe PusherFake::Channel::Presence,
          "#remove, for an unsubscribed connection" do
+  subject { described_class.new(name) }
+
   let(:name)         { "name" }
   let(:user_id)      { "1234" }
   let(:connection)   { double }
   let(:channel_data) { { user_id: user_id } }
-
-  subject { described_class.new(name) }
 
   before do
     allow(subject).to receive(:connections).and_return([])
@@ -218,12 +218,12 @@ describe PusherFake::Channel::Presence,
 end
 
 describe PusherFake::Channel::Presence, "#subscription_data" do
+  subject { described_class.new("name") }
+
   let(:one)     { { user_id: 1, name: "Bob" } }
   let(:two)     { { user_id: 2, name: "Beau" } }
   let(:data)    { subject.subscription_data }
   let(:members) { { double => one } }
-
-  subject { described_class.new("name") }
 
   before do
     allow(subject).to receive(:members).and_return(members)

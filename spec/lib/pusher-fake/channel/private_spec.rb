@@ -9,13 +9,13 @@ describe PusherFake::Channel::Private do
 end
 
 describe PusherFake::Channel::Private, "#add" do
+  subject { described_class.new(name) }
+
   let(:data)           { { auth: authentication } }
   let(:name)           { "name" }
   let(:connection)     { instance_double(PusherFake::Connection, emit: nil) }
   let(:connections)    { instance_double(Array, push: nil, length: 0) }
   let(:authentication) { "auth" }
-
-  subject { described_class.new(name) }
 
   before do
     allow(PusherFake::Webhook).to receive(:trigger)
@@ -77,6 +77,8 @@ describe PusherFake::Channel::Private, "#add" do
 end
 
 describe PusherFake::Channel::Private, "#authentication_for" do
+  subject { described_class.new(name) }
+
   let(:id)        { "1234" }
   let(:name)      { "private-channel" }
   let(:digest)    { instance_double(OpenSSL::Digest::SHA256) }
@@ -86,8 +88,6 @@ describe PusherFake::Channel::Private, "#authentication_for" do
   let(:configuration) do
     instance_double(PusherFake::Configuration, key: "key", secret: "secret")
   end
-
-  subject { described_class.new(name) }
 
   before do
     allow(PusherFake).to receive(:configuration).and_return(configuration)
@@ -111,6 +111,8 @@ end
 
 describe PusherFake::Channel::Private,
          "#authentication_for, with channel data" do
+  subject { described_class.new(name) }
+
   let(:id)           { "1234" }
   let(:name)         { "private-channel" }
   let(:digest)       { instance_double(OpenSSL::Digest::SHA256) }
@@ -121,8 +123,6 @@ describe PusherFake::Channel::Private,
   let(:configuration) do
     instance_double(PusherFake::Configuration, key: "key", secret: "secret")
   end
-
-  subject { described_class.new(name) }
 
   before do
     allow(PusherFake).to receive(:configuration).and_return(configuration)
@@ -145,13 +145,13 @@ describe PusherFake::Channel::Private,
 end
 
 describe PusherFake::Channel::Private, "#authorized?" do
+  subject { described_class.new(name) }
+
   let(:data)           { { auth: authentication, channel_data: channel_data } }
   let(:name)           { "private-channel" }
   let(:connection)     { instance_double(PusherFake::Connection, id: "1") }
   let(:channel_data)   { "{}" }
   let(:authentication) { "authentication" }
-
-  subject { described_class.new(name) }
 
   before do
     allow(subject).to receive(:authentication_for)

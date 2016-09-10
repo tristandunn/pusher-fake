@@ -41,6 +41,8 @@ describe PusherFake::Server, ".start" do
 end
 
 describe PusherFake::Server, ".start_socket_server" do
+  subject { described_class }
+
   let(:data)    { double }
   let(:options) { configuration.socket_options }
 
@@ -57,8 +59,6 @@ describe PusherFake::Server, ".start_socket_server" do
     instance_double(EventMachine::WebSocket::Connection,
                     onopen: nil, onmessage: nil, onclose: nil)
   end
-
-  subject { described_class }
 
   before do
     allow(PusherFake).to receive(:configuration).and_return(configuration)
@@ -131,6 +131,8 @@ describe PusherFake::Server, ".start_socket_server" do
 end
 
 describe PusherFake::Server, ".start_web_server" do
+  subject { described_class }
+
   let(:host)   { "192.168.0.1" }
   let(:port)   { 8081 }
   let(:server) { instance_double(Thin::Server, :start! => true, :ssl= => true) }
@@ -139,8 +141,6 @@ describe PusherFake::Server, ".start_web_server" do
     instance_double(PusherFake::Configuration,
                     web_options: { host: host, port: port, ssl: true })
   end
-
-  subject { described_class }
 
   before do
     allow(Thin::Server).to receive(:new).and_return(server)

@@ -1,13 +1,22 @@
 require:
   - rubocop-rspec
 
+RSpec/ExampleLength:
+  Max: 10
+
 RSpec/FilePath:
   Enabled: false
 
 RSpec/MultipleDescribes:
   Enabled: false
 
+RSpec/MultipleExpectations:
+  Max: 4
+
 RSpec/NamedSubject:
+  Enabled: false
+
+RSpec/SubjectStub:
   Enabled: false
 
 Style/AlignHash:

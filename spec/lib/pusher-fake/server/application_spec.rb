@@ -1,13 +1,13 @@
 require "spec_helper"
 
 shared_examples_for "an API request" do
+  subject { PusherFake::Server::Application }
+
   let(:hash)        { double }
   let(:string)      { double }
   let(:request)     { instance_double(Rack::Request, path: path) }
   let(:response)    { double }
   let(:environment) { double }
-
-  subject { PusherFake::Server::Application }
 
   before do
     allow(response).to receive(:finish).and_return(response)
@@ -84,6 +84,8 @@ describe PusherFake::Server::Application,
 end
 
 describe PusherFake::Server::Application, ".call, with unknown path" do
+  subject { described_class }
+
   let(:path)        { "/apps/fake/events" }
   let(:request)     { instance_double(Rack::Request, path: path) }
   let(:message)     { "Unknown path: #{path}" }
@@ -96,8 +98,6 @@ describe PusherFake::Server::Application, ".call, with unknown path" do
     allow(Rack::Request).to receive(:new).and_return(request)
     allow(Rack::Response).to receive(:new).and_return(response)
   end
-
-  subject { described_class }
 
   it "creates a request" do
     subject.call(environment)
@@ -125,14 +125,14 @@ describe PusherFake::Server::Application, ".call, with unknown path" do
 end
 
 describe PusherFake::Server::Application, ".call, raising an error" do
+  subject { described_class }
+
   let(:id)          { PusherFake.configuration.app_id }
   let(:path)        { "/apps/#{id}/channels" }
   let(:message)     { "Example error message." }
   let(:request)     { instance_double(Rack::Request, path: path) }
   let(:response)    { double }
   let(:environment) { double }
-
-  subject { described_class }
 
   before do
     allow(subject).to receive(:channels).and_raise(message)
@@ -169,6 +169,8 @@ describe PusherFake::Server::Application, ".call, raising an error" do
 end
 
 describe PusherFake::Server::Application, ".events" do
+  subject { described_class }
+
   let(:body)       { instance_double(StringIO, read: event_json) }
   let(:data)       { { "example" => "data" } }
   let(:name)       { "event-name" }
@@ -188,8 +190,6 @@ describe PusherFake::Server::Application, ".events" do
       "socket_id" => socket_id
     }
   end
-
-  subject { described_class }
 
   before do
     allow(MultiJson).to receive(:load).with(event_json).and_return(event)
@@ -240,10 +240,10 @@ describe PusherFake::Server::Application, ".events" do
 end
 
 describe PusherFake::Server::Application, ".channels, requesting all" do
+  subject { described_class }
+
   let(:request)  { instance_double(Rack::Request, params: {}) }
   let(:channels) { { "channel-1" => double, "channel-2" => double } }
-
-  subject { described_class }
 
   before do
     allow(PusherFake::Channel).to receive(:channels).and_return(channels)
@@ -258,11 +258,11 @@ end
 
 describe PusherFake::Server::Application,
          ".channels, requesting channels with a filter" do
+  subject { described_class }
+
   let(:params)   { { "filter_by_prefix" => "public-" } }
   let(:request)  { instance_double(Rack::Request, params: params) }
   let(:channels) { { "public-1" => double, "presence-1" => double } }
-
-  subject { described_class }
 
   before do
     allow(PusherFake::Channel).to receive(:channels).and_return(channels)
@@ -277,6 +277,8 @@ end
 
 describe PusherFake::Server::Application,
          ".channels, requesting user count for channels with a filter" do
+  subject { described_class }
+
   let(:request)  { instance_double(Rack::Request, params: params) }
   let(:channels) { { "public-1" => double, "presence-1" => channel } }
 
@@ -288,8 +290,6 @@ describe PusherFake::Server::Application,
   let(:params) do
     { "filter_by_prefix" => "presence-", "info" => "user_count" }
   end
-
-  subject { described_class }
 
   before do
     allow(PusherFake::Channel).to receive(:channels).and_return(channels)
@@ -304,9 +304,9 @@ end
 
 describe PusherFake::Server::Application,
          ".channels, requesting all channels with no channels occupied" do
-  let(:request) { instance_double(Rack::Request, params: {}) }
-
   subject { described_class }
+
+  let(:request) { instance_double(Rack::Request, params: {}) }
 
   before do
     allow(PusherFake::Channel).to receive(:channels).and_return({})
@@ -321,10 +321,10 @@ end
 
 describe PusherFake::Server::Application,
          ".channels, requesting a user count on a non-presence channel" do
+  subject { described_class }
+
   let(:params)  { { "filter_by_prefix" => "public-", "info" => "user_count" } }
   let(:request) { instance_double(Rack::Request, params: params) }
-
-  subject { described_class }
 
   it "raises an error" do
     expect do
@@ -334,6 +334,8 @@ describe PusherFake::Server::Application,
 end
 
 describe PusherFake::Server::Application, ".channel, for an occupied channel" do
+  subject { described_class }
+
   let(:name)     { "public-1" }
   let(:request)  { instance_double(Rack::Request, params: {}) }
   let(:channels) { { name => channel } }
@@ -341,8 +343,6 @@ describe PusherFake::Server::Application, ".channel, for an occupied channel" do
   let(:channel) do
     instance_double(PusherFake::Channel::Presence, connections: [double])
   end
-
-  subject { described_class }
 
   before do
     allow(PusherFake::Channel).to receive(:channels).and_return(channels)
@@ -356,6 +356,8 @@ describe PusherFake::Server::Application, ".channel, for an occupied channel" do
 end
 
 describe PusherFake::Server::Application, ".channel, for unoccupied channel" do
+  subject { described_class }
+
   let(:name)     { "public-1" }
   let(:request)  { instance_double(Rack::Request, params: {}) }
   let(:channels) { { name => channel } }
@@ -363,8 +365,6 @@ describe PusherFake::Server::Application, ".channel, for unoccupied channel" do
   let(:channel) do
     instance_double(PusherFake::Channel::Presence, connections: [])
   end
-
-  subject { described_class }
 
   before do
     allow(PusherFake::Channel).to receive(:channels).and_return(channels)
@@ -378,10 +378,10 @@ describe PusherFake::Server::Application, ".channel, for unoccupied channel" do
 end
 
 describe PusherFake::Server::Application, ".channel, for an unknown channel" do
+  subject { described_class }
+
   let(:request)  { instance_double(Rack::Request, params: {}) }
   let(:channels) { {} }
-
-  subject { described_class }
 
   before do
     allow(PusherFake::Channel).to receive(:channels).and_return(channels)
@@ -396,6 +396,8 @@ end
 
 describe PusherFake::Server::Application,
          ".channel, request user count for a presence channel" do
+  subject { described_class }
+
   let(:name)     { "presence-1" }
   let(:params)   { { "info" => "user_count" } }
   let(:request)  { instance_double(Rack::Request, params: params) }
@@ -405,8 +407,6 @@ describe PusherFake::Server::Application,
     instance_double(PusherFake::Channel::Presence,
                     connections: [double, double])
   end
-
-  subject { described_class }
 
   before do
     allow(PusherFake::Channel).to receive(:channels).and_return(channels)
@@ -421,10 +421,10 @@ end
 
 describe PusherFake::Server::Application,
          ".channel, requesting a user count on a non-presence channel" do
+  subject { described_class }
+
   let(:params)  { { "info" => "user_count" } }
   let(:request) { instance_double(Rack::Request, params: params) }
-
-  subject { described_class }
 
   it "raises an error" do
     expect do
@@ -434,6 +434,8 @@ describe PusherFake::Server::Application,
 end
 
 describe PusherFake::Server::Application, ".users, for an occupied channel" do
+  subject { described_class }
+
   let(:name)     { "public-1" }
   let(:user_1)   { instance_double(PusherFake::Connection, id: "1") }
   let(:user_2)   { instance_double(PusherFake::Connection, id: "2") }
@@ -442,8 +444,6 @@ describe PusherFake::Server::Application, ".users, for an occupied channel" do
   let(:channel) do
     instance_double(PusherFake::Channel::Public, connections: [user_1, user_2])
   end
-
-  subject { described_class }
 
   before do
     allow(PusherFake::Channel).to receive(:channels).and_return(channels)
@@ -457,14 +457,14 @@ describe PusherFake::Server::Application, ".users, for an occupied channel" do
 end
 
 describe PusherFake::Server::Application, ".users, for an empty channel" do
+  subject { described_class }
+
   let(:name)     { "public-1" }
   let(:channels) { { name => channel } }
 
   let(:channel) do
     instance_double(PusherFake::Channel::Public, connections: [])
   end
-
-  subject { described_class }
 
   before do
     allow(PusherFake::Channel).to receive(:channels).and_return(channels)
@@ -478,9 +478,9 @@ describe PusherFake::Server::Application, ".users, for an empty channel" do
 end
 
 describe PusherFake::Server::Application, ".users, for an unknown channel" do
-  let(:channels) { {} }
-
   subject { described_class }
+
+  let(:channels) { {} }
 
   before do
     allow(PusherFake::Channel).to receive(:channels).and_return(channels)

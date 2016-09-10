@@ -1,10 +1,10 @@
 require "spec_helper"
 
 describe PusherFake::Channel, ".factory" do
+  subject { described_class }
+
   let(:name)    { "channel" }
   let(:channel) { double }
-
-  subject { described_class }
 
   before do
     allow(PusherFake::Channel::Public).to receive(:new).and_return(channel)
@@ -37,10 +37,10 @@ describe PusherFake::Channel, ".factory" do
 end
 
 describe PusherFake::Channel, ".factory, for a private channel" do
+  subject { described_class }
+
   let(:name)    { "private-channel" }
   let(:channel) { double }
-
-  subject { described_class }
 
   before do
     allow(PusherFake::Channel::Private).to receive(:new).and_return(channel)
@@ -73,10 +73,10 @@ describe PusherFake::Channel, ".factory, for a private channel" do
 end
 
 describe PusherFake::Channel, ".factory, for a presence channel" do
+  subject { described_class }
+
   let(:name)    { "presence-channel" }
   let(:channel) { double }
-
-  subject { described_class }
 
   before do
     allow(PusherFake::Channel::Presence).to receive(:new).and_return(channel)
@@ -109,6 +109,8 @@ describe PusherFake::Channel, ".factory, for a presence channel" do
 end
 
 describe PusherFake::Channel, ".remove" do
+  subject { described_class }
+
   let(:channels)   { { channel_1: channel_1, channel_2: channel_2 } }
   let(:connection) { double }
 
@@ -123,8 +125,6 @@ describe PusherFake::Channel, ".remove" do
                     remove:      nil,
                     connections: instance_double(Array, empty?: false))
   end
-
-  subject { described_class }
 
   before do
     allow(subject).to receive(:channels).and_return(channels)
