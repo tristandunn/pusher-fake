@@ -23,6 +23,9 @@ Style/AlignHash:
   EnforcedColonStyle: table
   EnforcedHashRocketStyle: table
 
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
 Style/IfUnlessModifier:
   Enabled: false
 
