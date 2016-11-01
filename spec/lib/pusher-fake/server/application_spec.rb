@@ -66,6 +66,24 @@ describe PusherFake::Server::Application, ".call, for triggering events" do
 end
 
 describe PusherFake::Server::Application,
+         ".call, for triggering batch events" do
+  it_should_behave_like "an API request" do
+    let(:id)   { PusherFake.configuration.app_id }
+    let(:path) { "/apps/#{id}/batch_events" }
+
+    before do
+      allow(subject).to receive(:batch_events).and_return(hash)
+    end
+
+    it "emits batch events" do
+      subject.call(environment)
+
+      expect(subject).to have_received(:batch_events).with(request)
+    end
+  end
+end
+
+describe PusherFake::Server::Application,
          ".call, retrieving occupied channels" do
   it_should_behave_like "an API request" do
     let(:id)   { PusherFake.configuration.app_id }

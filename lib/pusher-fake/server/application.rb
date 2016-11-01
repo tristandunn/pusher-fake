@@ -13,6 +13,7 @@ module PusherFake
 
       REQUEST_PATHS = {
         %r{\A/apps/:id/events\z}                 => :events,
+        %r{\A/apps/:id/batch_events\z}           => :batch_events,
         %r{\A/apps/:id/channels\z}               => :channels,
         %r{\A/apps/:id/channels/([^/]+)\z}       => :channel,
         %r{\A/apps/:id/channels/([^/]+)/users\z} => :users
