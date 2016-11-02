@@ -42,6 +42,7 @@ module PusherFake
         event = MultiJson.load(request.body.read)
         data  = MultiJson.load(event["data"]) rescue event["data"]
 
+        event["channels"] ||= [event["channel"]]
         event["channels"].each do |channel_name|
           channel = Channel.factory(channel_name)
           channel.emit(event["name"], data, socket_id: event["socket_id"])
@@ -56,13 +57,14 @@ module PusherFake
       # @param [Rack::Request] request The HTTP request.
       # @return [Hash] An empty hash.
       #
-      # rubocop:disable Style/RescueModifier
+      # rubocop:disable Style/RescueModifier, Metrics/AbcSize
       def self.batch_events(request)
         batch = MultiJson.load(request.body.read)["batch"]
 
         batch.each do |event|
           data = MultiJson.load(event["data"]) rescue event["data"]
 
+          event["channels"] ||= [event["channel"]]
           event["channels"].each do |channel_name|
             channel = Channel.factory(channel_name)
             channel.emit(event["name"], data, socket_id: event["socket_id"])
@@ -71,7 +73,7 @@ module PusherFake
 
         {}
       end
-      # rubocop:enable Style/RescueModifier
+      # rubocop:enable Style/RescueModifier, Metrics/AbcSize
 
       # Return a hash of channel information.
       #
