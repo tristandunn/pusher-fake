@@ -257,6 +257,79 @@ describe PusherFake::Server::Application, ".events" do
   end
 end
 
+describe PusherFake::Server::Application, ".batch_events" do
+  subject { described_class }
+
+  let(:body)       { instance_double(StringIO, read: event_json) }
+  let(:data)       { { "example" => "data" } }
+  let(:name)       { "event-name" }
+  let(:request)    { instance_double(Rack::Request, body: body) }
+  let(:channels)   { ["channel-1", "channel-2"] }
+  let(:channel_1)  { instance_double(PusherFake::Channel::Public, emit: true) }
+  let(:channel_2)  { instance_double(PusherFake::Channel::Public, emit: true) }
+  let(:data_json)  { data.to_json }
+  let(:socket_id)  { double }
+  let(:event_json) { double }
+
+  let(:batch) do
+    {
+      "batch" => [{
+        "channels"  => channels,
+        "name"      => name,
+        "data"      => data_json,
+        "socket_id" => socket_id
+      }]
+    }
+  end
+
+  before do
+    allow(MultiJson).to receive(:load).with(event_json).and_return(batch)
+    allow(MultiJson).to receive(:load).with(data_json).and_return(data)
+    allow(PusherFake::Channel).to receive(:factory)
+      .with(channels[0]).and_return(channel_1)
+    allow(PusherFake::Channel).to receive(:factory)
+      .with(channels[1]).and_return(channel_2)
+  end
+
+  it "parses the request body as JSON" do
+    subject.batch_events(request)
+
+    expect(MultiJson).to have_received(:load).with(event_json)
+  end
+
+  it "parses the event data as JSON" do
+    subject.batch_events(request)
+
+    expect(MultiJson).to have_received(:load).with(data_json)
+  end
+
+  it "handles invalid JSON for event data" do
+    batch["batch"].first["data"] = data = "fake"
+
+    allow(MultiJson).to receive(:load)
+      .with(data).and_raise(MultiJson::LoadError)
+
+    expect { subject.batch_events(request) }.not_to raise_error
+  end
+
+  it "creates channels by name" do
+    subject.batch_events(request)
+
+    channels.each do |channel|
+      expect(PusherFake::Channel).to have_received(:factory).with(channel)
+    end
+  end
+
+  it "emits the event to the channels" do
+    subject.batch_events(request)
+
+    expect(channel_1).to have_received(:emit)
+      .with(name, data, socket_id: socket_id)
+    expect(channel_2).to have_received(:emit)
+      .with(name, data, socket_id: socket_id)
+  end
+end
+
 describe PusherFake::Server::Application, ".channels, requesting all" do
   subject { described_class }
 
