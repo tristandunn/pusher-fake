@@ -51,6 +51,28 @@ module PusherFake
       end
       # rubocop:enable Style/RescueModifier
 
+      # Emit a batch event with data to the requested channel(s).
+      #
+      # @param [Rack::Request] request The HTTP request.
+      # @return [Hash] An empty hash.
+      #
+      # rubocop:disable Style/RescueModifier
+      def self.batch_events(request)
+        batch = MultiJson.load(request.body.read)["batch"]
+
+        batch.each do |event|
+          data = MultiJson.load(event["data"]) rescue event["data"]
+
+          event["channels"].each do |channel_name|
+            channel = Channel.factory(channel_name)
+            channel.emit(event["name"], data, socket_id: event["socket_id"])
+          end
+        end
+
+        {}
+      end
+      # rubocop:enable Style/RescueModifier
+
       # Return a hash of channel information.
       #
       # Occupied status is always included. A user count may be requested for
