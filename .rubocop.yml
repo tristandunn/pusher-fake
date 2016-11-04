@@ -1,6 +1,9 @@
 require:
   - rubocop-rspec
 
+AllCops:
+  TargetRubyVersion: 2.2
+
 RSpec/ExampleLength:
   Max: 10
 
@@ -22,9 +25,6 @@ RSpec/SubjectStub:
 Style/AlignHash:
   EnforcedColonStyle: table
   EnforcedHashRocketStyle: table
-
-Style/FrozenStringLiteralComment:
-  Enabled: false
 
 Style/IfUnlessModifier:
   Enabled: false
