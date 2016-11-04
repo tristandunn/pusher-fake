@@ -3,6 +3,7 @@
 ## 1.7.0 — Unreleased
 
 * Add support for batch events. (Tyler Hogan)
+* Update the Pusher JS client to version 3.2.1. (Tristan Dunn)
 * Update development and test dependencies. (Tristan Dunn)
 
 ## 1.6.0 — July 31, 2016

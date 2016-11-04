@@ -1,5 +1,5 @@
 /*!
- * Pusher JavaScript Library v3.1.0
+ * Pusher JavaScript Library v3.2.1
  * http://pusher.com/
  *
  * Copyright 2016, Pusher
@@ -154,9 +154,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    };
 	    Pusher.log = function (message) {
-	        var global = Function("return this")();
-	        if (Pusher.logToConsole && global.console && global.console.log) {
-	            global.console.log(message);
+	        if (Pusher.logToConsole && (window).console && (window).console.log) {
+	            (window).console.log(message);
 	        }
 	    };
 	    Pusher.getClientFeatures = function () {
@@ -189,6 +188,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    Pusher.prototype.bind = function (event_name, callback) {
 	        this.global_emitter.bind(event_name, callback);
+	        return this;
+	    };
+	    Pusher.prototype.unbind = function (event_name, callback) {
+	        this.global_emitter.unbind(event_name, callback);
 	        return this;
 	    };
 	    Pusher.prototype.bind_all = function (callback) {
@@ -297,9 +300,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	    getProtocol: function () {
 	        return this.getDocument().location.protocol;
-	    },
-	    getGlobal: function () {
-	        return window;
 	    },
 	    getAuthorizers: function () {
 	        return { ajax: xhr_auth_1["default"], jsonp: jsonp_auth_1["default"] };
@@ -451,7 +451,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	"use strict";
 	var Defaults = {
-	    VERSION: "3.1.0",
+	    VERSION: "3.2.1",
 	    PROTOCOL: 7,
 	    host: 'ws.pusherapp.com',
 	    ws_port: 80,
@@ -601,13 +601,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	            args[_i - 0] = arguments[_i];
 	        }
 	        var message = collections_1.stringify.apply(this, arguments);
-	        var global = Function("return this")();
-	        if (global.console) {
-	            if (global.console.warn) {
-	                global.console.warn(message);
+	        if ((window).console) {
+	            if ((window).console.warn) {
+	                (window).console.warn(message);
 	            }
-	            else if (global.console.log) {
-	                global.console.log(message);
+	            else if ((window).console.log) {
+	                (window).console.log(message);
 	            }
 	        }
 	        if (pusher_1["default"].log) {
@@ -626,7 +625,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	"use strict";
 	var base64_1 = __webpack_require__(10);
 	var util_1 = __webpack_require__(11);
-	var global = Function("return this")();
 	function extend(target) {
 	    var sources = [];
 	    for (var _i = 1; _i < arguments.length; _i++) {
@@ -654,7 +652,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            m.push(arguments[i]);
 	        }
 	        else {
-	            m.push(JSON.stringify(arguments[i]));
+	            m.push(safeJSONStringify(arguments[i]));
 	        }
 	    }
 	    return m.join(" : ");
@@ -702,7 +700,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.values = values;
 	function apply(array, f, context) {
 	    for (var i = 0; i < array.length; i++) {
-	        f.call(context || global, array[i], i, array);
+	        f.call(context || (window), array[i], i, array);
 	    }
 	}
 	exports.apply = apply;
@@ -772,7 +770,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	function encodeParamsObject(data) {
 	    return mapObject(data, function (value) {
 	        if (typeof value === "object") {
-	            value = JSON.stringify(value);
+	            value = safeJSONStringify(value);
 	        }
 	        return encodeURIComponent(base64_1["default"](value.toString()));
 	    });
@@ -786,29 +784,61 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return query;
 	}
 	exports.buildQueryString = buildQueryString;
-	function safeJSONStringify(source) {
-	    var cache = [];
-	    var serialized = JSON.stringify(source, function (key, value) {
-	        if (typeof value === 'object' && value !== null) {
-	            if (cache.indexOf(value) !== -1) {
-	                return;
-	            }
-	            cache.push(value);
+	function decycleObject(object) {
+	    var objects = [], paths = [];
+	    return (function derez(value, path) {
+	        var i, name, nu;
+	        switch (typeof value) {
+	            case 'object':
+	                if (!value) {
+	                    return null;
+	                }
+	                for (i = 0; i < objects.length; i += 1) {
+	                    if (objects[i] === value) {
+	                        return { $ref: paths[i] };
+	                    }
+	                }
+	                objects.push(value);
+	                paths.push(path);
+	                if (Object.prototype.toString.apply(value) === '[object Array]') {
+	                    nu = [];
+	                    for (i = 0; i < value.length; i += 1) {
+	                        nu[i] = derez(value[i], path + '[' + i + ']');
+	                    }
+	                }
+	                else {
+	                    nu = {};
+	                    for (name in value) {
+	                        if (Object.prototype.hasOwnProperty.call(value, name)) {
+	                            nu[name] = derez(value[name], path + '[' + JSON.stringify(name) + ']');
+	                        }
+	                    }
+	                }
+	                return nu;
+	            case 'number':
+	            case 'string':
+	            case 'boolean':
+	                return value;
 	        }
-	        return value;
-	    });
-	    cache = null;
-	    return serialized;
+	    }(object, '$'));
+	}
+	exports.decycleObject = decycleObject;
+	function safeJSONStringify(source) {
+	    try {
+	        return JSON.stringify(source);
+	    }
+	    catch (e) {
+	        return JSON.stringify(decycleObject(source));
+	    }
 	}
 	exports.safeJSONStringify = safeJSONStringify;
 
 
 /***/ },
 /* 10 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var global = Function("return this")();
 	function encode(s) {
 	    return btoa(utob(s));
 	}
@@ -845,7 +875,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    ];
 	    return chars.join('');
 	};
-	var btoa = global.btoa || function (b) {
+	var btoa = (window).btoa || function (b) {
 	    return b.replace(/[\s\S]{1,3}/g, cb_encode);
 	};
 
@@ -857,9 +887,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	"use strict";
 	var timers_1 = __webpack_require__(12);
 	var Util = {
-	    getGlobal: function () {
-	        return Function("return this")();
-	    },
 	    now: function () {
 	        if (Date.now) {
 	            return Date.now();
@@ -897,12 +924,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
 	var abstract_timer_1 = __webpack_require__(13);
-	var global = Function("return this")();
 	function clearTimeout(timer) {
-	    global.clearTimeout(timer);
+	    (window).clearTimeout(timer);
 	}
 	function clearInterval(timer) {
-	    global.clearInterval(timer);
+	    (window).clearInterval(timer);
 	}
 	var OneOffTimer = (function (_super) {
 	    __extends(OneOffTimer, _super);
@@ -1458,7 +1484,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	"use strict";
 	var callback_registry_1 = __webpack_require__(24);
-	var global = Function("return this")();
 	var Dispatcher = (function () {
 	    function Dispatcher(failThrough) {
 	        this.callbacks = new callback_registry_1["default"]();
@@ -1489,7 +1514,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var callbacks = this.callbacks.get(eventName);
 	        if (callbacks && callbacks.length > 0) {
 	            for (i = 0; i < callbacks.length; i++) {
-	                callbacks[i].fn.call(callbacks[i].context || global, data);
+	                callbacks[i].fn.call(callbacks[i].context || (window), data);
 	            }
 	        }
 	        else if (this.failThrough) {
@@ -3586,12 +3611,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var onClosed = function () {
 	            unbindListeners();
 	            var serializedTransport;
-	            try {
-	                serializedTransport = JSON.stringify(transport);
-	            }
-	            catch (e) {
-	                serializedTransport = Collections.safeJSONStringify(transport);
-	            }
+	            serializedTransport = Collections.safeJSONStringify(transport);
 	            callback(new Errors.TransportClosed(serializedTransport));
 	        };
 	        var unbindListeners = function () {
@@ -3816,6 +3836,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var util_1 = __webpack_require__(11);
 	var runtime_1 = __webpack_require__(2);
 	var sequential_strategy_1 = __webpack_require__(56);
+	var Collections = __webpack_require__(9);
 	var CachedStrategy = (function () {
 	    function CachedStrategy(strategy, transports, options) {
 	        this.strategy = strategy;
@@ -3900,7 +3921,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var storage = runtime_1["default"].getLocalStorage();
 	    if (storage) {
 	        try {
-	            storage[getTransportCacheKey(encrypted)] = JSON.stringify({
+	            storage[getTransportCacheKey(encrypted)] = Collections.safeJSONStringify({
 	                timestamp: util_1["default"].now(),
 	                transport: transport,
 	                latency: latency
