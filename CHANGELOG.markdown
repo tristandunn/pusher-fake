@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.7.0 — Unreleased
+
+* Add support for batch events. (Tyler Hogan)
+
 ## 1.6.0 — July 31, 2016
 
 * Update development and test dependencies. (Tristan Dunn)
