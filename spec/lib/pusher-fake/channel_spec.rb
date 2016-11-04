@@ -1,110 +1,60 @@
 require "spec_helper"
 
 describe PusherFake::Channel, ".factory" do
-  subject { described_class }
+  shared_examples_for "a channel factory" do
+    subject { described_class }
 
-  let(:name)    { "channel" }
-  let(:channel) { double }
+    let(:channel) { double }
 
-  before do
-    allow(PusherFake::Channel::Public).to receive(:new).and_return(channel)
+    before do
+      allow(channel_class).to receive(:new).and_return(channel)
+    end
+
+    after do
+      subject.reset
+    end
+
+    it "caches the channel" do
+      allow(channel_class).to receive(:new).and_call_original
+
+      factory_one = subject.factory(name)
+      factory_two = subject.factory(name)
+
+      expect(factory_one).to eq(factory_two)
+    end
+
+    it "creates the channel by name" do
+      subject.factory(name)
+
+      expect(channel_class).to have_received(:new).with(name)
+    end
+
+    it "returns the channel instance" do
+      factory = subject.factory(name)
+
+      expect(factory).to eq(channel)
+    end
   end
 
-  after do
-    described_class.reset
+  context "for a public channel" do
+    let(:name)          { "channel" }
+    let(:channel_class) { PusherFake::Channel::Public }
+
+    it_behaves_like "a channel factory"
   end
 
-  it "caches the channel" do
-    allow(PusherFake::Channel::Public).to receive(:new).and_call_original
+  context "for a private channel" do
+    let(:name)          { "private-channel" }
+    let(:channel_class) { PusherFake::Channel::Private }
 
-    factory_one = subject.factory(name)
-    factory_two = subject.factory(name)
-
-    expect(factory_one).to eq(factory_two)
+    it_behaves_like "a channel factory"
   end
 
-  it "creates a public channel by name" do
-    subject.factory(name)
+  context "for a presence channel" do
+    let(:name)          { "presence-channel" }
+    let(:channel_class) { PusherFake::Channel::Presence }
 
-    expect(PusherFake::Channel::Public).to have_received(:new).with(name)
-  end
-
-  it "returns the channel instance" do
-    factory = subject.factory(name)
-
-    expect(factory).to eq(channel)
-  end
-end
-
-describe PusherFake::Channel, ".factory, for a private channel" do
-  subject { described_class }
-
-  let(:name)    { "private-channel" }
-  let(:channel) { double }
-
-  before do
-    allow(PusherFake::Channel::Private).to receive(:new).and_return(channel)
-  end
-
-  after do
-    described_class.reset
-  end
-
-  it "caches the channel" do
-    allow(PusherFake::Channel::Private).to receive(:new).and_call_original
-
-    factory_one = subject.factory(name)
-    factory_two = subject.factory(name)
-
-    expect(factory_one).to eq(factory_two)
-  end
-
-  it "creates a private channel by name" do
-    subject.factory(name)
-
-    expect(PusherFake::Channel::Private).to have_received(:new).with(name)
-  end
-
-  it "returns the channel instance" do
-    factory = subject.factory(name)
-
-    expect(factory).to eq(channel)
-  end
-end
-
-describe PusherFake::Channel, ".factory, for a presence channel" do
-  subject { described_class }
-
-  let(:name)    { "presence-channel" }
-  let(:channel) { double }
-
-  before do
-    allow(PusherFake::Channel::Presence).to receive(:new).and_return(channel)
-  end
-
-  after do
-    described_class.reset
-  end
-
-  it "caches the channel" do
-    allow(PusherFake::Channel::Presence).to receive(:new).and_call_original
-
-    factory_one = subject.factory(name)
-    factory_two = subject.factory(name)
-
-    expect(factory_one).to eq(factory_two)
-  end
-
-  it "creates a presence channel by name" do
-    subject.factory(name)
-
-    expect(PusherFake::Channel::Presence).to have_received(:new).with(name)
-  end
-
-  it "returns the channel instance" do
-    factory = subject.factory(name)
-
-    expect(factory).to eq(channel)
+    it_behaves_like "a channel factory"
   end
 end
 
