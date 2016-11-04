@@ -22,12 +22,12 @@ module PusherFake
       def remove(connection)
         super
 
-        if members.key?(connection)
-          trigger("member_removed",
-                  channel: name, user_id: members[connection][:user_id])
+        return unless members.key?(connection)
 
-          emit("pusher_internal:member_removed", members.delete(connection))
-        end
+        trigger("member_removed",
+                channel: name, user_id: members[connection][:user_id])
+
+        emit("pusher_internal:member_removed", members.delete(connection))
       end
 
       # Return a hash containing presence information for the channel.

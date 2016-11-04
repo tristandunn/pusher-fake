@@ -19,10 +19,10 @@ Gem::Specification.new do |s|
   s.add_dependency "multi_json",      "~> 1.6"
 
   s.add_development_dependency "capybara-webkit", "1.11.1"
-  s.add_development_dependency "pusher",          "1.1.0"
-  s.add_development_dependency "rake",            "11.2.2"
+  s.add_development_dependency "pusher",          "1.3.0"
+  s.add_development_dependency "rake",            "11.3.0"
   s.add_development_dependency "rspec",           "3.5.0"
-  s.add_development_dependency "rubocop",         "0.42.0"
+  s.add_development_dependency "rubocop",         "0.43.0"
   s.add_development_dependency "rubocop-rspec",   "1.7.0"
   s.add_development_dependency "sinatra",         "1.4.7"
   s.add_development_dependency "yard",            "0.9.5"

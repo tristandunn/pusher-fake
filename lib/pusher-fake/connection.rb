@@ -79,11 +79,11 @@ module PusherFake
     def process_trigger(event, message)
       channel = channel_for(message)
 
-      if channel.is_a?(Channel::Private) && channel.includes?(self)
-        channel.emit(event, message[:data], socket_id: id)
+      return unless channel.is_a?(Channel::Private) && channel.includes?(self)
 
-        trigger(channel, id, event, message[:data])
-      end
+      channel.emit(event, message[:data], socket_id: id)
+
+      trigger(channel, id, event, message[:data])
     end
 
     def trigger(channel, id, event, data)
