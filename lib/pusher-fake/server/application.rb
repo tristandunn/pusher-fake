@@ -12,8 +12,8 @@ module PusherFake
       PRESENCE_PREFIX_MATCHER = /\Apresence-/
 
       REQUEST_PATHS = {
-        %r{\A/apps/:id/events\z}                 => :events,
         %r{\A/apps/:id/batch_events\z}           => :batch_events,
+        %r{\A/apps/:id/events\z}                 => :events,
         %r{\A/apps/:id/channels\z}               => :channels,
         %r{\A/apps/:id/channels/([^/]+)\z}       => :channel,
         %r{\A/apps/:id/channels/([^/]+)/users\z} => :users
@@ -32,48 +32,30 @@ module PusherFake
         Rack::Response.new(error.message, 400).finish
       end
 
+      # Emit batch events with data to the requested channel(s).
+      #
+      # @param [Rack::Request] request The HTTP request.
+      # @return [Hash] An empty hash.
+      def self.batch_events(request)
+        batch = MultiJson.load(request.body.read)["batch"]
+        batch.each do |event|
+          send_event(event)
+        end
+
+        {}
+      end
+
       # Emit an event with data to the requested channel(s).
       #
       # @param [Rack::Request] request The HTTP request.
       # @return [Hash] An empty hash.
-      #
-      # rubocop:disable Style/RescueModifier
       def self.events(request)
         event = MultiJson.load(request.body.read)
-        data  = MultiJson.load(event["data"]) rescue event["data"]
 
-        event["channels"] ||= [event["channel"]]
-        event["channels"].each do |channel_name|
-          channel = Channel.factory(channel_name)
-          channel.emit(event["name"], data, socket_id: event["socket_id"])
-        end
+        send_event(event)
 
         {}
       end
-      # rubocop:enable Style/RescueModifier
-
-      # Emit a batch event with data to the requested channel(s).
-      #
-      # @param [Rack::Request] request The HTTP request.
-      # @return [Hash] An empty hash.
-      #
-      # rubocop:disable Style/RescueModifier, Metrics/AbcSize
-      def self.batch_events(request)
-        batch = MultiJson.load(request.body.read)["batch"]
-
-        batch.each do |event|
-          data = MultiJson.load(event["data"]) rescue event["data"]
-
-          event["channels"] ||= [event["channel"]]
-          event["channels"].each do |channel_name|
-            channel = Channel.factory(channel_name)
-            channel.emit(event["name"], data, socket_id: event["socket_id"])
-          end
-        end
-
-        {}
-      end
-      # rubocop:enable Style/RescueModifier, Metrics/AbcSize
 
       # Return a hash of channel information.
       #
@@ -160,6 +142,23 @@ module PusherFake
 
         { users: users || [] }
       end
+
+      private_class_method
+
+      # Emit an event with data to the requested channel(s).
+      #
+      # @param [Hash] event The raw event JSON.
+      #
+      # rubocop:disable Style/RescueModifier
+      def self.send_event(event)
+        data     = MultiJson.load(event["data"]) rescue event["data"]
+        channels = Array(event["channels"] || event["channel"])
+        channels.each do |channel_name|
+          channel = Channel.factory(channel_name)
+          channel.emit(event["name"], data, socket_id: event["socket_id"])
+        end
+      end
+      # rubocop:enable Style/RescueModifier
     end
   end
 end
