@@ -48,8 +48,6 @@ module PusherFake
   end
 
   def self.log(message)
-    if configuration.verbose
-      configuration.logger << "#{message}\n"
-    end
+    configuration.logger << "#{message}\n" if configuration.verbose
   end
 end
