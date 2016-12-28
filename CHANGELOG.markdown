@@ -2,7 +2,7 @@
 
 ## 1.8.0 — Unreleased
 
-* Update development dependencies. (Tristan Dunn)
+* Update development and test dependencies. (Tristan Dunn)
 
 ## 1.7.0 — November 4, 2016
 

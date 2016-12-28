@@ -3,5 +3,5 @@ source "https://rubygems.org"
 gemspec
 
 group :test do
-  gem "coveralls", "0.8.15"
+  gem "coveralls", "0.8.17"
 end
