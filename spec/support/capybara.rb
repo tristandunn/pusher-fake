@@ -1,6 +1,9 @@
+require "capybara/poltergeist"
 require "capybara/rspec"
 
-Capybara.app = Sinatra::Application
-Capybara.default_driver = :webkit
+Capybara.register_driver :poltergeist do |app|
+  Capybara::Poltergeist::Driver.new(app, url_whitelist: [])
+end
 
-Capybara::Webkit.configure(&:block_unknown_urls)
+Capybara.app = Sinatra::Application
+Capybara.default_driver = :poltergeist
