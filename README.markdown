@@ -105,6 +105,23 @@ Pusher::Client.new({
 }.merge(PusherFake.configuration.web_options))
 ```
 
+### Binary
+
+If you need to run the fake as a standalone service, perhaps when using Docker, there is a `pusher-fake` binary available.
+
+```
+$ pusher-fake --help
+Usage: pusher-fake [options]
+    -i, --id ID                      Use ID as the application ID for Pusher
+    -k, --key KEY                    Use KEY as the key for Pusher
+    -s, --secret SECRET              Use SECRET as the secret token for Pusher
+        --socket-host HOST           Use HOST for the web socket server
+        --socket-port PORT           Use PORT for the web socket server
+    -v, --[no-]verbose               Run verbosely
+        --web-host HOST              Use HOST for the web server
+        --web-port PORT              Use PORT for the web server
+```
+
 ## Configuration
 
 Note that the application ID, API key, and token are automatically set to the `Pusher` values when using an included support file.

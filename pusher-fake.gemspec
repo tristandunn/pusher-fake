@@ -11,6 +11,7 @@ Gem::Specification.new do |s|
 
   s.files        = Dir["lib/**/*"].to_a
   s.test_files   = Dir["spec/**/*"].to_a
+  s.executables << "pusher-fake"
   s.require_path = "lib"
 
   s.add_dependency "em-http-request", "~> 1.1"

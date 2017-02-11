@@ -1,0 +1,52 @@
+#!/usr/bin/env ruby
+
+# rubocop:disable Metrics/BlockLength, Metrics/LineLength
+
+require "optparse"
+require "pusher"
+require "pusher-fake"
+
+PusherFake.configure do |configuration|
+  OptionParser.new do |options|
+    options.on("-iID", "--id ID", String, "Use ID as the application ID for Pusher") do |application_id|
+      Pusher.app_id        = application_id
+      configuration.app_id = application_id
+    end
+
+    options.on("-kKEY", "--key KEY", String, "Use KEY as the key for Pusher") do |key|
+      Pusher.key        = key
+      configuration.key = key
+    end
+
+    options.on("-sSECRET", "--secret SECRET", String, "Use SECRET as the secret token for Pusher") do |secret|
+      Pusher.secret        = secret
+      configuration.secret = secret
+    end
+
+    options.on("--socket-host HOST", String, "Use HOST for the web socket server") do |host|
+      configuration.socket_options[:host] = host
+    end
+
+    options.on("--socket-port PORT", Integer, "Use PORT for the web socket server") do |port|
+      configuration.socket_options[:port] = port
+    end
+
+    options.on("-v", "--[no-]verbose", "Run verbosely") do |verbose|
+      configuration.verbose = verbose
+    end
+
+    options.on("--web-host HOST", String, "Use HOST for the web server") do |host|
+      configuration.web_options[:host] = host
+    end
+
+    options.on("--web-port PORT", Integer, "Use PORT for the web server") do |port|
+      configuration.web_options[:port] = port
+    end
+  end.parse!
+end
+
+raise OptionParser::MissingArgument.new("--id")     if Pusher.app_id.nil?
+raise OptionParser::MissingArgument.new("--key")    if Pusher.key.nil?
+raise OptionParser::MissingArgument.new("--secret") if Pusher.secret.nil?
+
+PusherFake::Server.start
