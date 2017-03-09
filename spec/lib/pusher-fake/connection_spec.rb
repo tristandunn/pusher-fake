@@ -104,7 +104,7 @@ describe PusherFake::Connection, "#id" do
 end
 
 describe PusherFake::Connection, "#process, with a subscribe event" do
-  it_should_behave_like "#process" do
+  it_behaves_like "#process" do
     let(:data)    { { channel: name, auth: "auth" } }
     let(:name)    { "channel" }
     let(:message) { { event: "pusher:subscribe", data: data } }
@@ -132,7 +132,7 @@ describe PusherFake::Connection, "#process, with a subscribe event" do
 end
 
 describe PusherFake::Connection, "#process, with an unsubscribe event" do
-  it_should_behave_like "#process" do
+  it_behaves_like "#process" do
     let(:name)    { "channel" }
     let(:message) { { event: "pusher:unsubscribe", channel: name } }
 
@@ -159,7 +159,7 @@ describe PusherFake::Connection, "#process, with an unsubscribe event" do
 end
 
 describe PusherFake::Connection, "#process, with a ping event" do
-  it_should_behave_like "#process" do
+  it_behaves_like "#process" do
     let(:message) { { event: "pusher:ping", data: {} } }
 
     before do
@@ -182,7 +182,7 @@ describe PusherFake::Connection, "#process, with a ping event" do
 end
 
 describe PusherFake::Connection, "#process, with a client event" do
-  it_should_behave_like "#process" do
+  it_behaves_like "#process" do
     let(:data)    { {} }
     let(:name)    { "channel" }
     let(:event)   { "client-hello-world" }
@@ -247,7 +247,7 @@ end
 
 describe PusherFake::Connection,
          "#process, with a client event trigger a webhook" do
-  it_should_behave_like "#process" do
+  it_behaves_like "#process" do
     let(:data)    { { example: "data" } }
     let(:name)    { "channel" }
     let(:event)   { "client-hello-world" }
@@ -304,7 +304,7 @@ describe PusherFake::Connection,
 end
 
 describe PusherFake::Connection, "#process, with an unknown event" do
-  it_should_behave_like "#process" do
+  it_behaves_like "#process" do
     let(:data)    { {} }
     let(:name)    { "channel" }
     let(:event)   { "hello-world" }

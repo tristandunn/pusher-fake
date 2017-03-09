@@ -49,7 +49,7 @@ shared_examples_for "an API request" do
 end
 
 describe PusherFake::Server::Application, ".call, for triggering events" do
-  it_should_behave_like "an API request" do
+  it_behaves_like "an API request" do
     let(:id)   { PusherFake.configuration.app_id }
     let(:path) { "/apps/#{id}/events" }
 
@@ -67,7 +67,7 @@ end
 
 describe PusherFake::Server::Application,
          ".call, for triggering batch events" do
-  it_should_behave_like "an API request" do
+  it_behaves_like "an API request" do
     let(:id)   { PusherFake.configuration.app_id }
     let(:path) { "/apps/#{id}/batch_events" }
 
@@ -85,7 +85,7 @@ end
 
 describe PusherFake::Server::Application,
          ".call, retrieving occupied channels" do
-  it_should_behave_like "an API request" do
+  it_behaves_like "an API request" do
     let(:id)   { PusherFake.configuration.app_id }
     let(:path) { "/apps/#{id}/channels" }
 

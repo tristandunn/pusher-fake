@@ -4,6 +4,10 @@ require:
 AllCops:
   TargetRubyVersion: 2.2
 
+Metrics/BlockLength:
+  Exclude:
+    - spec/**/*_spec.rb
+
 RSpec/ExampleLength:
   Max: 10
 
