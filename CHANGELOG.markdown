@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.8.0 — Unreleased
+## 1.8.0 — March 13, 2017
 
 * Add a `pusher-fake` binary to run the servers. (Tristan Dunn)
 * Update development and test dependencies. (Tristan Dunn)
