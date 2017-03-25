@@ -19,12 +19,12 @@ Gem::Specification.new do |s|
   s.add_dependency "thin",            "~> 1.5"
   s.add_dependency "multi_json",      "~> 1.6"
 
-  s.add_development_dependency "poltergeist",   "1.13.0"
-  s.add_development_dependency "pusher",        "1.3.0"
+  s.add_development_dependency "poltergeist",   "1.14.0"
+  s.add_development_dependency "pusher",        "1.3.1"
   s.add_development_dependency "rake",          "12.0.0"
   s.add_development_dependency "rspec",         "3.5.0"
   s.add_development_dependency "rubocop",       "0.47.1"
-  s.add_development_dependency "rubocop-rspec", "1.13.0"
+  s.add_development_dependency "rubocop-rspec", "1.14.0"
   s.add_development_dependency "sinatra",       "1.4.8"
   s.add_development_dependency "yard",          "0.9.8"
 end
