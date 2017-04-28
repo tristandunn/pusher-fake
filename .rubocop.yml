@@ -33,6 +33,10 @@ Style/AlignHash:
 Style/IfUnlessModifier:
   Enabled: false
 
+Style/PercentLiteralDelimiters:
+  PreferredDelimiters:
+    "%w": "()"
+
 Style/RaiseArgs:
   EnforcedStyle: compact
 

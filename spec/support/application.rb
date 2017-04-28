@@ -3,8 +3,8 @@ require "tilt/erb"
 
 module Sinatra
   class Application
-    set :root,  proc { File.join(File.dirname(__FILE__), "application") }
-    set :views, proc { File.join(root, "views") }
+    set(:root,  proc { File.join(File.dirname(__FILE__), "application") })
+    set(:views, proc { File.join(root, "views") })
 
     disable :logging
 
