@@ -13,7 +13,7 @@
   <ul></ul>
 </section>
 
-<script src="/javascripts/vendor/pusher-3.2.1.js"></script>
+<script src="/javascripts/vendor/pusher-4.1.0.js"></script>
 <script>
   Pusher.instance = <%= PusherFake.javascript %>;
   Pusher.instance.connection.bind("state_change", function(states) {
@@ -64,7 +64,7 @@
 
           list.removeChild(item);
         })
-        .bind_all(function(event, message) {
+        .bind_global(function(event, message) {
           Helpers.log("Channel " + name + " received " + event + " event.");
         });
     },
