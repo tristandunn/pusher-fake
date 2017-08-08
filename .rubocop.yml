@@ -4,6 +4,10 @@ require:
 AllCops:
   TargetRubyVersion: 2.2
 
+Layout/AlignHash:
+  EnforcedColonStyle: table
+  EnforcedHashRocketStyle: table
+
 Metrics/BlockLength:
   Exclude:
     - spec/**/*_spec.rb
@@ -25,10 +29,6 @@ RSpec/NamedSubject:
 
 RSpec/SubjectStub:
   Enabled: false
-
-Style/AlignHash:
-  EnforcedColonStyle: table
-  EnforcedHashRocketStyle: table
 
 Style/IfUnlessModifier:
   Enabled: false
