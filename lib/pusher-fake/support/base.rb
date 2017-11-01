@@ -5,6 +5,11 @@
        "Should be set before including PusherFake")
 end
 
+unless defined?(PusherFake)
+  warn("Warning: PusherFake is not defined. " \
+       "Should be required before requiring a support file.")
+end
+
 # Use the same API key and secret as the live version.
 PusherFake.configure do |configuration|
   configuration.app_id = Pusher.app_id

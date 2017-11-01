@@ -2,6 +2,7 @@
 
 ## 1.9.0 — Unreleased
 
+* Warn when the library is not required before a support file. (Tristan Dunn)
 * Update the Pusher JS client to version 4.1.0. (Tristan Dunn)
 * Update development and test dependencies. (Tristan Dunn)
 
