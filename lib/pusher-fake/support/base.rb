@@ -1,7 +1,7 @@
 %w(app_id key secret).each do |setting|
   next unless Pusher.public_send(setting).nil?
 
-  warn("Warning: Pusher.#{setting} is not set." \
+  warn("Warning: Pusher.#{setting} is not set. " \
        "Should be set before including PusherFake")
 end
 
