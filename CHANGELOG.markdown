@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.9.0 — Unreleased
+## 1.9.0 — November 1, 2017
 
 * Warn when the library is not required before a support file. (Tristan Dunn)
 * Update the Pusher JS client to version 4.2.1. (Tristan Dunn)
