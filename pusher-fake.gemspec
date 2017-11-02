@@ -16,15 +16,15 @@ Gem::Specification.new do |s|
 
   s.add_dependency "em-http-request", "~> 1.1"
   s.add_dependency "em-websocket",    "~> 0.5"
-  s.add_dependency "thin",            "~> 1.5"
   s.add_dependency "multi_json",      "~> 1.6"
+  s.add_dependency "thin",            "~> 1.5"
 
   s.add_development_dependency "poltergeist",   "1.16.0"
   s.add_development_dependency "pusher",        "1.3.1"
-  s.add_development_dependency "rake",          "12.0.0"
-  s.add_development_dependency "rspec",         "3.6.0"
-  s.add_development_dependency "rubocop",       "0.49.1"
-  s.add_development_dependency "rubocop-rspec", "1.15.1"
+  s.add_development_dependency "rake",          "12.2.1"
+  s.add_development_dependency "rspec",         "3.7.0"
+  s.add_development_dependency "rubocop",       "0.51.0"
+  s.add_development_dependency "rubocop-rspec", "1.19.0"
   s.add_development_dependency "sinatra",       "2.0.0"
   s.add_development_dependency "yard",          "0.9.9"
 end

@@ -4,7 +4,9 @@ feature "Client subscribing to a channel" do
   before do
     visit "/"
 
+    # rubocop:disable RSpec/ExpectInHook
     expect(page).to have_content("Client connected.")
+    # rubocop:enable RSpec/ExpectInHook
   end
 
   scenario "successfully subscribes to a channel" do

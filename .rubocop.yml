@@ -12,6 +12,9 @@ Metrics/BlockLength:
   Exclude:
     - spec/**/*_spec.rb
 
+Capybara/FeatureMethods:
+  Enabled: false
+
 RSpec/ExampleLength:
   Max: 10
 

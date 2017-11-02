@@ -28,7 +28,7 @@ end
 at_exit { thread.exit }
 
 RSpec.configure do |config|
-  config.before(:each) do
+  config.before do
     $events = []
 
     PusherFake.configuration.webhooks = ["http://127.0.0.1:8082"]
