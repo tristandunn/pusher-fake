@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.10.0 — Unreleased
+
+* Update development and test dependencies. (Tristan Dunn)
+
 ## 1.9.0 — November 1, 2017
 
 * Warn when the library is not required before a support file. (Tristan Dunn)

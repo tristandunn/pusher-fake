@@ -21,10 +21,10 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency "poltergeist",   "1.16.0"
   s.add_development_dependency "pusher",        "1.3.1"
-  s.add_development_dependency "rake",          "12.2.1"
+  s.add_development_dependency "rake",          "12.3.0"
   s.add_development_dependency "rspec",         "3.7.0"
   s.add_development_dependency "rubocop",       "0.51.0"
-  s.add_development_dependency "rubocop-rspec", "1.19.0"
+  s.add_development_dependency "rubocop-rspec", "1.20.1"
   s.add_development_dependency "sinatra",       "2.0.0"
-  s.add_development_dependency "yard",          "0.9.9"
+  s.add_development_dependency "yard",          "0.9.10"
 end

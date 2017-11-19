@@ -36,21 +36,21 @@ describe PusherFake::Channel, ".factory" do
     end
   end
 
-  context "for a public channel" do
+  context "with a public channel" do
     let(:name)          { "channel" }
     let(:channel_class) { PusherFake::Channel::Public }
 
     it_behaves_like "a channel factory"
   end
 
-  context "for a private channel" do
+  context "with a private channel" do
     let(:name)          { "private-channel" }
     let(:channel_class) { PusherFake::Channel::Private }
 
     it_behaves_like "a channel factory"
   end
 
-  context "for a presence channel" do
+  context "with a presence channel" do
     let(:name)          { "presence-channel" }
     let(:channel_class) { PusherFake::Channel::Presence }
 
