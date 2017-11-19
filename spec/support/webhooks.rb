@@ -1,4 +1,12 @@
-# rubocop:disable Style/GlobalVars
+class WebhookHelper
+  def self.events
+    @events ||= []
+  end
+
+  def self.mutex
+    @mutex ||= Mutex.new
+  end
+end
 
 thread = Thread.new do
   # Not explicitly requiring Thin::Server occasionally results in
@@ -12,7 +20,9 @@ thread = Thread.new do
       webhook = Pusher::WebHook.new(request)
 
       if webhook.valid?
-        $events.concat(webhook.events)
+        WebhookHelper.mutex.synchronize do
+          WebhookHelper.events.concat(webhook.events)
+        end
       end
 
       Rack::Response.new.finish
@@ -26,11 +36,3 @@ thread = Thread.new do
 end
 
 at_exit { thread.exit }
-
-RSpec.configure do |config|
-  config.before do
-    $events = []
-
-    PusherFake.configuration.webhooks = ["http://127.0.0.1:8082"]
-  end
-end
