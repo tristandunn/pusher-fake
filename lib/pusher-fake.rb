@@ -51,3 +51,5 @@ module PusherFake
     configuration.logger << "#{message}\n" if configuration.verbose
   end
 end
+
+# rubocop:enable Naming/FileName

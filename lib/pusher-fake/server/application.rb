@@ -28,7 +28,7 @@ module PusherFake
         response = response_for(request)
 
         Rack::Response.new(MultiJson.dump(response)).finish
-      rescue => error # rubocop:disable Lint/RescueWithoutErrorClass
+      rescue StandardError => error
         Rack::Response.new(error.message, 400).finish
       end
 

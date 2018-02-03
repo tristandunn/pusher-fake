@@ -50,3 +50,5 @@ raise OptionParser::MissingArgument.new("--key")    if Pusher.key.nil?
 raise OptionParser::MissingArgument.new("--secret") if Pusher.secret.nil?
 
 PusherFake::Server.start
+
+# rubocop:enable Metrics/BlockLength, Metrics/LineLength
