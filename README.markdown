@@ -2,16 +2,16 @@
 
 A fake [Pusher](https://pusher.com) server for development and testing.
 
-When run, an entire fake service is started on two random open ports. Connections can then be made to the service without needing a Pusher account. The host and port for the socket and web servers can be found by checking the configuration.
+When run, an entire fake service starts on two random open ports. A Pusher account is not required to make connections to the fake service. If you need to know the host or port, you can find the values in the configuration.
 
-The project is intended to fully replace the Pusher service with a local version for testing and development purposes. It is not intended to be a replacement for production usage!
+The project fully replaces the Pusher service with a location version for testing and development. Using the service as a replacement for production is not recommended.
 
 #### Why?
 
+1. Working offline is not possible.
 1. Using a remote API for testing is slow.
-2. Working offline is currently impossible.
-3. Wasting connections and messages in development is unreasonable.
-4. Stubbing the JavaScript, such as with [pusher-test-stub](https://github.com/leggetter/pusher-test-stub), is suboptimal and tedious for integration tests.
+1. Wasting connections and messages in development is unreasonable.
+1. Stubbing the JavaScript, such as with [pusher-test-stub](https://github.com/leggetter/pusher-test-stub), is suboptimal and tedious for integration tests.
 
 ## Usage
 
@@ -49,7 +49,7 @@ require "pusher-fake/support/cucumber"
 
 ##### Zeus
 
-A custom plan is required. See [an example plan](https://github.com/tristandunn/pusher-fake-example/commit/add6dedad3b6da12cdac818d2fff3696a5d44738) for the configuration necessary.
+Using Zeus requires a custom plan. See [an example plan](https://github.com/tristandunn/pusher-fake-example/commit/add6dedad3b6da12cdac818d2fff3696a5d44738) for the configuration necessary.
 
 ##### Other
 
@@ -65,22 +65,22 @@ PusherFake::Channel.reset
 In a Rails initializer, or any file executed during loading:
 
 ```ruby
-# Ensure it's only run in a development environment if it's a global file.
+# Avoid running outside of development, if it's a global file.
 if Rails.env.development?
-  # Ensure Pusher configuration is set if you're not doing so elsewhere.
+  # Set the Pusher configuration, if it's not done elsewhere.
   Pusher.app_id = "MY_TEST_ID"
   Pusher.key    = "MY_TEST_KEY"
   Pusher.secret = "MY_TEST_SECRET"
 
-  # Require the base file, which immediately starts the socket and web servers.
+  # Require the base file, which starts the socket and web servers.
   #
-  # If you're including this file in multiple processes, you may want to add an
-  # additional check or even possibly hard code the socket and web ports.
+  # If you're including this file in different processes, you may want to add
+  # another check or even possibly hard code the socket and web ports.
   require "pusher-fake/support/base"
 end
 ```
 
-If you're using Foreman, or something similar, you'll only want to run the fake for a single process:
+If you're using Foreman, or something similar, you'll want to limit the fake to a single process:
 
 ```ruby
 if ENV["PUSHER_FAKE"]
