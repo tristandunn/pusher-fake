@@ -6,4 +6,5 @@ Capybara.register_driver :poltergeist do |app|
 end
 
 Capybara.app = Sinatra::Application
+Capybara.server = :webrick
 Capybara.default_driver = :poltergeist

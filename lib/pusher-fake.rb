@@ -1,5 +1,3 @@
-# rubocop:disable Naming/FileName
-
 require "em-http-request"
 require "em-websocket"
 require "multi_json"
@@ -51,5 +49,3 @@ module PusherFake
     configuration.logger << "#{message}\n" if configuration.verbose
   end
 end
-
-# rubocop:enable Naming/FileName
