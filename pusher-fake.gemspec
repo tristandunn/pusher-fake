@@ -23,8 +23,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency "pusher",        "1.3.1"
   s.add_development_dependency "rake",          "12.3.1"
   s.add_development_dependency "rspec",         "3.7.0"
-  s.add_development_dependency "rubocop",       "0.56.0"
-  s.add_development_dependency "rubocop-rspec", "1.25.1"
-  s.add_development_dependency "sinatra",       "2.0.1"
-  s.add_development_dependency "yard",          "0.9.12"
+  s.add_development_dependency "rubocop",       "0.57.2"
+  s.add_development_dependency "rubocop-rspec", "1.26.0"
+  s.add_development_dependency "sinatra",       "2.0.3"
+  s.add_development_dependency "yard",          "0.9.14"
 end
