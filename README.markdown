@@ -18,7 +18,7 @@ With SaaS Pusher:
 
 ### Test Environment
 
-#### 1. Use the PusherFake JS for the Pusher JS instance.
+#### 1a. Use the PusherFake JS for the Pusher JS instance.
 
 ```erb
 <script>
@@ -32,6 +32,18 @@ With SaaS Pusher:
     var instance = new Pusher(...);
   <% end %>
 </script>
+```
+
+#### 1b. If not running in Rails, configure [pusher-js](https://github.com/pusher/pusher-js) manually
+
+```javascript
+const socket = new Pusher(APP_KEY, {
+  wsPort: LOCAL_PORT,  // the port that the service was started on
+  httpPort: LOCAL_PORT,  // same
+  wsHost: LOCAL_HOST,  // typically 'localhost' or an internal network IP
+  httpHost: LOCAL_HOST,  // same
+  encrypted: false,  // do not turn this off for production usage!
+});
 ```
 
 #### 2. Start PusherFake in your environment.
