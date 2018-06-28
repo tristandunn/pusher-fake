@@ -64,6 +64,25 @@ require "pusher-fake/support/cucumber"
 
 Using Zeus requires a custom plan. See [an example plan](https://github.com/tristandunn/pusher-fake-example/commit/add6dedad3b6da12cdac818d2fff3696a5d44738) for the configuration necessary.
 
+##### Binary
+
+If you need to run the fake as a standalone service, perhaps when using Docker, there is a `pusher-fake` binary available.
+
+```
+$ gem install pusher pusher-fake # or run from source through this repo
+
+$ pusher-fake --help
+Usage: pusher-fake [options]
+    -i, --id ID                      Use ID as the application ID for Pusher
+    -k, --key KEY                    Use KEY as the key for Pusher
+    -s, --secret SECRET              Use SECRET as the secret token for Pusher
+        --socket-host HOST           Use HOST for the web socket server
+        --socket-port PORT           Use PORT for the web socket server
+    -v, --[no-]verbose               Run verbosely
+        --web-host HOST              Use HOST for the web server
+        --web-port PORT              Use PORT for the web server
+```
+
 ##### Other
 
 ```ruby
@@ -116,23 +135,6 @@ Pusher::Client.new({
   app_id: Pusher.app_id,
   secret: Pusher.secret
 }.merge(PusherFake.configuration.web_options))
-```
-
-### Binary
-
-If you need to run the fake as a standalone service, perhaps when using Docker, there is a `pusher-fake` binary available.
-
-```
-$ pusher-fake --help
-Usage: pusher-fake [options]
-    -i, --id ID                      Use ID as the application ID for Pusher
-    -k, --key KEY                    Use KEY as the key for Pusher
-    -s, --secret SECRET              Use SECRET as the secret token for Pusher
-        --socket-host HOST           Use HOST for the web socket server
-        --socket-port PORT           Use PORT for the web socket server
-    -v, --[no-]verbose               Run verbosely
-        --web-host HOST              Use HOST for the web server
-        --web-port PORT              Use PORT for the web server
 ```
 
 ## Configuration
