@@ -4,10 +4,11 @@ A fake [Pusher](https://pusher.com) server for development and testing.
 
 When run, an entire fake service starts on two random open ports. A Pusher account is not required to make connections to the fake service. If you need to know the host or port, you can find the values in the configuration.
 
-The project fully replaces the Pusher service with a location version for testing and development. Using the service as a replacement for production is not recommended.
+The project fully replaces the Pusher service with a local version for testing and development. While mostly functional and clients and servers can exchange messages with it via public, private or presence channels, using the service as a replacement for production is not recommended. There is no high availability and no monitoring.
 
 #### Why?
 
+With SaaS Pusher:
 1. Working offline is not possible.
 1. Using a remote API for testing is slow.
 1. Wasting connections and messages in development is unreasonable.
@@ -17,7 +18,7 @@ The project fully replaces the Pusher service with a location version for testin
 
 ### Test Environment
 
-#### 1. Use the PusherFake JS for the Pusher JS instance.
+#### 1a. Use the PusherFake JS for the Pusher JS instance.
 
 ```erb
 <script>
@@ -31,6 +32,18 @@ The project fully replaces the Pusher service with a location version for testin
     var instance = new Pusher(...);
   <% end %>
 </script>
+```
+
+#### 1b. If not running in Rails, configure [pusher-js](https://github.com/pusher/pusher-js) manually
+
+```javascript
+const socket = new Pusher(APP_KEY, {
+  wsPort: LOCAL_PORT,  // the port that the service was started on
+  httpPort: LOCAL_PORT,  // same
+  wsHost: LOCAL_HOST,  // typically 'localhost' or an internal network IP
+  httpHost: LOCAL_HOST,  // same
+  encrypted: false,  // do not turn this off for production usage!
+});
 ```
 
 #### 2. Start PusherFake in your environment.
@@ -50,6 +63,25 @@ require "pusher-fake/support/cucumber"
 ##### Zeus
 
 Using Zeus requires a custom plan. See [an example plan](https://github.com/tristandunn/pusher-fake-example/commit/add6dedad3b6da12cdac818d2fff3696a5d44738) for the configuration necessary.
+
+##### Binary
+
+If you need to run the fake as a standalone service, perhaps when using Docker, there is a `pusher-fake` binary available.
+
+```
+$ gem install pusher pusher-fake # or run from source through this repo
+
+$ pusher-fake --help
+Usage: pusher-fake [options]
+    -i, --id ID                      Use ID as the application ID for Pusher
+    -k, --key KEY                    Use KEY as the key for Pusher
+    -s, --secret SECRET              Use SECRET as the secret token for Pusher
+        --socket-host HOST           Use HOST for the web socket server
+        --socket-port PORT           Use PORT for the web socket server
+    -v, --[no-]verbose               Run verbosely
+        --web-host HOST              Use HOST for the web server
+        --web-port PORT              Use PORT for the web server
+```
 
 ##### Other
 
@@ -103,23 +135,6 @@ Pusher::Client.new({
   app_id: Pusher.app_id,
   secret: Pusher.secret
 }.merge(PusherFake.configuration.web_options))
-```
-
-### Binary
-
-If you need to run the fake as a standalone service, perhaps when using Docker, there is a `pusher-fake` binary available.
-
-```
-$ pusher-fake --help
-Usage: pusher-fake [options]
-    -i, --id ID                      Use ID as the application ID for Pusher
-    -k, --key KEY                    Use KEY as the key for Pusher
-    -s, --secret SECRET              Use SECRET as the secret token for Pusher
-        --socket-host HOST           Use HOST for the web socket server
-        --socket-port PORT           Use PORT for the web socket server
-    -v, --[no-]verbose               Run verbosely
-        --web-host HOST              Use HOST for the web server
-        --web-port PORT              Use PORT for the web server
 ```
 
 ## Configuration
