@@ -4,10 +4,11 @@ A fake [Pusher](https://pusher.com) server for development and testing.
 
 When run, an entire fake service starts on two random open ports. A Pusher account is not required to make connections to the fake service. If you need to know the host or port, you can find the values in the configuration.
 
-The project fully replaces the Pusher service with a location version for testing and development. Using the service as a replacement for production is not recommended.
+The project fully replaces the Pusher service with a local version for testing and development. While mostly functional and clients and servers can exchange messages with it via public, private or presence channels, using the service as a replacement for production is not recommended. There is no high availability and no monitoring.
 
 #### Why?
 
+With SaaS Pusher:
 1. Working offline is not possible.
 1. Using a remote API for testing is slow.
 1. Wasting connections and messages in development is unreasonable.
