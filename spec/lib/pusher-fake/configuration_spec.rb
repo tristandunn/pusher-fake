@@ -48,6 +48,16 @@ describe PusherFake::Configuration do
   end
 end
 
+describe PusherFake::Configuration, "#app_id=" do
+  subject { described_class.new }
+
+  it "converts value to a string" do
+    subject.app_id = 1_337
+
+    expect(subject.app_id).to eq("1337")
+  end
+end
+
 describe PusherFake::Configuration, "#to_options" do
   it "includes the socket host as wsHost" do
     options = subject.to_options

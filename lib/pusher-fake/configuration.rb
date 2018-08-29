@@ -2,7 +2,7 @@ module PusherFake
   # Configuration class.
   class Configuration
     # @return [String] The Pusher Applicaiton ID. (Defaults to +PUSHER_APP_ID+.)
-    attr_accessor :app_id
+    attr_reader :app_id
 
     # @return [String] The Pusher API key. (Defaults to +PUSHER_API_KEY+.)
     attr_accessor :key
@@ -32,6 +32,13 @@ module PusherFake
     # Instantiated from {PusherFake.configuration}. Sets the defaults.
     def initialize
       reset!
+    end
+
+    # Assign the application ID, ensuring it's a string.
+    #
+    # @params [Integer|String] id The application ID.
+    def app_id=(id)
+      @app_id = id.to_s
     end
 
     def reset!

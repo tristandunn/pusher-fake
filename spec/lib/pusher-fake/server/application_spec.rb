@@ -48,6 +48,23 @@ shared_examples_for "an API request" do
   end
 end
 
+describe PusherFake::Server::Application, ".call, with a numeric ID" do
+  it_behaves_like "an API request" do
+    let(:id)   { Time.now.to_i }
+    let(:path) { "/apps/#{id}/events" }
+
+    before do
+      PusherFake.configuration.app_id = id
+
+      allow(subject).to receive(:events).and_return(hash)
+    end
+
+    after do
+      PusherFake.configuration.app_id = "PUSHER_APP_ID"
+    end
+  end
+end
+
 describe PusherFake::Server::Application, ".call, for triggering events" do
   it_behaves_like "an API request" do
     let(:id)   { PusherFake.configuration.app_id }

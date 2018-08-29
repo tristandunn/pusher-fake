@@ -2,6 +2,7 @@
 
 ## 1.10.0 — Unreleased
 
+* Ensure the application ID is a string. (Craig McNamara)
 * Fix a typo in the README. (Jouke Waleson)
 * Update development and test dependencies. (Tristan Dunn)
 
