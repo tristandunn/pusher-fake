@@ -110,7 +110,7 @@ module PusherFake
       # @param [Rack::Request] request The HTTP request.
       # @return [Hash] A response hash.
       def self.response_for(request)
-        id = PusherFake.configuration.app_id
+        id = PusherFake.configuration.app_id.to_s
 
         REQUEST_PATHS.each do |path, method|
           matcher = Regexp.new(path.to_s.sub(":id", id))
