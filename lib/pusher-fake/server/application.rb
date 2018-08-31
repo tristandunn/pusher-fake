@@ -143,8 +143,6 @@ module PusherFake
         { users: users || [] }
       end
 
-      private_class_method
-
       # Emit an event with data to the requested channel(s).
       #
       # @param [Hash] event The raw event JSON.
@@ -158,6 +156,7 @@ module PusherFake
           channel.emit(event["name"], data, socket_id: event["socket_id"])
         end
       end
+      private_class_method :send_event
       # rubocop:enable Style/RescueModifier
     end
   end

@@ -2,32 +2,32 @@ require "spec_helper"
 
 describe PusherFake::Configuration do
   it do
-    is_expected.to have_configuration_option(:key)
+    expect(subject).to have_configuration_option(:key)
       .with_default("PUSHER_API_KEY")
   end
 
   it do
-    is_expected.to have_configuration_option(:logger)
+    expect(subject).to have_configuration_option(:logger)
       .with_default(STDOUT.to_io)
   end
 
   it do
-    is_expected.to have_configuration_option(:verbose)
+    expect(subject).to have_configuration_option(:verbose)
       .with_default(false)
   end
 
   it do
-    is_expected.to have_configuration_option(:webhooks)
+    expect(subject).to have_configuration_option(:webhooks)
       .with_default([])
   end
 
   it do
-    is_expected.to have_configuration_option(:app_id)
+    expect(subject).to have_configuration_option(:app_id)
       .with_default("PUSHER_APP_ID")
   end
 
   it do
-    is_expected.to have_configuration_option(:secret)
+    expect(subject).to have_configuration_option(:secret)
       .with_default("PUSHER_API_SECRET")
   end
 
