@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.10.0 — Unreleased
+## 1.10.0 — September 5, 2018
 
 * Ensure the application ID is a string. (Craig McNamara)
 * Fix a typo in the README. (Jouke Waleson)
