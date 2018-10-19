@@ -4,6 +4,9 @@ require:
 AllCops:
   TargetRubyVersion: 2.2
 
+Capybara/FeatureMethods:
+  Enabled: false
+
 Layout/AlignHash:
   EnforcedColonStyle: table
   EnforcedHashRocketStyle: table
@@ -12,8 +15,9 @@ Metrics/BlockLength:
   Exclude:
     - spec/**/*_spec.rb
 
-Capybara/FeatureMethods:
-  Enabled: false
+Naming/FileName:
+  Exclude:
+    - lib/pusher-fake.rb
 
 RSpec/ExampleLength:
   Max: 10

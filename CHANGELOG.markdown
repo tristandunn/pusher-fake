@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.11.0 — Unreleased
+
+* Update development and test dependencies. (Tristan Dunn)
+
 ## 1.10.0 — September 5, 2018
 
 * Ensure the application ID is a string. (Craig McNamara)
