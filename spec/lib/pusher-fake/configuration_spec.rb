@@ -2,6 +2,11 @@ require "spec_helper"
 
 describe PusherFake::Configuration do
   it do
+    expect(subject).to have_configuration_option(:disable_stats)
+      .with_default(true)
+  end
+
+  it do
     expect(subject).to have_configuration_option(:key)
       .with_default("PUSHER_API_KEY")
   end
@@ -59,6 +64,12 @@ describe PusherFake::Configuration, "#app_id=" do
 end
 
 describe PusherFake::Configuration, "#to_options" do
+  it "includes disable_stats as disableStats" do
+    options = subject.to_options
+
+    expect(options).to include(disableStats: subject.disable_stats)
+  end
+
   it "includes the socket host as wsHost" do
     options = subject.to_options
 

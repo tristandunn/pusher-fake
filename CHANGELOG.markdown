@@ -2,6 +2,7 @@
 
 ## 1.11.0 — Unreleased
 
+* Add statistics configuration and disable by default. (Tristan Dunn)
 * Update development and test dependencies. (Tristan Dunn)
 
 ## 1.10.0 — September 5, 2018

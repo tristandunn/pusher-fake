@@ -4,6 +4,9 @@ module PusherFake
     # @return [String] The Pusher Applicaiton ID. (Defaults to +PUSHER_APP_ID+.)
     attr_reader :app_id
 
+    # @return [Boolean] Disable the client statistics. (Defaults to +true+.)
+    attr_accessor :disable_stats
+
     # @return [String] The Pusher API key. (Defaults to +PUSHER_API_KEY+.)
     attr_accessor :key
 
@@ -49,6 +52,7 @@ module PusherFake
       self.verbose  = false
       self.webhooks = []
 
+      self.disable_stats  = true
       self.socket_options = { host: "127.0.0.1", port: available_port }
       self.web_options    = { host: "127.0.0.1", port: available_port }
     end
@@ -58,9 +62,10 @@ module PusherFake
     # @param [Hash] options Custom options for Pusher client.
     def to_options(options = {})
       options.merge(
-        wsHost:  socket_options[:host],
-        wsPort:  socket_options[:port],
-        cluster: "us-east-1"
+        wsHost:       socket_options[:host],
+        wsPort:       socket_options[:port],
+        cluster:      "us-east-1",
+        disableStats: disable_stats
       )
     end
 
