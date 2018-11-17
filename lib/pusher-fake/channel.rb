@@ -5,13 +5,13 @@ module PusherFake
     autoload :Private,  "pusher-fake/channel/private"
     autoload :Presence, "pusher-fake/channel/presence"
 
+    # Prefix for private channels.
+    PRIVATE_CHANNEL_PREFIX = "private-".freeze
+
+    # Prefix for presence channels.
+    PRESENCE_CHANNEL_PREFIX = "presence-".freeze
+
     class << self
-      # Name matcher for private channels.
-      PRIVATE_CHANNEL_MATCHER  = /\Aprivate-/
-
-      # Name matcher for presence channels.
-      PRESENCE_CHANNEL_MATCHER = /\Apresence-/
-
       # @return [Hash] Cache of existing channels.
       attr_writer :channels
 
@@ -58,10 +58,9 @@ module PusherFake
       # @param [String] name The name of the channel.
       # @return [Class] The class to use for the channel.
       def class_for(name)
-        case name
-        when PRIVATE_CHANNEL_MATCHER
+        if name.start_with?(PRIVATE_CHANNEL_PREFIX)
           Private
-        when PRESENCE_CHANNEL_MATCHER
+        elsif name.start_with?(PRESENCE_CHANNEL_PREFIX)
           Presence
         else
           Public

@@ -9,8 +9,6 @@ module PusherFake
       CHANNEL_USER_COUNT_ERROR = "Cannot retrieve the user count unless the " \
                                  "channel is a presence channel".freeze
 
-      PRESENCE_PREFIX_MATCHER = /\Apresence-/
-
       REQUEST_PATHS = {
         %r{\A/apps/:id/batch_events\z}           => :batch_events,
         %r{\A/apps/:id/events\z}                 => :events,
@@ -68,11 +66,9 @@ module PusherFake
       def self.channel(name, request)
         count = request.params["info"].to_s.split(",").include?("user_count")
 
-        if count && name !~ PRESENCE_PREFIX_MATCHER
-          raise CHANNEL_USER_COUNT_ERROR
-        end
+        raise CHANNEL_USER_COUNT_ERROR if invalid_channel_to_count?(name, count)
 
-        channel     = PusherFake::Channel.channels[name]
+        channel     = Channel.channels[name]
         connections = channel ? channel.connections : []
 
         result = { occupied: connections.any? }
@@ -92,7 +88,7 @@ module PusherFake
         count  = request.params["info"].to_s.split(",").include?("user_count")
         prefix = request.params["filter_by_prefix"].to_s
 
-        raise CHANNEL_FILTER_ERROR if count && prefix !~ PRESENCE_PREFIX_MATCHER
+        raise CHANNEL_FILTER_ERROR if invalid_channel_to_count?(prefix, count)
 
         PusherFake::Channel
           .channels
@@ -142,6 +138,12 @@ module PusherFake
 
         { users: users || [] }
       end
+
+      # @return [Boolean]
+      def self.invalid_channel_to_count?(name, includes_count)
+        includes_count && !name.start_with?(Channel::PRESENCE_CHANNEL_PREFIX)
+      end
+      private_class_method :invalid_channel_to_count?
 
       # Emit an event with data to the requested channel(s).
       #

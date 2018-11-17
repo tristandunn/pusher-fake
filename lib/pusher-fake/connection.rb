@@ -1,8 +1,8 @@
 module PusherFake
   # A client connection.
   class Connection
-    # Name matcher for client events.
-    CLIENT_EVENT_MATCHER = /\Aclient-(.+)\z/
+    # Prefix for client events.
+    CLIENT_EVENT_PREFIX = "client-".freeze
 
     # @return [EventMachine::WebSocket::Connection] Socket for the connection.
     attr_reader :socket
@@ -53,7 +53,7 @@ module PusherFake
 
       PusherFake.log("RECV #{id}: #{message}")
 
-      if event =~ CLIENT_EVENT_MATCHER
+      if event.start_with?(CLIENT_EVENT_PREFIX)
         process_trigger(event, message)
       else
         process_event(event, message)
