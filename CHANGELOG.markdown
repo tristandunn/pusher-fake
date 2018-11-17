@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.11.0 — Unreleased
+## 1.11.0 — November 17, 2018
 
 * Add statistics configuration and disable by default. (Tristan Dunn)
 * Update development and test dependencies. (Tristan Dunn)
