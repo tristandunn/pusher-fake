@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.12.0 — Unreleased
+## 1.12.0 — April 2, 2019
 
 * Add webhooks options to binary. (nytai)
 * Update development and test dependencies. (Tristan Dunn)
