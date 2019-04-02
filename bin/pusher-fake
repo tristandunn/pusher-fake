@@ -42,6 +42,10 @@ PusherFake.configure do |configuration|
     options.on("--web-port PORT", Integer, "Use PORT for the web server") do |port|
       configuration.web_options[:port] = port
     end
+
+    options.on("--webhooks HOOKS", Array, "List of webhooks for server") do |hooks|
+      configuration.webhooks = hooks
+    end
   end.parse!
 end
 

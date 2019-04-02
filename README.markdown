@@ -120,6 +120,7 @@ Usage: pusher-fake [options]
     -v, --[no-]verbose               Run verbosely
         --web-host HOST              Use HOST for the web server
         --web-port PORT              Use PORT for the web server
+        --webhooks HOOKS             List of webhooks for server
 ```
 
 ## Configuration
