@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module PusherFake
   module Channel
     # A presence channel.

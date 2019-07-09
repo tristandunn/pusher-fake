@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 %w(app_id key secret).each do |setting|
   next unless Pusher.public_send(setting).nil?
 

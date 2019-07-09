@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec::Matchers.define :have_configuration_option do |option|
   match do |configuration|
     configuration.respond_to?(option) &&

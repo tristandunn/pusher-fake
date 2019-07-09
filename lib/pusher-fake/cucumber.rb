@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "pusher-fake/support/cucumber"
 
 warn %([DEPRECATION] "pusher-fake/cucumber" is deprecated.) +

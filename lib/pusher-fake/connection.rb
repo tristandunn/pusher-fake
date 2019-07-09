@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 module PusherFake
   # A client connection.
   class Connection
     # Prefix for client events.
-    CLIENT_EVENT_PREFIX = "client-".freeze
+    CLIENT_EVENT_PREFIX = "client-"
 
     # @return [EventMachine::WebSocket::Connection] Socket for the connection.
     attr_reader :socket

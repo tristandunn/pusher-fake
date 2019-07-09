@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module PusherFake
   # Socket and web server manager.
   module Server

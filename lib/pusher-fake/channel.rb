@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module PusherFake
   # Channel creation and management.
   module Channel
@@ -6,10 +8,10 @@ module PusherFake
     autoload :Presence, "pusher-fake/channel/presence"
 
     # Prefix for private channels.
-    PRIVATE_CHANNEL_PREFIX = "private-".freeze
+    PRIVATE_CHANNEL_PREFIX = "private-"
 
     # Prefix for presence channels.
-    PRESENCE_CHANNEL_PREFIX = "presence-".freeze
+    PRESENCE_CHANNEL_PREFIX = "presence-"
 
     class << self
       # @return [Hash] Cache of existing channels.

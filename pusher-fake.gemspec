@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Gem::Specification.new do |s|
   s.name        = "pusher-fake"
   s.version     = "1.12.0"
@@ -14,17 +16,19 @@ Gem::Specification.new do |s|
   s.executables << "pusher-fake"
   s.require_path = "lib"
 
+  s.required_ruby_version = ">= 2.3"
+
   s.add_dependency "em-http-request", "~> 1.1"
   s.add_dependency "em-websocket",    "~> 0.5"
   s.add_dependency "multi_json",      "~> 1.6"
   s.add_dependency "thin",            "~> 1.5"
 
   s.add_development_dependency "poltergeist",   "1.18.1"
-  s.add_development_dependency "pusher",        "1.3.2"
+  s.add_development_dependency "pusher",        "1.3.3"
   s.add_development_dependency "rake",          "12.3.2"
   s.add_development_dependency "rspec",         "3.8.0"
-  s.add_development_dependency "rubocop",       "0.63.1"
-  s.add_development_dependency "rubocop-rspec", "1.31.0"
+  s.add_development_dependency "rubocop",       "0.72.0"
+  s.add_development_dependency "rubocop-rspec", "1.33.0"
   s.add_development_dependency "sinatra",       "2.0.5"
-  s.add_development_dependency "yard",          "0.9.18"
+  s.add_development_dependency "yard",          "0.9.20"
 end

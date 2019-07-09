@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "spec_helper"
 
 shared_examples_for "an API request" do
@@ -210,7 +212,7 @@ describe PusherFake::Server::Application, ".events" do
   let(:data)       { { "example" => "data" } }
   let(:name)       { "event-name" }
   let(:request)    { instance_double(Rack::Request, body: body) }
-  let(:channels)   { ["channel-1", "channel-2"] }
+  let(:channels)   { %w(channel-1 channel-2) }
   let(:channel_1)  { instance_double(PusherFake::Channel::Public, emit: true) }
   let(:channel_2)  { instance_double(PusherFake::Channel::Public, emit: true) }
   let(:data_json)  { data.to_json }
@@ -281,7 +283,7 @@ describe PusherFake::Server::Application, ".batch_events" do
   let(:data)       { { "example" => "data" } }
   let(:name)       { "event-name" }
   let(:request)    { instance_double(Rack::Request, body: body) }
-  let(:channels)   { ["channel-1", "channel-2"] }
+  let(:channels)   { %w(channel-1 channel-2) }
   let(:channel_1)  { instance_double(PusherFake::Channel::Public, emit: true) }
   let(:channel_2)  { instance_double(PusherFake::Channel::Public, emit: true) }
   let(:data_json)  { data.to_json }
