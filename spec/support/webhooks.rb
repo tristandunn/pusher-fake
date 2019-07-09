@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class WebhookHelper
   def self.events
     @events ||= []

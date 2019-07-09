@@ -1,12 +1,10 @@
+# frozen_string_literal: true
+
 require "spec_helper"
 
 feature "Client subscribing to a channel" do
   before do
-    visit "/"
-
-    # rubocop:disable RSpec/ExpectInHook
-    expect(page).to have_content("Client connected.")
-    # rubocop:enable RSpec/ExpectInHook
+    connect
   end
 
   scenario "successfully subscribes to a channel" do
@@ -55,6 +53,12 @@ feature "Client subscribing to a channel" do
 
   def attempt_to_subscribe_to(channel)
     page.execute_script("Helpers.subscribe(#{MultiJson.dump(channel)})")
+  end
+
+  def connect
+    visit "/"
+
+    expect(page).to have_content("Client connected.")
   end
 
   def override_socket_id(value)

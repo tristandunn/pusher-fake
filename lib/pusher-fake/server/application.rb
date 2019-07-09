@@ -1,13 +1,15 @@
+# frozen_string_literal: true
+
 module PusherFake
   module Server
     # The fake web application.
     class Application
       CHANNEL_FILTER_ERROR = "user_count may only be requested for presence " \
                              "channels - please supply filter_by_prefix " \
-                             "begining with presence-".freeze
+                             "begining with presence-"
 
       CHANNEL_USER_COUNT_ERROR = "Cannot retrieve the user count unless the " \
-                                 "channel is a presence channel".freeze
+                                 "channel is a presence channel"
 
       REQUEST_PATHS = {
         %r{\A/apps/:id/batch_events\z}           => :batch_events,

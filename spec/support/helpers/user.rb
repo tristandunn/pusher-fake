@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module UserHelpers
   def user_id(name = nil)
     using_session(name) do

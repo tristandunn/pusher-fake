@@ -2,7 +2,7 @@ require:
   - rubocop-rspec
 
 AllCops:
-  TargetRubyVersion: 2.2
+  TargetRubyVersion: 2.3
 
 Capybara/FeatureMethods:
   Enabled: false
@@ -13,11 +13,20 @@ Layout/AlignHash:
 
 Metrics/BlockLength:
   Exclude:
+    - pusher-fake.gemspec
+    - bin/pusher-fake
     - spec/**/*_spec.rb
+
+Metrics/LineLength:
+  Exclude:
+    - bin/pusher-fake
 
 Naming/FileName:
   Exclude:
     - lib/pusher-fake.rb
+
+Naming/RescuedExceptionsVariableName:
+  PreferredName: error
 
 RSpec/ExampleLength:
   Max: 10

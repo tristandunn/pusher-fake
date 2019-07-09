@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SubscriptionHelpers
   def subscribe_to(channel)
     page.execute_script("Helpers.subscribe(#{MultiJson.dump(channel)})")

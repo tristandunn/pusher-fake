@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "em-http-request"
 require "em-websocket"
 require "multi_json"
@@ -7,7 +9,7 @@ require "thin"
 # A Pusher fake.
 module PusherFake
   # The current version string.
-  VERSION = "1.12.0".freeze
+  VERSION = "1.12.0"
 
   autoload :Channel,       "pusher-fake/channel"
   autoload :Configuration, "pusher-fake/configuration"
