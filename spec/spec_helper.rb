@@ -4,7 +4,7 @@ require "bundler/setup"
 
 Bundler.require(:default, :development)
 
-Dir[File.expand_path("support/**/*.rb", __dir__)].each do |file|
+Dir[File.expand_path("support/**/*.rb", __dir__)].sort.each do |file|
   require file
 end
 

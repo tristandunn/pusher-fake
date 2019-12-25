@@ -2,24 +2,24 @@ require:
   - rubocop-rspec
 
 AllCops:
-  TargetRubyVersion: 2.3
+  TargetRubyVersion: 2.4
 
 Capybara/FeatureMethods:
   Enabled: false
 
-Layout/AlignHash:
+Layout/HashAlignment:
   EnforcedColonStyle: table
   EnforcedHashRocketStyle: table
+
+Layout/LineLength:
+  Exclude:
+    - bin/pusher-fake
 
 Metrics/BlockLength:
   Exclude:
     - pusher-fake.gemspec
     - bin/pusher-fake
     - spec/**/*_spec.rb
-
-Metrics/LineLength:
-  Exclude:
-    - bin/pusher-fake
 
 Naming/FileName:
   Exclude:

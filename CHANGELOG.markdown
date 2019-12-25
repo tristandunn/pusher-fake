@@ -2,7 +2,7 @@
 
 ## 2.0.0 — Unreleased
 
-* Drop support for Ruby 2.2. (Tristan Dunn)
+* Drop support for Ruby 2.2 and 2.3. (Tristan Dunn)
 * Update development and test dependencies. (Tristan Dunn)
 
 ## 1.12.0 — April 2, 2019
