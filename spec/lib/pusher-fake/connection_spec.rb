@@ -97,8 +97,8 @@ end
 describe PusherFake::Connection, "#id" do
   subject { described_class.new(socket) }
 
-  let(:id)     { "123.456" }
-  let(:socket) { instance_double(Object, object_id: 123_456) }
+  let(:id)     { "1234.567" }
+  let(:socket) { instance_double(Object, object_id: 1_234_567) }
 
   it "returns the object ID of the socket" do
     expect(subject.id).to eq(id)
