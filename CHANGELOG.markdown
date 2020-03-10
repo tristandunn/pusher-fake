@@ -2,6 +2,7 @@
 
 ## 2.0.0 — Unreleased
 
+* Add support for Ruby 2.7. (Tristan Dunn)
 * Fix connection ID for Ruby 2.7. (Mark Thorn)
 * Drop support for Ruby 2.2 and 2.3. (Tristan Dunn)
 * Update development and test dependencies. (Tristan Dunn)
