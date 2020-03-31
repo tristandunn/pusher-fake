@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.0.0 — Unreleased
+## 2.0.0 — March 31, 2020
 
 * Add support for Ruby 2.7. (Tristan Dunn)
 * Fix connection ID for Ruby 2.7. (Mark Thorn)
