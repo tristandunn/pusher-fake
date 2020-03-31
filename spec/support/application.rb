@@ -24,7 +24,7 @@ module Sinatra
     protected
 
     def channel_data
-      return unless params[:channel_name] =~ /^presence-/
+      return unless /^presence-/.match?(params[:channel_name])
 
       {
         user_id:   params[:socket_id],
