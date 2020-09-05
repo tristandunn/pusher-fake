@@ -28,7 +28,7 @@ module PusherFake
       end
 
       def signature_for(payload)
-        digest = OpenSSL::Digest::SHA256.new
+        digest = OpenSSL::Digest.new("SHA256")
         secret = PusherFake.configuration.secret
 
         OpenSSL::HMAC.hexdigest(digest, secret, payload)

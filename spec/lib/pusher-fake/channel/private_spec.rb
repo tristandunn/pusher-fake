@@ -94,7 +94,7 @@ describe PusherFake::Channel::Private, "#authentication_for" do
   before do
     allow(PusherFake).to receive(:configuration).and_return(configuration)
     allow(OpenSSL::HMAC).to receive(:hexdigest).and_return(signature)
-    allow(OpenSSL::Digest::SHA256).to receive(:new).and_return(digest)
+    allow(OpenSSL::Digest).to receive(:new).with("SHA256").and_return(digest)
   end
 
   it "generates a signature" do
@@ -129,7 +129,7 @@ describe PusherFake::Channel::Private,
   before do
     allow(PusherFake).to receive(:configuration).and_return(configuration)
     allow(OpenSSL::HMAC).to receive(:hexdigest).and_return(signature)
-    allow(OpenSSL::Digest::SHA256).to receive(:new).and_return(digest)
+    allow(OpenSSL::Digest).to receive(:new).with("SHA256").and_return(digest)
   end
 
   it "generates a signature" do

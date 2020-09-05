@@ -49,7 +49,7 @@ module PusherFake
     def reset!
       self.app_id   = "PUSHER_APP_ID"
       self.key      = "PUSHER_API_KEY"
-      self.logger   = STDOUT.to_io
+      self.logger   = $stdout.to_io
       self.secret   = "PUSHER_API_SECRET"
       self.verbose  = false
       self.webhooks = []

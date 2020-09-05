@@ -3,6 +3,7 @@ require:
   - rubocop-rspec
 
 AllCops:
+  NewCops: enable
   TargetRubyVersion: 2.4
 
 Capybara/FeatureMethods:
@@ -40,6 +41,9 @@ RSpec/MultipleDescribes:
 
 RSpec/MultipleExpectations:
   Max: 4
+
+RSpec/MultipleMemoizedHelpers:
+  Enabled: false
 
 RSpec/NamedSubject:
   Enabled: false

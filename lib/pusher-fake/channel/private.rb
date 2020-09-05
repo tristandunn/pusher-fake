@@ -40,7 +40,7 @@ module PusherFake
         configuration = PusherFake.configuration
 
         data      = [id, name, data].compact.map(&:to_s).join(":")
-        digest    = OpenSSL::Digest::SHA256.new
+        digest    = OpenSSL::Digest.new("SHA256")
         signature = OpenSSL::HMAC.hexdigest(digest, configuration.secret, data)
 
         "#{configuration.key}:#{signature}"

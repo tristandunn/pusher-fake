@@ -33,7 +33,7 @@ describe PusherFake::Webhook, ".trigger" do
 
   before do
     allow(OpenSSL::HMAC).to receive(:hexdigest).and_return(signature)
-    allow(OpenSSL::Digest::SHA256).to receive(:new).and_return(digest)
+    allow(OpenSSL::Digest).to receive(:new).with("SHA256").and_return(digest)
     allow(EventMachine::HttpRequest).to receive(:new).and_return(http)
     allow(PusherFake).to receive(:log)
     allow(PusherFake).to receive(:configuration).and_return(configuration)

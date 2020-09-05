@@ -15,7 +15,7 @@ describe PusherFake::Configuration do
 
   it do
     expect(subject).to have_configuration_option(:logger)
-      .with_default(STDOUT.to_io)
+      .with_default($stdout.to_io)
   end
 
   it do

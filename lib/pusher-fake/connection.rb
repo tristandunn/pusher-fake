@@ -69,11 +69,12 @@ module PusherFake
     end
 
     def process_event(event, message)
-      if event == "pusher:subscribe"
+      case event
+      when "pusher:subscribe"
         channel_for(message).add(self, message[:data])
-      elsif event == "pusher:unsubscribe"
+      when "pusher:unsubscribe"
         channel_for(message).remove(self)
-      elsif event == "pusher:ping"
+      when "pusher:ping"
         emit("pusher:pong")
       end
     end
