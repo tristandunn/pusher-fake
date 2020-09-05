@@ -67,6 +67,7 @@ module PusherFake
         wsHost:       socket_options[:host],
         wsPort:       socket_options[:port],
         cluster:      "us-east-1",
+        forceTLS:     false,
         disableStats: disable_stats
       )
     end

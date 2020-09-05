@@ -159,6 +159,12 @@ The WebSocket server is provided all `socket_options`, allowing you to set the `
 
 The web server passes all `web_options`, besides `host` and `port`, to the Thin backend via attribute writers, allowing you to set the `ssl` and `ssl_options` options.
 
+If you would like to force TLS for the JavaScript client, you can provide a `forceTLS` option:
+
+```erb
+var instance = <%= PusherFake.javascript(forceTLS: true) %>;
+```
+
 ## Examples
 
 * [pusher-fake-example](https://github.com/tristandunn/pusher-fake-example) - An example of using pusher-fake with RSpec to test a Rails application.

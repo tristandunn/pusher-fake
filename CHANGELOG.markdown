@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.0 — Unreleased
+
+* Update the Pusher JS client to version 7.0.0. (Tristan Dunn)
+
 ## 2.0.0 — March 31, 2020
 
 * Add support for Ruby 2.7. (Tristan Dunn)

@@ -90,6 +90,12 @@ describe PusherFake::Configuration, "#to_options" do
     expect(options).to include(cluster: "us-east-1")
   end
 
+  it "disables the forceTLS option" do
+    options = subject.to_options
+
+    expect(options).to include(forceTLS: false)
+  end
+
   it "supports passing custom options" do
     options = subject.to_options(custom: "option")
 
