@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.1.0 — Unreleased
+## 2.1.0 — September 5th, 2020
 
 * Remove deprecated Cucumber file. (Tristan Dunn)
 * Update the Pusher JS client to version 7.0.0. (Tristan Dunn)
