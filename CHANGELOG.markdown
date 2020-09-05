@@ -2,6 +2,7 @@
 
 ## 2.1.0 — Unreleased
 
+* Remove deprecated Cucumber file. (Tristan Dunn)
 * Update the Pusher JS client to version 7.0.0. (Tristan Dunn)
 * Update development and test dependencies. (Tristan Dunn)
 
