@@ -26,6 +26,6 @@ PusherFake.configuration.web_options.tap do |options|
 end
 
 # Start the fake socket and web servers.
-fork { PusherFake::Server.start }.tap do |id|
-  at_exit { Process.kill("KILL", id) }
+Thread.new { PusherFake::Server.start }.tap do |thread|
+  at_exit { Thread.kill(thread) }
 end

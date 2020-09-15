@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.0 — Unreleased
+
+* Enable support for Windows by using a thread instead of fork. (Ian Clarkson)
+
 ## 2.1.0 — September 5th, 2020
 
 * Remove deprecated Cucumber file. (Tristan Dunn)
