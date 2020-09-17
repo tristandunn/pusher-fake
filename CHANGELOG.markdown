@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.2.0 — Unreleased
+## 2.2.0 — September 16, 2020
 
 * Enable support for Windows by using a thread instead of fork. (Ian Clarkson)
 * Update development dependencies. (Tristan Dunn)
