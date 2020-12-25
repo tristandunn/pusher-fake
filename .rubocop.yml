@@ -1,13 +1,11 @@
 require:
   - rubocop-performance
+  - rubocop-rake
   - rubocop-rspec
 
 AllCops:
   NewCops: enable
-  TargetRubyVersion: 2.4
-
-Capybara/FeatureMethods:
-  Enabled: false
+  TargetRubyVersion: 2.5
 
 Layout/HashAlignment:
   EnforcedColonStyle: table
@@ -29,6 +27,12 @@ Naming/FileName:
 
 Naming/RescuedExceptionsVariableName:
   PreferredName: error
+
+Naming/VariableNumber:
+  EnforcedStyle: snake_case
+
+RSpec/Capybara/FeatureMethods:
+  Enabled: false
 
 RSpec/ExampleLength:
   Max: 10
