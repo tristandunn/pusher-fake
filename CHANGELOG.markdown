@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.0 — Unreleased
+
+* Add support for Ruby 3.0. (Tristan Dunn)
+* Drop support for Ruby 2.4. (Tristan Dunn)
+* Update development dependencies. (Tristan Dunn)
+
 ## 2.2.0 — September 16, 2020
 
 * Enable support for Windows by using a thread instead of fork. (Ian Clarkson)

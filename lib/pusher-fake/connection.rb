@@ -23,7 +23,7 @@ module PusherFake
       parts = socket.object_id.to_s.split("")
       parts = parts.each_slice((parts.length / 2.0).ceil).to_a
 
-      [parts.first.join(""), parts.last.join("")].join(".")
+      [parts.first.join, parts.last.join].join(".")
     end
 
     # Emit an event to the connection.
