@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.executables << "pusher-fake"
   s.require_path = "lib"
 
-  s.required_ruby_version = ">= 2.5"
+  s.required_ruby_version = ">= 2.6"
 
   s.add_dependency "em-http-request", "~> 1.1"
   s.add_dependency "em-websocket",    "~> 0.5"
@@ -25,11 +25,11 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency "capybara",            "3.35.3"
   s.add_development_dependency "poltergeist",         "1.18.1"
-  s.add_development_dependency "pusher",              "1.4.3"
+  s.add_development_dependency "pusher",              "2.0.1"
   s.add_development_dependency "rake",                "13.0.3"
   s.add_development_dependency "rspec",               "3.10.0"
-  s.add_development_dependency "rubocop",             "1.10.0"
-  s.add_development_dependency "rubocop-performance", "1.9.2"
+  s.add_development_dependency "rubocop",             "1.12.1"
+  s.add_development_dependency "rubocop-performance", "1.10.2"
   s.add_development_dependency "rubocop-rake",        "0.5.1"
   s.add_development_dependency "rubocop-rspec",       "2.2.0"
   s.add_development_dependency "sinatra",             "2.1.0"
