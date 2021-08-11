@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.0.0 — Unreleased
+## 3.0.0 — August 10th, 2021
 
 * Add support for Ruby 3.0. (Tristan Dunn)
 * Drop support for Ruby 2.4 and 2.5. (Tristan Dunn)
