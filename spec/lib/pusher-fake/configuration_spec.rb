@@ -53,6 +53,25 @@ describe PusherFake::Configuration do
   it "defaults socket and web ports to different values" do
     expect(subject.socket_options[:port]).not_to eq(subject.web_options[:port])
   end
+
+  context "with StringIO as standard out" do
+    let(:io) { StringIO.new }
+
+    around do |example|
+      original = $stdout
+      $stdout  = io # rubocop:disable RSpec/ExpectOutput
+
+      example.run
+
+      $stdout = original # rubocop:disable RSpec/ExpectOutput
+    end
+
+    it "assigns standard out to the logger" do
+      subject.reset!
+
+      expect(subject.logger).to eq(io)
+    end
+  end
 end
 
 describe PusherFake::Configuration, "#app_id=" do

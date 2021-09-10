@@ -49,7 +49,7 @@ module PusherFake
     def reset!
       self.app_id   = "PUSHER_APP_ID"
       self.key      = "PUSHER_API_KEY"
-      self.logger   = $stdout.to_io
+      self.logger   = standard_out_io
       self.secret   = "PUSHER_API_SECRET"
       self.verbose  = false
       self.webhooks = []
@@ -79,6 +79,14 @@ module PusherFake
       socket.bind(Addrinfo.tcp("127.0.0.1", 0))
       socket.local_address.ip_port.tap do
         socket.close
+      end
+    end
+
+    def standard_out_io
+      if $stdout.respond_to?(:to_io)
+        $stdout.to_io
+      else
+        $stdout
       end
     end
   end

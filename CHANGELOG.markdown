@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.1 — Unreleased
+
+* Handle `StringIO` being assigned to `$stdout`. (Tristan Dunn)
+
 ## 3.0.0 — August 10th, 2021
 
 * Add support for Ruby 3.0. (Tristan Dunn)
