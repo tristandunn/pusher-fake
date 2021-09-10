@@ -3,6 +3,7 @@
 ## 3.0.1 — Unreleased
 
 * Handle `StringIO` being assigned to `$stdout`. (Tristan Dunn)
+* Update development dependencies. (Tristan Dunn)
 
 ## 3.0.0 — August 10th, 2021
 
