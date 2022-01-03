@@ -18,13 +18,13 @@ describe PusherFake, ".configuration" do
   let(:configuration) { double }
 
   before do
-    described_class.instance_variable_set("@configuration", nil)
+    described_class.instance_variable_set(:@configuration, nil)
 
     allow(PusherFake::Configuration).to receive(:new).and_return(configuration)
   end
 
   after do
-    described_class.instance_variable_set("@configuration", nil)
+    described_class.instance_variable_set(:@configuration, nil)
   end
 
   it "initializes a configuration object" do
