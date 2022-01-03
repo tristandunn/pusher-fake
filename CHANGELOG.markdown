@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+* Require MFA for privileged operations on RubyGems. (Tristan Dunn)
 * Update development and test dependencies. (Tristan Dunn)
 
 ## 3.0.1 — September 10th, 2021
