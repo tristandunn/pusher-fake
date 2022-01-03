@@ -10,6 +10,7 @@ Gem::Specification.new do |s|
   s.summary     = "A fake Pusher server for development and testing."
   s.description = "A fake Pusher server for development and testing."
   s.license     = "MIT"
+  s.metadata    = { "rubygems_mfa_required" => "true" }
 
   s.files        = Dir["lib/**/*"].to_a
   s.test_files   = Dir["spec/**/*"].to_a
