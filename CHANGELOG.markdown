@@ -5,6 +5,7 @@
 * Add support for Ruby 3.1. (Tristan Dunn)
 * Drop support for Ruby 2.6. (Tristan Dunn)
 * Require MFA for privileged operations on RubyGems. (Tristan Dunn)
+* Replace coveralls with simplecov. (Tristan Dunn)
 * Update development and test dependencies. (Tristan Dunn)
 
 ## 3.0.1 — September 10th, 2021

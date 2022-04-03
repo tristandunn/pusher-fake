@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require "bundler/setup"
-require "coveralls/rake/task"
 require "rspec/core/rake_task"
 require "yard"
 
@@ -16,10 +15,4 @@ YARD::Rake::YardocTask.new do |t|
   t.options = ["--no-private"]
 end
 
-Coveralls::RakeTask.new
-
 task default: [:spec]
-
-if ENV["CI"]
-  Rake::Task["default"].enhance(["coveralls:push"])
-end

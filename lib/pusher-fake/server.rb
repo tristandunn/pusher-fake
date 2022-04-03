@@ -54,15 +54,6 @@ module PusherFake
       def configuration
         PusherFake.configuration
       end
-
-      # Return a hash of options for the socket server based on
-      # the configuration.
-      #
-      # @return [Hash] The socket server configuration options.
-      def socket_server_options
-        { host: configuration.socket_host,
-          port: configuration.socket_port }
-      end
     end
   end
 end

@@ -5,5 +5,5 @@ source "https://rubygems.org"
 gemspec
 
 group :test do
-  gem "coveralls", "0.8.23"
+  gem "simplecov-console", "0.9.1", require: false
 end
