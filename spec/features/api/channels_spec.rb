@@ -48,13 +48,13 @@ feature "Requesting channel API endpoint" do
   end
 
   scenario "channel, with no occupants" do
-    expect(channel[:occupied]).to eq(false)
+    expect(channel[:occupied]).to be(false)
   end
 
   scenario "channel, with an occupant" do
     subscribe_to(channel_name)
 
-    expect(channel[:occupied]).to eq(true)
+    expect(channel[:occupied]).to be(true)
   end
 
   scenario "channel, with info attributes" do
@@ -62,7 +62,7 @@ feature "Requesting channel API endpoint" do
 
     result = Pusher.get("/channels/#{presence_name}", info: "user_count")
 
-    expect(result[:occupied]).to eq(true)
+    expect(result[:occupied]).to be(true)
     expect(result[:user_count]).to eq(1)
   end
 

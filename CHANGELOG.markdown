@@ -3,6 +3,7 @@
 ## Unreleased
 
 * Add support for Ruby 3.1. (Tristan Dunn)
+* Drop support for Ruby 2.6. (Tristan Dunn)
 * Require MFA for privileged operations on RubyGems. (Tristan Dunn)
 * Update development and test dependencies. (Tristan Dunn)
 
