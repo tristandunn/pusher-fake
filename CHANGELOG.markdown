@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 4.0.0 — April 5th, 2022
 
 * Add support for Ruby 3.1. (Tristan Dunn)
 * Drop support for Ruby 2.6. (Tristan Dunn)
