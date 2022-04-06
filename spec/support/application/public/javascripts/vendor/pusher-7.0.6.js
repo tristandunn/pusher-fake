@@ -1,5 +1,5 @@
 /*!
- * Pusher JavaScript Library v7.0.0
+ * Pusher JavaScript Library v7.0.6
  * https://pusher.com/
  *
  * Copyright 2020, Pusher
@@ -388,7 +388,7 @@ exports.maxDecodedLength = function (length) {
 exports.decodedLength = function (s) {
     return stdCoder.decodedLength(s);
 };
-//# sourceMappingURL=base64.js.map
+
 
 /***/ }),
 /* 1 */
@@ -543,7 +543,7 @@ function decode(arr) {
     return chars.join("");
 }
 exports.decode = decode;
-//# sourceMappingURL=utf8.js.map
+
 
 /***/ }),
 /* 2 */
@@ -558,6 +558,7 @@ module.exports = __webpack_require__(3).default;
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+// ESM COMPAT FLAG
 __webpack_require__.r(__webpack_exports__);
 
 // CONCATENATED MODULE: ./src/runtimes/web/dom/script_receiver_factory.ts
@@ -592,7 +593,7 @@ var ScriptReceivers = new ScriptReceiverFactory('_pusher_script_', 'Pusher.Scrip
 
 // CONCATENATED MODULE: ./src/core/defaults.ts
 var Defaults = {
-    VERSION: "7.0.0",
+    VERSION: "7.0.6",
     PROTOCOL: 7,
     wsPort: 80,
     wssPort: 443,
@@ -2332,6 +2333,7 @@ var channel_Channel = (function (_super) {
         this.subscriptionCancelled = false;
         this.authorize(this.pusher.connection.socket_id, function (error, data) {
             if (error) {
+                _this.subscriptionPending = false;
                 logger.error(error.toString());
                 _this.emit('pusher:subscription_error', Object.assign({}, {
                     type: 'AuthError',
@@ -4531,7 +4533,7 @@ var pusher_Pusher = (function () {
         }
         else {
             channel = this.channels.remove(channel_name);
-            if (channel && this.connection.state === 'connected') {
+            if (channel && channel.subscribed) {
                 channel.unsubscribe();
             }
         }
