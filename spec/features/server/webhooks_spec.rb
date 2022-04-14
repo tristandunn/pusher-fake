@@ -5,6 +5,7 @@ require "spec_helper"
 feature "Receiving event webhooks" do
   let(:channel)          { "room-1" }
   let(:other_user)       { "Bob" }
+  let(:cache_channel)    { "cache-last-command" }
   let(:presence_channel) { "presence-room-1" }
 
   before do
@@ -70,6 +71,24 @@ feature "Receiving event webhooks" do
     expect(events).to include_event("member_added",
                                     "channel" => presence_channel,
                                     "user_id" => user_id(other_user))
+  end
+
+  scenario "subscribing to a cache channel with no event" do
+    subscribe_to(cache_channel)
+
+    expect(events).to include_event("cache_miss",
+                                    "channel" => cache_channel)
+  end
+
+  scenario "subscribing to a cache channel with an event" do
+    subscribe_to(cache_channel)
+    events.clear
+    Pusher.trigger(cache_channel, "an event", {}, {})
+
+    subscribe_to_as(cache_channel, other_user)
+
+    expect(events).not_to include_event("cache_miss",
+                                        "channel" => cache_channel)
   end
 
   protected

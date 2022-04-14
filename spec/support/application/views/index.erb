@@ -65,6 +65,9 @@
 
           list.removeChild(item);
         })
+        .bind("pusher:cache_miss", function(client) {
+          Helpers.log("No cached event for " + name + ".");
+        })
         .bind_global(function(event, message) {
           Helpers.log("Channel " + name + " received " + event + " event.");
         });

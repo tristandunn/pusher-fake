@@ -53,6 +53,64 @@ describe PusherFake::Channel, "#add" do
     expect(PusherFake::Webhook).to have_received(:trigger)
       .with("channel_occupied", channel: name).once
   end
+
+  context "when a cached channel" do
+    let(:name) { "cache-name" }
+
+    before do
+      allow(subject).to receive(:connections).and_call_original
+    end
+
+    context "with a cached event" do
+      before do
+        subject.emit("example-cache-event", example: true)
+      end
+
+      it "triggers the cached event to the connection added" do
+        subject.add(connection)
+
+        expect(connection).to have_received(:emit)
+          .with("example-cache-event", { example: true }, name).once
+      end
+
+      it "does not trigger cache miss event" do
+        subject.add(connection)
+
+        expect(connection).not_to have_received(:emit)
+          .with("pusher:cache-miss", nil, name)
+      end
+
+      it "does not trigger cache miss webhook" do
+        subject.add(connection)
+
+        expect(PusherFake::Webhook).not_to have_received(:trigger)
+          .with("cache_miss", channel: name)
+      end
+    end
+
+    context "without a cached event" do
+      it "triggers cache miss event" do
+        subject.add(connection)
+
+        expect(connection).to have_received(:emit)
+          .with("pusher:cache_miss", nil, name).once
+      end
+
+      it "triggers cache miss webhook" do
+        subject.add(connection)
+
+        expect(PusherFake::Webhook).to have_received(:trigger)
+          .with("cache_miss", channel: name).once
+      end
+
+      it "does not trigger event" do
+        subject.add(connection)
+
+        expect(connection).not_to have_received(:emit)
+          .with("example-cache-event", { example: true }, name)
+      end
+    end
+  end
 end
 
 describe PusherFake::Channel, "#emit" do

@@ -4,6 +4,8 @@ module PusherFake
   module Channel
     # A public channel.
     class Public
+      CACHE_CHANNEL_PREFIX = /^(private-|presence-){0,1}cache-/.freeze
+
       # @return [Array] Connections in this channel.
       attr_reader :connections
 
@@ -15,6 +17,7 @@ module PusherFake
       # @param [String] name The channel name.
       def initialize(name)
         @name        = name
+        @last_event  = nil
         @connections = []
       end
 
@@ -24,6 +27,7 @@ module PusherFake
       # @param [Hash] options The options for the channel.
       def add(connection, options = {})
         subscription_succeeded(connection, options)
+        emit_last_event(connection)
       end
 
       # Emit an event to the channel.
@@ -31,6 +35,10 @@ module PusherFake
       # @param [String] event The event name.
       # @param [Hash] data The event data.
       def emit(event, data, options = {})
+        if cache_channel?
+          @last_event = [event, data]
+        end
+
         connections.each do |connection|
           unless connection.id == options[:socket_id]
             connection.emit(event, data, name)
@@ -70,6 +78,30 @@ module PusherFake
       end
 
       private
+
+      # @return [Array] Arguments for the last event emitted.
+      attr_reader :last_event
+
+      # Whether or not the channel is a cache channel.
+      #
+      # @return [Boolean]
+      def cache_channel?
+        @cache_channel ||= name.match?(CACHE_CHANNEL_PREFIX)
+      end
+
+      # Emit the last event if present and a cache channel.
+      #
+      # @param [Connection] connection The connection to emit to.
+      def emit_last_event(connection)
+        return unless cache_channel?
+
+        if last_event
+          connection.emit(*last_event, name)
+        else
+          connection.emit("pusher:cache_miss", nil, name)
+          trigger("cache_miss", channel: name)
+        end
+      end
 
       # Notify the +connection+ of the successful subscription and add the
       # connection to the channel.
