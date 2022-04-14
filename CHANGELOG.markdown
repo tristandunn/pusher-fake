@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+* Add support for cache channels. (Tristan Dunn)
+
 ## 4.0.0 — April 5th, 2022
 
 * Add support for Ruby 3.1. (Tristan Dunn)

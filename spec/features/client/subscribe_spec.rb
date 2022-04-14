@@ -3,6 +3,10 @@
 require "spec_helper"
 
 feature "Client subscribing to a channel" do
+  let(:cache_event)   { "command" }
+  let(:cache_channel) { "cache-last-command" }
+  let(:other_user)    { "Bob" }
+
   before do
     connect
   end
@@ -49,16 +53,27 @@ feature "Client subscribing to a channel" do
     expect(page).not_to have_content("Subscribed to presence-game-1.")
   end
 
+  scenario "successfully subscribes to a cache channel, with no cached event" do
+    subscribe_to(cache_channel)
+
+    expect(page).to have_content("No cached event for cache-last-command.")
+  end
+
+  scenario "successfully subscribes to a cache channel, with cached event" do
+    subscribe_to(cache_channel)
+    Pusher.trigger(cache_channel, cache_event, {}, {})
+
+    connect_as(other_user, channel: cache_channel)
+
+    using_session(other_user) do
+      expect(page).to have_content("Channel #{cache_channel} received #{cache_event} event.")
+    end
+  end
+
   protected
 
   def attempt_to_subscribe_to(channel)
     page.execute_script("Helpers.subscribe(#{MultiJson.dump(channel)})")
-  end
-
-  def connect
-    visit "/"
-
-    expect(page).to have_content("Client connected.")
   end
 
   def override_socket_id(value)
