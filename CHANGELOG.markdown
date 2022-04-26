@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 4.1.0 — April 26th, 2022
 
 * Add support for cache channels. (Tristan Dunn)
 

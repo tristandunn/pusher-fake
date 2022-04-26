@@ -9,7 +9,7 @@ require "thin"
 # A Pusher fake.
 module PusherFake
   # The current version string.
-  VERSION = "4.0.0"
+  VERSION = "4.1.0"
 
   autoload :Channel,       "pusher-fake/channel"
   autoload :Configuration, "pusher-fake/configuration"
