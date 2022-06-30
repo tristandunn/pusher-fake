@@ -153,11 +153,25 @@ PusherFake.configure do |configuration|
 end
 ```
 
-### SSL
+### SSL/TLS
 
 The WebSocket server is provided all `socket_options`, allowing you to set the `secure` and `tls_options` options to [create a secure server](https://github.com/igrigorik/em-websocket#secure-server).
 
 The web server passes all `web_options`, besides `host` and `port`, to the Thin backend via attribute writers, allowing you to set the `ssl` and `ssl_options` options.
+
+As this project is meant for local testing, SSL/TLS is not a first class citizen. and the extensive options won't be added to the `pusher-fake` binary options parser. If you just want to run the binary, the simplest solution is to make a custom copy of the `/bin/pusher-fake` file that includes the following:
+
+```
+    configuration.socket_options = {
+      :secure => true,
+      :tls_options => {
+        :cert_chain_file => "/.../cert.pem",
+        :private_key_file => "/.../key.pem",
+        ......,
+      },
+    }
+
+```
 
 If you would like to force TLS for the JavaScript client, you can provide a `forceTLS` option:
 
