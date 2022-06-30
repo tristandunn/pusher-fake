@@ -123,6 +123,8 @@ Usage: pusher-fake [options]
         --webhooks URLS              Use URLS for the webhooks
 ```
 
+Note that the binary does not support SSL options since they're forwarded to the server libraries. If you need SSL support in the binary, it's recommended you copy [the included binary](bin/pusher-fake) into your own project and set [the appropriate configuration](README.markdown#ssl) there instead.
+
 ## Configuration
 
 Note that the application ID, API key, and token are automatically set to the `Pusher` values when using an included support file.
