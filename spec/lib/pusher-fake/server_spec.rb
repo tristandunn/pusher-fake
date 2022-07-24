@@ -11,6 +11,23 @@ describe PusherFake::Server, ".start" do
     allow(EventMachine).to receive(:run).and_return(nil)
   end
 
+  it "prepends the chain trap handlers module to the WebSocket server" do
+    allow(EventMachine::WebSocket.singleton_class).to receive(:prepend)
+
+    subject.start
+
+    expect(EventMachine::WebSocket.singleton_class).to have_received(:prepend)
+      .with(PusherFake::Server::ChainTrapHandlers)
+  end
+
+  it "prepends the chain trap handlers module to the web server" do
+    allow(Thin::Server).to receive(:prepend)
+
+    subject.start
+
+    expect(Thin::Server).to have_received(:prepend).with(PusherFake::Server::ChainTrapHandlers)
+  end
+
   it "runs the event loop" do
     subject.start
 

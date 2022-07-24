@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+* Correctly handle signal trap chains. (Christian Prescott, Tristan Dunn)
 * Loosen the thin version restriction. (Tristan Dunn)
 * Update development dependencies. (Tristan Dunn)
 
