@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "extensions/parent_trap"
+
 module PusherFake
   # Socket and web server manager.
   module Server
