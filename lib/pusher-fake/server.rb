@@ -4,6 +4,7 @@ module PusherFake
   # Socket and web server manager.
   module Server
     autoload :Application, "pusher-fake/server/application"
+    autoload :ChainTrapHandlers, "pusher-fake/server/chain_trap_handlers"
 
     class << self
       # Start the servers.
@@ -11,6 +12,8 @@ module PusherFake
       # @see start_socket_server
       # @see start_web_server
       def start
+        chain_trap_handlers
+
         EventMachine.run do
           start_web_server
           start_socket_server
@@ -47,6 +50,13 @@ module PusherFake
       end
 
       private
+
+      # Force +Thin::Server+ and +EventMachine::WebSocket+ to call the chain of
+      # trap handlers to ensure other handles, such as +RSpec+, can interrupt.
+      def chain_trap_handlers
+        EventMachine::WebSocket.singleton_class.prepend(ChainTrapHandlers)
+        Thin::Server.prepend(ChainTrapHandlers)
+      end
 
       # Convenience method for access the configuration object.
       #

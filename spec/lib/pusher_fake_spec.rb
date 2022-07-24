@@ -78,6 +78,10 @@ describe PusherFake, ".log" do
     configuration.logger = logger
   end
 
+  after do
+    configuration.logger = StringIO.new("")
+  end
+
   it "forwards message to logger when verbose" do
     configuration.verbose = true
 
