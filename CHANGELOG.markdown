@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 4.2.0 — August 1st, 2022
 
 * Correctly handle signal trap chains. (Christian Prescott, Tristan Dunn)
 * Loosen the thin version restriction. (Tristan Dunn)
