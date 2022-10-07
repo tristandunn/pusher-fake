@@ -11,7 +11,7 @@ The project fully replaces the Pusher service with a local version for testing a
 1. Working offline is not possible.
 1. Using a remote API for testing is slow.
 1. Wasting connections and messages in development is unreasonable.
-1. Stubbing the JavaScript, such as with [pusher-test-stub](https://github.com/leggetter/pusher-test-stub), is suboptimal and tedious for integration tests.
+1. Stubbing the JavaScript, such as with [pusher-js-test-stub](https://github.com/pusher-community/pusher-js-test-stub), is suboptimal and tedious for integration tests.
 
 ## Usage
 
