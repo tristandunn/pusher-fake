@@ -47,6 +47,18 @@ PusherFake.configure do |configuration|
       configuration.webhooks = hooks
     end
   end.parse!
+
+  # Optionally enable TLS for the em-websocket server.
+  # configuration.socket_options = {
+  #   secure: true,
+  #   tls_options: { }
+  # }
+  #
+  # Optionally enable SSL for the Thin web server.
+  # configuration.web_options = {
+  #   ssl: true,
+  #   ssl_options: { }
+  # }
 end
 
 raise OptionParser::MissingArgument.new("--id")     if Pusher.app_id.nil?
