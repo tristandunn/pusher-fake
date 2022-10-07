@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+* Update development dependencies. (Tristan Dunn)
+
 ## 4.2.0 — August 1st, 2022
 
 * Correctly handle signal trap chains. (Christian Prescott, Tristan Dunn)
