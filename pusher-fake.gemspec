@@ -10,7 +10,11 @@ Gem::Specification.new do |s|
   s.summary     = "A fake Pusher server for development and testing."
   s.description = "A fake Pusher server for development and testing."
   s.license     = "MIT"
-  s.metadata    = { "rubygems_mfa_required" => "true" }
+  s.metadata    = {
+    "bug_tracker_uri"       => "https://github.com/tristandunn/pusher-fake/issues",
+    "changelog_uri"         => "https://github.com/tristandunn/pusher-fake/blob/main/CHANGELOG.markdown",
+    "rubygems_mfa_required" => "true"
+  }
 
   s.files        = Dir["lib/**/*"].to_a
   s.executables << "pusher-fake"
