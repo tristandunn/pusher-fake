@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+* Add support for Ruby 3.2. (Tristan Dunn)
 * Update development dependencies. (Tristan Dunn)
 
 ## 4.2.0 — August 1st, 2022
