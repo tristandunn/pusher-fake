@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
   s.executables << "pusher-fake"
   s.require_path = "lib"
 
-  s.required_ruby_version = ">= 2.7"
+  s.required_ruby_version = ">= 3.0"
 
   s.add_dependency "em-http-request", "~> 1.1"
   s.add_dependency "em-websocket",    "~> 0.5"

@@ -17,7 +17,7 @@ if ENV["CI"] || ENV["COVERAGE"]
   end
 end
 
-Dir[File.expand_path("support/**/*.rb", __dir__)].sort.each do |file|
+Dir[File.expand_path("support/**/*.rb", __dir__)].each do |file|
   require file
 end
 

@@ -4,7 +4,7 @@ module PusherFake
   module Channel
     # A public channel.
     class Public
-      CACHE_CHANNEL_PREFIX = /^(private-|presence-){0,1}cache-/.freeze
+      CACHE_CHANNEL_PREFIX = /^(private-|presence-){0,1}cache-/
 
       # @return [Array] Connections in this channel.
       attr_reader :connections
