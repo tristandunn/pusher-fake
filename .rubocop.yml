@@ -8,6 +8,9 @@ AllCops:
   NewCops: enable
   TargetRubyVersion: 3.0
 
+Gemspec/DevelopmentDependencies:
+  EnforcedStyle: gemspec
+
 Layout/HashAlignment:
   EnforcedColonStyle: table
   EnforcedHashRocketStyle: table
@@ -40,6 +43,9 @@ RSpec/ExampleLength:
 
 RSpec/FilePath:
   Enabled: false
+
+RSpec/IndexedLet:
+  Max: 2
 
 RSpec/MultipleDescribes:
   Enabled: false
