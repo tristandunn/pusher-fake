@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+* Update development dependencies. (Tristan Dunn)
+
 ## 5.0.0 — March 27th, 2023
 
 * Add support for Ruby 3.2. (Tristan Dunn)
