@@ -229,8 +229,7 @@ describe PusherFake::Connection, "#process, with a client event" do
     end
 
     it "does not emit the event when the channel is not private" do
-      allow(channel).to receive(:is_a?).and_return(false)
-      allow(channel).to receive(:includes?).and_return(true)
+      allow(channel).to receive_messages(is_a?: false, includes?: true)
 
       subject.process(json)
 
@@ -294,8 +293,7 @@ describe PusherFake::Connection,
     end
 
     it "includes user ID in event when on a presence channel" do
-      allow(channel).to receive(:is_a?).and_return(true)
-      allow(channel).to receive(:members).and_return(members)
+      allow(channel).to receive_messages(is_a?: true, members: members)
 
       subject.process(json)
 

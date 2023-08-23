@@ -6,8 +6,7 @@ describe PusherFake::Server, ".start" do
   subject { described_class }
 
   before do
-    allow(subject).to receive(:start_web_server).and_return(nil)
-    allow(subject).to receive(:start_socket_server).and_return(nil)
+    allow(subject).to receive_messages(start_web_server: nil, start_socket_server: nil)
     allow(EventMachine).to receive(:run).and_return(nil)
   end
 

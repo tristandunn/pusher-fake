@@ -37,9 +37,11 @@ describe PusherFake::Channel::Presence, "#add" do
   before do
     allow(PusherFake::Webhook).to receive(:trigger)
     allow(MultiJson).to receive(:load).and_return(channel_data)
-    allow(subject).to receive(:connections).and_return(connections)
-    allow(subject).to receive(:emit).and_return(nil)
-    allow(subject).to receive(:subscription_data).and_return(subscription_data)
+    allow(subject).to receive_messages(
+      connections:       connections,
+      emit:              nil,
+      subscription_data: subscription_data
+    )
   end
 
   it "authorizes the connection" do
@@ -150,8 +152,7 @@ describe PusherFake::Channel::Presence, "#remove" do
 
   before do
     allow(PusherFake::Webhook).to receive(:trigger)
-    allow(subject).to receive(:connections).and_return([connection])
-    allow(subject).to receive(:emit).and_return(nil)
+    allow(subject).to receive_messages(connections: [connection], emit: nil)
 
     subject.members[connection] = channel_data
   end
@@ -193,9 +194,7 @@ describe PusherFake::Channel::Presence,
   let(:channel_data) { { user_id: user_id } }
 
   before do
-    allow(subject).to receive(:connections).and_return([])
-    allow(subject).to receive(:emit).and_return(nil)
-    allow(subject).to receive(:trigger).and_return(nil)
+    allow(subject).to receive_messages(connections: [], emit: nil, trigger: nil)
   end
 
   it "does not raise an error" do
