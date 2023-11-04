@@ -59,6 +59,9 @@ RSpec/MultipleMemoizedHelpers:
 RSpec/NamedSubject:
   Enabled: false
 
+RSpec/SpecFilePathFormat:
+  Enabled: false
+
 RSpec/SubjectStub:
   Enabled: false
 
