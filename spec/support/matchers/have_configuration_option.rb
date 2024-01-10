@@ -3,7 +3,7 @@
 RSpec::Matchers.define :have_configuration_option do |option|
   match do |configuration|
     configuration.respond_to?(option) &&
-      configuration.respond_to?("#{option}=") &&
+      configuration.respond_to?(:"#{option}=") &&
       (@default.nil? || configuration.public_send(option) == @default)
   end
 

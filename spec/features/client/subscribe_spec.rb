@@ -42,7 +42,7 @@ feature "Client subscribing to a channel" do
 
     attempt_to_subscribe_to("private-message-bob")
 
-    expect(page).not_to have_content("Subscribed to private-message-bob.")
+    expect(page).to have_no_content("Subscribed to private-message-bob.")
   end
 
   scenario "unsuccessfully subscribes to a presence channel" do
@@ -50,7 +50,7 @@ feature "Client subscribing to a channel" do
 
     attempt_to_subscribe_to("presence-game-1")
 
-    expect(page).not_to have_content("Subscribed to presence-game-1.")
+    expect(page).to have_no_content("Subscribed to presence-game-1.")
   end
 
   scenario "successfully subscribes to a cache channel, with no cached event" do
