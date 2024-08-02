@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+* Update development dependencies. (Tristan Dunn)
+
 ## 6.0.0 — March 21st, 2024
 
 * Add support for Ruby 3.3. (Tristan Dunn)

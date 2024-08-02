@@ -8,9 +8,6 @@ AllCops:
   NewCops: enable
   TargetRubyVersion: 3.1
 
-Gemspec/DevelopmentDependencies:
-  EnforcedStyle: gemspec
-
 Layout/HashAlignment:
   EnforcedColonStyle: table
   EnforcedHashRocketStyle: table
@@ -35,14 +32,8 @@ Naming/RescuedExceptionsVariableName:
 Naming/VariableNumber:
   EnforcedStyle: snake_case
 
-RSpec/Capybara/FeatureMethods:
-  Enabled: false
-
 RSpec/ExampleLength:
   Max: 10
-
-RSpec/FilePath:
-  Enabled: false
 
 RSpec/IndexedLet:
   Max: 2
