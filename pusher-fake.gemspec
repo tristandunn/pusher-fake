@@ -25,5 +25,5 @@ Gem::Specification.new do |s|
   s.add_dependency "em-http-request", "~> 1.1"
   s.add_dependency "em-websocket",    "~> 0.5"
   s.add_dependency "multi_json",      "~> 1.6"
-  s.add_dependency "thin",            "~> 1"
+  s.add_dependency "thin",            "~> 1.8.2"
 end

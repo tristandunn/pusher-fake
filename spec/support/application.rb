@@ -1,35 +1,58 @@
 # frozen_string_literal: true
 
-require "sinatra"
-require "tilt/erb"
+require "rack"
 
-module Sinatra
-  class Application
-    set(:root,  proc { File.join(File.dirname(__FILE__), "application") })
-    set(:views, proc { File.join(root, "views") })
+module PusherFake
+  module Testing
+    class Application
+      def call(env)
+        request = Rack::Request.new(env)
 
-    disable :logging
+        case request.path
+        when "/"                then index
+        when "/pusher/auth"     then authenticate(request.params)
+        when %r{\A/javascripts} then asset(request.path)
+        else
+          [404, {}, []]
+        end
+      end
 
-    get "/" do
-      erb :index
-    end
+      private
 
-    post "/pusher/auth" do
-      channel  = Pusher[params[:channel_name]]
-      response = channel.authenticate(params[:socket_id], channel_data)
+      def asset(path)
+        headers = { "content-type" => "text/javascript" }
+        root    = File.join(File.dirname(__FILE__), "application")
+        body    = File.read(File.join(root, "public", path))
 
-      MultiJson.dump(response)
-    end
+        [200, headers, [body]]
+      end
 
-    protected
+      def authenticate(params)
+        channel  = Pusher[params["channel_name"]]
+        response = channel.authenticate(params["socket_id"], channel_data(params))
+        headers  = { "Content-Type" => "application/json" }
 
-    def channel_data
-      return unless /^presence-/.match?(params[:channel_name])
+        [200, headers, [MultiJson.dump(response)]]
+      end
 
-      {
-        user_id:   params[:socket_id],
-        user_info: { name: "Alan Turing" }
-      }
+      def channel_data(params)
+        return unless /^presence-/.match?(params["channel_name"])
+
+        {
+          user_id:   params["socket_id"],
+          user_info: { name: "Alan Turing" }
+        }
+      end
+
+      def index
+        headers  = { "content-type" => "text/html" }
+        root     = File.join(File.dirname(__FILE__), "application")
+        template = File.read(File.join(root, "views", "index.erb"))
+        erb      = ERB.new(template)
+        body     = erb.result(binding)
+
+        [200, headers, [body]]
+      end
     end
   end
 end
