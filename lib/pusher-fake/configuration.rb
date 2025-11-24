@@ -26,7 +26,7 @@ module PusherFake
     # @return [Boolean] Enable verbose logging.
     attr_accessor :verbose
 
-    # Options for the web server. See +Thin::Server+ for options.
+    # Options for the web server. See +Puma::Server+ for options.
     #
     # @return [Hash] Options for the web server.
     attr_accessor :web_options

@@ -19,14 +19,6 @@ describe PusherFake::Server, ".start" do
       .with(PusherFake::Server::ChainTrapHandlers)
   end
 
-  it "prepends the chain trap handlers module to the web server" do
-    allow(Thin::Server).to receive(:prepend)
-
-    subject.start
-
-    expect(Thin::Server).to have_received(:prepend).with(PusherFake::Server::ChainTrapHandlers)
-  end
-
   it "runs the event loop" do
     subject.start
 
@@ -153,41 +145,66 @@ describe PusherFake::Server, ".start_web_server" do
 
   let(:host)   { "192.168.0.1" }
   let(:port)   { 8081 }
-  let(:server) { instance_double(Thin::Server, :start! => true, :ssl= => true) }
+  let(:server) { instance_double(Puma::Server, add_tcp_listener: nil, run: nil) }
+  let(:thread) { instance_double(Thread) }
 
   let(:configuration) do
     instance_double(PusherFake::Configuration,
-                    web_options: { host: host, port: port, ssl: true })
+                    web_options: { host: host, port: port })
   end
 
   before do
-    allow(Thin::Server).to receive(:new).and_return(server)
-    allow(Thin::Logging).to receive(:silent=)
+    allow(Puma::Server).to receive(:new).and_return(server)
+    allow(Thread).to receive(:new).and_return(thread)
     allow(PusherFake).to receive(:configuration).and_return(configuration)
-  end
-
-  it "silences the logging" do
-    subject.start_web_server
-
-    expect(Thin::Logging).to have_received(:silent=).with(true)
   end
 
   it "creates the web server" do
     subject.start_web_server
 
-    expect(Thin::Server).to have_received(:new)
-      .with(host, port, PusherFake::Server::Application)
+    expect(Puma::Server).to have_received(:new)
+      .with(PusherFake::Server::Application)
   end
 
-  it "assigns custom options to the server" do
+  it "adds a TCP listener" do
     subject.start_web_server
 
-    expect(server).to have_received(:ssl=).with(true)
+    expect(server).to have_received(:add_tcp_listener).with(host, port)
   end
 
-  it "starts the web server" do
+  it "starts the web server in a thread" do
+    allow(Thread).to receive(:new).and_yield
+
     subject.start_web_server
 
-    expect(server).to have_received(:start!).with(no_args)
+    expect(server).to have_received(:run).with(no_args)
+  end
+
+  context "with SSL enabled" do
+    let(:ssl_context)  { instance_double(Puma::MiniSSL::Context, :key= => nil, :cert= => nil) }
+    let(:ssl_options)  { { private_key_file: "/path/to/key", cert_chain_file: "/path/to/cert" } }
+
+    let(:configuration) do
+      instance_double(PusherFake::Configuration,
+                      web_options: { host: host, port: port, ssl: true, ssl_options: ssl_options })
+    end
+
+    before do
+      allow(server).to receive(:add_ssl_listener)
+      allow(Puma::MiniSSL::Context).to receive(:new).and_return(ssl_context)
+    end
+
+    it "adds an SSL listener" do
+      subject.start_web_server
+
+      expect(server).to have_received(:add_ssl_listener).with(host, port, ssl_context)
+    end
+
+    it "creates an SSL context with the key and cert" do
+      subject.start_web_server
+
+      expect(ssl_context).to have_received(:key=).with("/path/to/key")
+      expect(ssl_context).to have_received(:cert=).with("/path/to/cert")
+    end
   end
 end

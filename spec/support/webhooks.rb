@@ -28,18 +28,11 @@ end
 RSpec.configure do |config|
   config.before(:suite) do
     EventMachine::WebSocket.singleton_class.prepend(PusherFake::Server::ChainTrapHandlers)
-    Thin::Server.prepend(PusherFake::Server::ChainTrapHandlers)
 
     thread = Thread.new do
-      # Not explicitly requiring Thin::Server occasionally results in
-      # Thin::Server.start not being defined.
-      require "thin"
-      require "thin/server"
-
-      EventMachine.run do
-        Thin::Logging.silent = true
-        Thin::Server.start("0.0.0.0", 8082, WebhookEndpoint)
-      end
+      server = Puma::Server.new(WebhookEndpoint)
+      server.add_tcp_listener("0.0.0.0", 8082)
+      server.run.join
     end
 
     at_exit { thread.exit }

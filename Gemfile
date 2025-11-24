@@ -7,7 +7,6 @@ gemspec
 gem "capybara",            "3.40.0"
 gem "mutex_m",             "0.3.0"
 gem "ostruct",             "0.6.3"
-gem "puma",                "7.1.0"
 gem "pusher",              "2.0.3"
 gem "rake",                "13.3.1"
 gem "rspec",               "3.13.2"

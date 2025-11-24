@@ -4,7 +4,7 @@ require "em-http-request"
 require "em-websocket"
 require "multi_json"
 require "openssl"
-require "thin"
+require "puma"
 
 # A Pusher fake.
 module PusherFake

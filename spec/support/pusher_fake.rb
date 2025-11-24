@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "thin/server"
-
 RSpec.configure do |config|
   config.before(:each, type: :feature) do
     PusherFake.configuration.reset!

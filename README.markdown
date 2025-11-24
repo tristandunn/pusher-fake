@@ -139,7 +139,7 @@ logger | An IO instance for verbose logging.
 secret | The Pusher API token.
 socket_options | Socket server options. See `EventMachine::WebSocket.start` for options.
 verbose | Enable verbose logging.
-web_options | Web server options. See `Thin::Server` for options.
+web_options | Web server options. See `Puma::Server` for options.
 webhooks | Array of webhook URLs.
 
 ### Usage
@@ -159,7 +159,7 @@ end
 
 The WebSocket server is provided all `socket_options`, allowing you to set the `secure` and `tls_options` options to [create a secure server](https://github.com/igrigorik/em-websocket#secure-server).
 
-The web server passes all `web_options`, besides `host` and `port`, to the Thin backend via attribute writers, allowing you to set the `ssl` and `ssl_options` options.
+The web server accepts `ssl` and `ssl_options` in `web_options`, using `Puma::MiniSSL::Context` for SSL configuration. The `ssl_options` hash should include `private_key_file` and `cert_chain_file` keys.
 
 If you would like to force TLS for the JavaScript client, you can provide a `forceTLS` option:
 
