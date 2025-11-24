@@ -17,7 +17,6 @@ gem "rubocop-performance", "1.24.0"
 gem "rubocop-rake",        "0.7.1"
 gem "rubocop-rspec",       "3.5.0"
 gem "selenium-webdriver",  "4.28.0"
-gem "sinatra",             "3.2.0"
 gem "yard",                "0.9.37"
 
 group :test do

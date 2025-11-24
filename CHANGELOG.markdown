@@ -5,6 +5,7 @@
 * Add support for Ruby 3.4. (Tristan Dunn)
 * Drop support for Ruby 3.1. (Tristan Dunn)
 * Update development dependencies. (Tristan Dunn)
+* Remove the sinatra dependency. (Tristan Dunn)
 
 ## 6.0.0 — March 21st, 2024
 
