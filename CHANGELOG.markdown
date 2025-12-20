@@ -4,6 +4,7 @@
 
 * Add support for Ruby 3.4. (Tristan Dunn)
 * Drop support for Ruby 3.1. (Tristan Dunn)
+* Enforce a more modern version of thin. (Tristan Dunn)
 * Update development dependencies. (Tristan Dunn)
 * Remove the sinatra dependency. (Tristan Dunn)
 
