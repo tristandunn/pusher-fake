@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 6.1.0 — December 19th, 2025
 
 * Add support for Ruby 3.4. (Tristan Dunn)
 * Drop support for Ruby 3.1. (Tristan Dunn)
