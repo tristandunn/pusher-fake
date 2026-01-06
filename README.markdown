@@ -1,4 +1,4 @@
-# pusher-fake [![Latest Version](https://img.shields.io/gem/v/pusher-fake.svg)](https://rubygems.org/gems/pusher-fake) [![Build Status](https://github.com/tristandunn/pusher-fake/workflows/CI/badge.svg)](https://github.com/tristandunn/pusher-fake/actions?query=workflow%3ACI) [![Maintainability](https://api.codeclimate.com/v1/badges/110c6ef7a313bf8baac3/maintainability)](https://codeclimate.com/github/tristandunn/pusher-fake/maintainability)
+# pusher-fake [![Latest Version](https://img.shields.io/gem/v/pusher-fake.svg)](https://rubygems.org/gems/pusher-fake) [![Build Status](https://github.com/tristandunn/pusher-fake/workflows/CI/badge.svg)](https://github.com/tristandunn/pusher-fake/actions?query=workflow%3ACI)
 
 A fake [Pusher](https://pusher.com) server for development and testing.
 
