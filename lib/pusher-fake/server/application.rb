@@ -6,7 +6,7 @@ module PusherFake
     class Application
       CHANNEL_FILTER_ERROR = "user_count may only be requested for presence " \
                              "channels - please supply filter_by_prefix " \
-                             "begining with presence-"
+                             "beginning with presence-"
 
       CHANNEL_USER_COUNT_ERROR = "Cannot retrieve the user count unless the " \
                                  "channel is a presence channel"
@@ -79,7 +79,7 @@ module PusherFake
       end
 
       # Returns a hash of occupied channels, optionally filtering with a
-      # prefix. When filtering to presence chanenls, the user count maybe also
+      # prefix. When filtering to presence channels, the user count may also
       # be requested.
       #
       # @param [Rack::Request] request The HTTP request.

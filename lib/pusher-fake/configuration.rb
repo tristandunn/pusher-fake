@@ -3,7 +3,7 @@
 module PusherFake
   # Configuration class.
   class Configuration
-    # @return [String] The Pusher Applicaiton ID. (Defaults to +PUSHER_APP_ID+.)
+    # @return [String] The Pusher Application ID. (Defaults to +PUSHER_APP_ID+.)
     attr_reader :app_id
 
     # @return [Boolean] Disable the client statistics. (Defaults to +true+.)
@@ -59,7 +59,7 @@ module PusherFake
       self.web_options    = { host: "127.0.0.1", port: available_port }
     end
 
-    # Convert the configuration to a hash sutiable for Pusher JS options.
+    # Convert the configuration to a hash suitable for Pusher JS options.
     #
     # @param [Hash] options Custom options for Pusher client.
     def to_options(options = {})
