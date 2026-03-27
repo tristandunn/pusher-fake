@@ -71,6 +71,10 @@ Style/HashTransformValues:
 Style/IfUnlessModifier:
   Enabled: false
 
+Style/OneClassPerFile:
+  Exclude:
+    - spec/support/webhooks.rb
+
 Style/PercentLiteralDelimiters:
   PreferredDelimiters:
     "%w": "()"
