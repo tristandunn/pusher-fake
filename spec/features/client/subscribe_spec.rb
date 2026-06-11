@@ -14,27 +14,27 @@ feature "Client subscribing to a channel" do
   scenario "successfully subscribes to a channel" do
     subscribe_to("chat-message")
 
-    expect(page).to have_content("Subscribed to chat-message.")
+    expect(page).to have_text("Subscribed to chat-message.")
   end
 
   scenario "successfully subscribes to multiple channel" do
     subscribe_to("chat-enter")
     subscribe_to("chat-exit")
 
-    expect(page).to have_content("Subscribed to chat-enter.")
-    expect(page).to have_content("Subscribed to chat-exit.")
+    expect(page).to have_text("Subscribed to chat-enter.")
+    expect(page).to have_text("Subscribed to chat-exit.")
   end
 
   scenario "successfully subscribes to a private channel" do
     subscribe_to("private-message-bob")
 
-    expect(page).to have_content("Subscribed to private-message-bob.")
+    expect(page).to have_text("Subscribed to private-message-bob.")
   end
 
   scenario "successfully subscribes to a presence channel" do
     subscribe_to("presence-game-1")
 
-    expect(page).to have_content("Subscribed to presence-game-1.")
+    expect(page).to have_text("Subscribed to presence-game-1.")
   end
 
   scenario "unsuccessfully subscribes to a private channel" do
@@ -42,7 +42,7 @@ feature "Client subscribing to a channel" do
 
     attempt_to_subscribe_to("private-message-bob")
 
-    expect(page).to have_no_content("Subscribed to private-message-bob.")
+    expect(page).to have_no_text("Subscribed to private-message-bob.")
   end
 
   scenario "unsuccessfully subscribes to a presence channel" do
@@ -50,13 +50,13 @@ feature "Client subscribing to a channel" do
 
     attempt_to_subscribe_to("presence-game-1")
 
-    expect(page).to have_no_content("Subscribed to presence-game-1.")
+    expect(page).to have_no_text("Subscribed to presence-game-1.")
   end
 
   scenario "successfully subscribes to a cache channel, with no cached event" do
     subscribe_to(cache_channel)
 
-    expect(page).to have_content("No cached event for cache-last-command.")
+    expect(page).to have_text("No cached event for cache-last-command.")
   end
 
   scenario "successfully subscribes to a cache channel, with cached event" do
@@ -66,7 +66,7 @@ feature "Client subscribing to a channel" do
     connect_as(other_user, channel: cache_channel)
 
     using_session(other_user) do
-      expect(page).to have_content("Channel #{cache_channel} received #{cache_event} event.")
+      expect(page).to have_text("Channel #{cache_channel} received #{cache_event} event.")
     end
   end
 

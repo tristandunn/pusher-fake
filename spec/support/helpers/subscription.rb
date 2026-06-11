@@ -4,7 +4,7 @@ module SubscriptionHelpers
   def subscribe_to(channel)
     page.execute_script("Helpers.subscribe(#{MultiJson.dump(channel)})")
 
-    expect(page).to have_content("Subscribed to #{channel}.")
+    expect(page).to have_text("Subscribed to #{channel}.")
   end
 
   def subscribe_to_as(channel, name)
@@ -16,7 +16,7 @@ module SubscriptionHelpers
   def unsubscribe_from(channel)
     page.execute_script("Helpers.unsubscribe(#{MultiJson.dump(channel)})")
 
-    expect(page).to have_content("Unsubscribed from #{channel}.")
+    expect(page).to have_text("Unsubscribed from #{channel}.")
   end
 
   def unsubscribe_from_as(channel, name)
