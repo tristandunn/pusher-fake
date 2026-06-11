@@ -6,6 +6,6 @@ feature "Client connecting to the server" do
   scenario "successfully connects" do
     visit "/"
 
-    expect(page).to have_content("Client connected.")
+    expect(page).to have_text("Client connected.")
   end
 end

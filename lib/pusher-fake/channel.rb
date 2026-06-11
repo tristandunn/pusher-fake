@@ -27,8 +27,8 @@ module PusherFake
       # @param [String] name The channel name.
       # @return [Public|Private] The channel object.
       def factory(name)
-        self.channels       ||= {}
-        self.channels[name] ||= class_for(name).new(name)
+        self.channels ||= {}
+        channels[name] ||= class_for(name).new(name)
       end
 
       # Remove a connection from all channels.
