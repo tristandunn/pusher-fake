@@ -85,7 +85,7 @@ module PusherFake
       # @param [Rack::Request] request The HTTP request.
       # @return [Hash] A hash of occupied channels.
       #
-      # rubocop:disable Metrics/AbcSize
+      # rubocop:disable-next Metrics/AbcSize
       def self.channels(request)
         count  = request.params["info"].to_s.split(",").include?("user_count")
         prefix = request.params["filter_by_prefix"].to_s
@@ -101,7 +101,6 @@ module PusherFake
             channels[name][:user_count] = channel.connections.size if count
           end
       end
-      # rubocop:enable Metrics/AbcSize
 
       # Attempt to provide a response for the provided request.
       #

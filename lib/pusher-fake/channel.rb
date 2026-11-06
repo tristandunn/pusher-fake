@@ -28,6 +28,7 @@ module PusherFake
       # @return [Public|Private] The channel object.
       def factory(name)
         self.channels ||= {}
+
         channels[name] ||= class_for(name).new(name)
       end
 
